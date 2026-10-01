@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export default function Demo() {
   if (process.env.ENABLE_DEMO_MODE !== "true") notFound();
   return (
-    <main className="narrow stack" style={{ maxWidth: 480, padding: "35px 24px 70px" }}>
+    <main className="narrow stack demo-page" style={{ maxWidth: 480, padding: "35px 24px 70px" }}>
       <Brand />
       <div className="title-block">
         <span className="eyebrow muted">Ambiente acadêmico</span>

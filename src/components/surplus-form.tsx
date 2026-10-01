@@ -109,7 +109,7 @@ export function SurplusForm() {
         </span>
         <span className="eyebrow muted">O primeiro passo está feito</span>
         <h1>Excedente publicado</h1>
-        <h1 style={{ color: "#15803d", fontSize: 44 }}>
+        <h1 style={{ color: "var(--primary)", fontSize: 44 }}>
           {number(analysis.estimated_weight_kg)} kg
         </h1>
         <p className="muted">≈ {number(analysis.estimated_weight_kg * 2)} refeições estimadas</p>
@@ -176,7 +176,7 @@ export function SurplusForm() {
       {stage === "photo" ? (
         <>
           <div className="camera-zone">
-            <Camera size={48} strokeWidth={1.3} color="#15803d" />
+            <Camera size={48} strokeWidth={1.3} color="var(--primary)" />
             <h3>Enquadre todos os alimentos</h3>
             <p className="small muted">Boa iluminação ajuda na análise visual.</p>
             <Button disabled={busy} onClick={() => camera.current?.click()}>
@@ -206,7 +206,7 @@ export function SurplusForm() {
         </>
       ) : stage === "analyzing" ? (
         <div className="panel stack" style={{ padding: 35 }}>
-          <LoaderCircle className="spin" color="#15803d" size={32} />
+          <LoaderCircle className="spin" color="var(--primary)" size={32} />
           {[
             "Identificando alimentos",
             "Classificando categoria",

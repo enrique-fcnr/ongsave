@@ -1,5 +1,11 @@
 # Verificação — 1 de outubro de 2026
 
+## Refinamento visual
+
+A identidade visual descrita em [DESIGN.md](DESIGN.md) passou por ESLint, build de produção e TypeScript. Os nove testes públicos/PWA/foto/origem passaram em Chrome em 11,3 segundos, cobrindo larguras de 375 a 1440 px.
+
+A revisão de 24 capturas em 390 e 1440 px incluiu landing, login, demo e nove telas autenticadas dos três papéis. Não houve erros JavaScript ou rolagem horizontal. Os dados atuais foram preservados: nesta revisão visual, o cenário remoto com publicações, entregas e reset não foi repetido. Os resultados de fluxo completo abaixo pertencem à homologação anterior.
+
 ## Deploy HTTPS na Vercel
 
 Produção publicada em https://ongsave.vercel.app, com domínio HTTPS, variáveis de ambiente e Supabase Auth configurados. O build da aplicação (`16e8a23`) ficou Ready em 1 minuto e 6 segundos. O repositório GitHub está conectado à branch `main` para os próximos deploys.

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Brand } from "@/components/shared";
 import { Button } from "@/components/ui/button";
+import { FoodOrbit } from "@/components/design/food-orbit";
 const steps = [
   {
     Icon: Camera,
@@ -38,7 +39,7 @@ export default function Landing() {
       </header>
       <main>
         <section className="hero">
-          <div>
+          <div className="hero-copy">
             <span className="pill">
               <Leaf size={13} /> Menos desperdício. Mais possibilidades.
             </span>
@@ -51,20 +52,17 @@ export default function Landing() {
               Uma fotografia conecta o excedente do seu mercado a quem precisa. Nós aproximamos as
               pessoas que tornam o resgate possível.
             </p>
-            <div className="row" style={{ marginTop: 30 }}>
+            <div className="row hero-actions">
               <Button render={<Link href="/login" />} nativeButton={false}>
                 Começar um resgate <MoveRight size={16} />
               </Button>
             </div>
-            <p className="small" style={{ marginTop: 24 }}>
-              Supermercados, instituições e motoristas. Juntos.
-            </p>
+            <p className="hero-community">Supermercados, instituições e motoristas. Juntos.</p>
           </div>
           <div className="hero-art">
-            <span className="eyebrow" style={{ color: "#527654" }}>
-              O próximo destino é a esperança
-            </span>
-            <div className="panel stack">
+            <FoodOrbit className="hero-orbit" />
+            <span className="eyebrow hero-caption">O próximo destino é a esperança</span>
+            <div className="panel stack hero-preview">
               <div className="between">
                 <span className="row">
                   <span className="avatar">
@@ -75,7 +73,9 @@ export default function Landing() {
                 <span className="pill">Disponível</span>
               </div>
               <div className="row">
-                <Leaf size={70} color="#399756" />
+                <span className="hero-food-icon">
+                  <Leaf size={48} />
+                </span>
                 <div>
                   <h2>Hortifrúti misto</h2>
                   <p className="small" style={{ marginTop: 6 }}>
@@ -84,17 +84,16 @@ export default function Landing() {
                 </div>
               </div>
               <div className="between">
-                <h1>
-                  38{" "}
-                  <span className="muted" style={{ fontSize: 18 }}>
-                    kg
-                  </span>
-                </h1>
+                <p className="hero-weight">
+                  38 <span className="muted">kg</span>
+                </p>
                 <span className="small muted">≈ 76 refeições estimadas</span>
               </div>
             </div>
-            <div className="panel row" style={{ marginLeft: 35 }}>
-              <HeartHandshake color="#15803d" />
+            <div className="panel row hero-network">
+              <span className="network-icon">
+                <HeartHandshake />
+              </span>
               <div>
                 <h3>Uma rede que faz acontecer</h3>
                 <p className="small muted" style={{ marginTop: 5 }}>
@@ -107,8 +106,10 @@ export default function Landing() {
         <section className="landing-flow">
           {steps.map(({ Icon, title, text }) => (
             <div key={title}>
-              <Icon size={25} color="#15803d" />
-              <h2 style={{ marginTop: 18 }}>{title}</h2>
+              <span className="flow-icon">
+                <Icon size={25} />
+              </span>
+              <h2>{title}</h2>
               <p>{text}</p>
             </div>
           ))}

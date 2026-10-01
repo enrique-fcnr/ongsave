@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Brand } from "@/components/shared";
 import { LoginForm } from "@/components/login-form";
 import { isConfigured } from "@/lib/supabase/config";
+import { FoodOrbit } from "@/components/design/food-orbit";
 export default async function Login({
   searchParams,
 }: {
@@ -11,11 +12,10 @@ export default async function Login({
   return (
     <main className="auth-page">
       <section className="auth-story">
+        <FoodOrbit className="story-orbit" />
         <Brand />
         <div>
-          <span className="eyebrow" style={{ color: "#8fcba1" }}>
-            Cada alimento importa
-          </span>
+          <span className="eyebrow auth-eyebrow">Cada alimento importa</span>
           <h1 style={{ marginTop: 24 }}>
             O excedente de hoje.
             <br />A esperança de amanhã.
@@ -25,9 +25,7 @@ export default async function Login({
             desperdício a zero.
           </p>
         </div>
-        <span className="small" style={{ color: "#b8cbbf" }}>
-          São Paulo · Conexões que alimentam
-        </span>
+        <span className="small auth-location">São Paulo · Conexões que alimentam</span>
       </section>
       <section className="auth-form">
         <div className="stack">

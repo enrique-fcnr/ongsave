@@ -84,30 +84,30 @@ export function Charts({ rescues, asOf }: { rescues: Rescue[]; asOf: number }) {
         >
           <defs>
             <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#22c55e" stopOpacity=".18" />
-              <stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
+              <stop offset="0%" stopColor="#86a64b" stopOpacity=".18" />
+              <stop offset="100%" stopColor="#86a64b" stopOpacity="0" />
             </linearGradient>
           </defs>
           {[30, 75, 120, 165].map((y) => (
-            <line key={y} x1="10" x2="365" y1={y} y2={y} stroke="#eef0f2" />
+            <line key={y} x1="10" x2="365" y1={y} y2={y} stroke="#e8e9e1" />
           ))}
           <polygon points={`30,165 ${points} 345,165`} fill="url(#area)" />
           <polyline
             points={points}
             fill="none"
-            stroke="#22a35a"
+            stroke="#718f43"
             strokeWidth="3"
             strokeLinejoin="round"
           />
           {weeks.map((v, i) => (
             <g key={i}>
-              <circle cx={30 + i * 105} cy={160 - (v / max) * 130} r="4" fill="#22a35a" />
+              <circle cx={30 + i * 105} cy={160 - (v / max) * 130} r="4" fill="#718f43" />
               <text
                 x={30 + i * 105}
                 y={149 - (v / max) * 130}
                 textAnchor="middle"
                 fontSize="10"
-                fill="#667085"
+                fill="#666960"
               >
                 {number(v)} kg
               </text>

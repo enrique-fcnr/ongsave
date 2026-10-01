@@ -92,16 +92,14 @@ export default async function Home() {
         <>
           <div className="impact-banner">
             <div>
-              <span className="eyebrow" style={{ color: "#9bcbab" }}>
-                Uma foto. Muitas possibilidades.
-              </span>
+              <span className="eyebrow impact-eyebrow">Uma foto. Muitas possibilidades.</span>
               <h2 style={{ marginTop: 12 }}>O próximo resgate começa com você.</h2>
               <p>
                 Registre os alimentos disponíveis. Sua equipe revisa, e a rede encontra um novo
                 destino.
               </p>
               <Button
-                style={{ marginTop: 22, background: "#22c55e", color: "#10271b" }}
+                className="impact-cta"
                 render={<Link href="/supermarket/surplus/new" />}
                 nativeButton={false}
               >

@@ -67,7 +67,7 @@ export async function BatchDetail({ id }: { id: string }) {
             <StatusPill status={batch.status} />
           </div>
           <h1>{batch.title}</h1>
-          <h1 style={{ fontSize: 44, color: "#15803d" }}>
+          <h1 style={{ fontSize: 44, color: "var(--primary)" }}>
             {number(Number(batch.estimated_weight_kg))} <span style={{ fontSize: 22 }}>kg</span>
           </h1>
           <div className="row small muted">

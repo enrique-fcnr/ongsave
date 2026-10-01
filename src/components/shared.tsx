@@ -79,14 +79,14 @@ export function DonationCard({
         <h2>{batch.title}</h2>
         <div className="between">
           <h3>{number(Number(batch.estimated_weight_kg))} kg disponíveis</h3>
-          <ArrowUpRight size={18} color="#15803d" />
+          <ArrowUpRight size={18} color="var(--primary)" />
         </div>
         <p className="small muted">
           {market?.name} · {market?.neighborhood}
         </p>
         <div className="between small">
           <span className="muted">≈ {number(Number(batch.estimated_weight_kg) * 2)} refeições</span>
-          <span style={{ color: "#15803d" }}>Ver doação</span>
+          <span style={{ color: "var(--primary)" }}>Ver doação</span>
         </div>
       </div>
     </Link>

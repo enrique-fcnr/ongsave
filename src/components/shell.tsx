@@ -81,8 +81,8 @@ export function Shell({
           )}
         </nav>
         <div className="sidebar-footer">
-          <div className="panel" style={{ padding: 15, background: "#f7faf7" }}>
-            <Leaf size={20} color="#15803d" />
+          <div className="panel sidebar-note">
+            <Leaf size={20} />
             <p className="small muted" style={{ marginTop: 9, lineHeight: 1.6 }}>
               Pequenas ações.
               <br />
@@ -113,7 +113,7 @@ export function Shell({
                 <Bell size={19} />
                 {notifications.some((n) => !n.read_at) && (
                   <span
-                    style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e" }}
+                    style={{ width: 6, height: 6, borderRadius: "50%", background: "#86a64b" }}
                   />
                 )}
               </DialogTrigger>

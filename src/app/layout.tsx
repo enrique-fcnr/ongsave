@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import "@fontsource/geist/latin-400.css";
-import "@fontsource/geist/latin-500.css";
-import "@fontsource/geist/latin-600.css";
+import "@fontsource-variable/dm-sans";
 import "./globals.css";
 import { PWA } from "@/components/pwa";
 export const metadata: Metadata = {
@@ -16,7 +14,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#15803D",
+  themeColor: "#fafaf7",
 };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

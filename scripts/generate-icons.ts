@@ -7,7 +7,7 @@ async function main() {
     await sharp(svg).resize(size, size).png().toFile(`public/icons/icon-${size}.png`);
   await sharp(svg)
     .resize(320, 320)
-    .extend({ top: 96, bottom: 96, left: 96, right: 96, background: "#15803d" })
+    .extend({ top: 96, bottom: 96, left: 96, right: 96, background: "#d6ef93" })
     .png()
     .toFile("public/icons/icon-maskable.png");
   console.log("Ícones PWA gerados.");
