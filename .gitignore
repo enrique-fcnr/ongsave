@@ -19,6 +19,7 @@
 
 # production
 /build
+/public/maplibre/
 
 # misc
 .DS_Store
@@ -32,6 +33,13 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# QA artifacts and local browser state
+test-results/
+playwright-report/
+artifacts/
+*.tsbuildinfo
 
 # vercel
 .vercel

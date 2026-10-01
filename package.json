@@ -3,24 +3,64 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "predev": "node scripts/prepare-maplibre.mjs",
+    "dev": "next dev --hostname 0.0.0.0",
+    "prebuild": "node scripts/prepare-maplibre.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "seed": "tsx scripts/seed.ts",
+    "seed:sql": "tsx scripts/generate-seed-sql.ts",
+    "demo:users": "tsx scripts/create-demo-users.ts",
+    "demo:reset": "tsx scripts/reset-demo.ts",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "pwa:icons": "tsx scripts/generate-icons.ts"
   },
   "dependencies": {
+    "@base-ui/react": "^1.8.0",
+    "@fontsource/geist": "5.3.0",
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.117.2",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "cn": "^0.4.0",
+    "lucide-react": "1.49.0",
+    "maplibre-gl": "6.11.2",
     "next": "16.3.8",
+    "radix-ui": "1.6.7",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "shadcn": "^4.21.0",
+    "tailwind-merge": "3.7.0",
+    "tw-animate-css": "^1.4.0",
+    "zod": "4.6.5"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "22.20.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
+    "postgres": "3.4.9",
+    "prettier": "3.9.9",
+    "sharp": "0.35.5",
+    "supabase": "2.119.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "4.23.15",
+    "typescript": "^5",
+    "vite": "7.3.6",
+    "vitest": "4.1.11"
+  },
+  "overrides": {
+    "esbuild": "0.28.1",
+    "vitest": "4.1.11",
+    "vite": "7.3.6"
   }
 }

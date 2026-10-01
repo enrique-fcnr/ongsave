@@ -1,0 +1,10 @@
+node_modules
+.next
+package-lock.json
+supabase/seed.sql
+artifacts
+test-results
+playwright-report
+docs/SPECIFICATION.md
+.env.local
+public/maplibre
