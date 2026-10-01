@@ -149,6 +149,10 @@ Os scripts `predev` e `prebuild` copiam o worker MapLibre e seu módulo comparti
 
 ## Deploy Vercel
 
+Publicado em **https://ongsave.vercel.app**, na conta `enrique-fcnrs-projects`, conectado ao repositório `enrique-fcnr/ongsave` e à branch de produção `main`. Login: https://ongsave.vercel.app/login. Demonstração: https://ongsave.vercel.app/demo. As três contas oficiais acima usam a senha `demo123`.
+
+As variáveis de produção e preview foram configuradas na Vercel, com a chave administrativa Supabase restrita ao servidor. O Site URL do Supabase Auth aponta para o domínio publicado; redirecionamentos de desenvolvimento também foram preservados. O deploy mantém `AI_MODE=demo` e `ENABLE_DEMO_MODE=true`. Dez testes de navegador foram aprovados no endereço HTTPS, incluindo duas entregas completas com as três contas e reset entre elas.
+
 Conecte este projeto, configure as mesmas variáveis e execute build padrão Next.js. Adicione a URL HTTPS no Supabase Auth. Chaves `NEXT_PUBLIC_*` exigem um novo build quando alteradas. `/api/analyze` tem timeout do provider de 45 segundos e duração máxima configurada de 60 segundos, sujeita aos limites do plano de hospedagem.
 
 Para demonstração: `ENABLE_DEMO_MODE=true`, `AI_MODE=demo`. Fora da apresentação: desative demo, remova/controle as contas acadêmicas e use contas reais provisionadas pelo administrador.

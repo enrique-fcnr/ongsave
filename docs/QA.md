@@ -1,5 +1,13 @@
 # Verificação — 1 de outubro de 2026
 
+## Deploy HTTPS na Vercel
+
+Produção publicada em https://ongsave.vercel.app, com domínio HTTPS, variáveis de ambiente e Supabase Auth configurados. O build da aplicação (`16e8a23`) ficou Ready em 1 minuto e 6 segundos. O repositório GitHub está conectado à branch `main` para os próximos deploys.
+
+A suíte completa foi executada com `E2E_BASE_URL=https://ongsave.vercel.app`, `RUN_LIVE_E2E=true` e `PLAYWRIGHT_CHANNEL=chrome`: **10 testes aprovados em 1,7 minuto**. Confirmou os três logins, upload privado, IA demo e fallback manual, reservas, missões, tiles/mapa/rota, frames Realtime, código de entrega, impacto e reset. A demo foi restaurada após a execução. A chamada OpenAI real e a homologação em aparelhos físicos continuam pendentes.
+
+## Verificação local anterior
+
 | Verificação                      | Resultado                                                          |
 | -------------------------------- | ------------------------------------------------------------------ |
 | ESLint                           | Aprovado, sem erros ou avisos                                      |
@@ -41,7 +49,7 @@ Os testes públicos cobriram 375, 390, 430, 768, 1280 e 1440 px, proteção de r
 
 Os dez testes do provider verificam o contrato HTTP multimodal e Zod com respostas controladas: sucesso, demo sem rede, HTTP 429/500, JSON inválido/incompleto, confiança/peso inválidos, timeout e configuração ausente. Não substituem uma chamada OpenAI real. Apenas `OPENAI_API_KEY` falta para ativar `AI_MODE=live`.
 
-Capturas mobile, mapa, telas desktop e relatório ESG ficam em `artifacts/`, `test-results/` e `playwright-report/`, ignorados pelo Git. Traces podem conter sessões e URLs assinadas; mantenha-os locais. Nenhum deploy HTTPS ou teste físico em três celulares foi realizado.
+Capturas mobile, mapa, telas desktop e relatório ESG ficam em `artifacts/`, `test-results/` e `playwright-report/`, ignorados pelo Git. Traces podem conter sessões e URLs assinadas; mantenha-os locais. O deploy HTTPS foi realizado e homologado no navegador; o teste físico em três celulares ainda não foi realizado.
 
 Nove telas autenticadas desktop foram verificadas em 1440 px, sem overflow ou erros JavaScript. As capturas finais do mapa com ruas e rota e do gráfico semanal com 17 kg foram inspecionadas. O PDF ESG foi exportado para `artifacts/visual/ongsave-esg.pdf`.
 
