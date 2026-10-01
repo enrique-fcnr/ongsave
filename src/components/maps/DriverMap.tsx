@@ -38,24 +38,28 @@ export default function DriverMap({
         container: container.current,
         center: [-46.638, -23.588],
         zoom: 13,
-        style: {
-          version: 8,
-          sources: {
-            osm: {
-              type: "raster",
-              tiles: [
-                process.env.NEXT_PUBLIC_MAP_TILE_URL ||
-                  "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-              ],
-              tileSize: 256,
-              attribution:
-                '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
-            },
-          },
-          layers: [
-            { id: "osm", type: "raster", source: "osm", paint: { "raster-saturation": -0.5 } },
-          ],
+        attributionControl: {
+          compact: true,
+          customAttribution:
+            '<a href="https://github.com/openmaptiles/positron-gl-style">Positron</a> · ONGSave',
         },
+        style: process.env.NEXT_PUBLIC_MAP_TILE_URL
+          ? {
+              version: 8,
+              sources: {
+                osm: {
+                  type: "raster",
+                  tiles: [process.env.NEXT_PUBLIC_MAP_TILE_URL],
+                  tileSize: 256,
+                  attribution:
+                    '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+                },
+              },
+              layers: [
+                { id: "osm", type: "raster", source: "osm", paint: { "raster-saturation": -0.5 } },
+              ],
+            }
+          : "/maps/ongsave-soft.json",
       });
       map.current = instance;
       instance.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
@@ -129,7 +133,11 @@ export default function DriverMap({
     instance.once("idle", onIdle);
     const nextViewportKey = `${selected?.id}:${phase}:${rescues.map((r) => r.id).join(",")}`;
     if (rescues.length && viewportKey.current !== nextViewportKey) {
-      instance.fitBounds(bounds, { padding: 75, maxZoom: 14, duration: 500 });
+      instance.fitBounds(bounds, {
+        padding: { top: 150, bottom: 100, left: 60, right: 60 },
+        maxZoom: 14,
+        duration: 500,
+      });
       viewportKey.current = nextViewportKey;
     }
     return () => {
@@ -152,10 +160,25 @@ export default function DriverMap({
         aria-label="Mapa interativo dos resgates em São Paulo"
       />
       <div className="map-badge">
-        {rescues.length} {rescues.length === 1 ? "resgate próximo" : "resgates próximos"}
+        <div className="map-badge-title">
+          <span className="map-count">{rescues.length}</span>
+          {rescues.length === 1 ? "resgate próximo" : "resgates próximos"}
+        </div>
         <p className="small muted" style={{ marginTop: 5 }}>
-          Posição e rota simuladas · C coleta / D destino
+          Posição e rota simuladas
         </p>
+        <div className="map-legend" aria-label="Legenda do mapa">
+          <span>
+            <i className="legend-driver" />
+            Motorista
+          </span>
+          <span>
+            <i className="legend-pickup">C</i>Coleta
+          </span>
+          <span>
+            <i className="legend-ngo">D</i>Entrega
+          </span>
+        </div>
       </div>
       <span className="sr-only" role="status">
         {failed

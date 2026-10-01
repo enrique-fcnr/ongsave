@@ -29,7 +29,7 @@ Neste computador o projeto Ongsave `xhsbrwksbmxdzhujpyeb` já foi conectado via 
 | `OPENAI_API_KEY`                       | Necessária somente em live                                                         |
 | `AI_MODEL`                             | Modelo multimodal; exemplo `gpt-4.1-mini`                                          |
 | `NEXT_PUBLIC_MAP_PROVIDER`             | `maplibre`; é o provider implementado                                              |
-| `NEXT_PUBLIC_MAP_TILE_URL`             | Tiles raster; padrão OpenStreetMap sem chave                                       |
+| `NEXT_PUBLIC_MAP_TILE_URL`             | Override raster opcional; padrão vetorial OpenFreeMap com estilo ONGSave sem chave |
 | `NEXT_PUBLIC_MAPBOX_TOKEN`             | Reservado, não utilizado pelo MVP                                                  |
 | `ENABLE_DEMO_MODE`                     | `true` habilita `/demo` e reset; `false` fora da apresentação                      |
 | `DATABASE_URL`                         | Opcional: conexão PostgreSQL para `npm run db:migrate`; dispensável com SQL Editor |
@@ -160,7 +160,7 @@ Para demonstração: `ENABLE_DEMO_MODE=true`, `AI_MODE=demo`. Fora da apresenta�
 ## Limites conhecidos
 
 - Auth, upload, RLS, Realtime e entregas foram homologados no Supabase remoto pelo Chrome. A chamada OpenAI live depende de `OPENAI_API_KEY`; câmera e instalação PWA ainda precisam de homologação nos aparelhos físicos.
-- GPS, roteamento, distância, ETA, matching avançado e histórico são simulados e identificados. O mapa é interativo e depende de Internet/WebGL. Os tiles padrão OpenStreetMap seguem cache e atribuição do provider; para uso em escala, configure um serviço adequado em `NEXT_PUBLIC_MAP_TILE_URL`.
+- GPS, roteamento, distância, ETA, matching avançado e histórico são simulados e identificados. O mapa é interativo e depende de Internet/WebGL. A base vetorial OpenFreeMap usa dados OpenStreetMap e estilo Positron adaptado à paleta ONGSave, hospedado em `public/maps/`, com licenças e atribuição preservadas. O override raster opcional permanece disponível em `NEXT_PUBLIC_MAP_TILE_URL`.
 - Não há push, tracking GPS real, autoinscrição, painel administrativo completo ou motor de previsão.
 - Impacto ambiental/economia são projeções ilustrativas. O histórico demo participa dos indicadores e é informado na tela.
 - Relatório PDF utiliza impressão do navegador. Não há geração certificada de relatório ESG.

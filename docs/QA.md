@@ -2,6 +2,8 @@
 
 ## Refinamento visual
 
+O refinamento do mapa passou por lint, TypeScript e build de produção. Dois testes específicos em Chrome (390 e 996 px) confirmaram tiles vetoriais reais, desenho da rota, troca de coleta, marcadores e legenda visíveis, ausência de overflow e erros JavaScript, e destino livre do cartão superior. Esses testes são de leitura: nenhuma missão foi aceita, alterada ou resetada. A base utiliza OpenFreeMap e o estilo Positron adaptado, com créditos e licenças preservados.
+
 A identidade visual descrita em [DESIGN.md](DESIGN.md) passou por ESLint, build de produção e TypeScript. Os nove testes públicos/PWA/foto/origem passaram em Chrome em 11,3 segundos, cobrindo larguras de 375 a 1440 px.
 
 A revisão de 24 capturas em 390 e 1440 px incluiu landing, login, demo e nove telas autenticadas dos três papéis. Não houve erros JavaScript ou rolagem horizontal. Os dados atuais foram preservados: nesta revisão visual, o cenário remoto com publicações, entregas e reset não foi repetido. Os resultados de fluxo completo abaixo pertencem à homologação anterior.

@@ -14,14 +14,14 @@ export function updateRoute(map: Map, coordinates: [number, number][]) {
       type: "line",
       source: "rescue-route",
       layout: { "line-cap": "round", "line-join": "round" },
-      paint: { "line-color": "#ffffff", "line-width": 9 },
+      paint: { "line-color": "#ffffff", "line-width": 10, "line-opacity": 0.95 },
     });
     map.addLayer({
       id: "rescue-route",
       type: "line",
       source: "rescue-route",
       layout: { "line-cap": "round", "line-join": "round" },
-      paint: { "line-color": "#22a35a", "line-width": 5 },
+      paint: { "line-color": "#6b873f", "line-width": 5 },
     });
   }
 }

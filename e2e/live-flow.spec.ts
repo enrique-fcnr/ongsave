@@ -101,9 +101,10 @@ test("foto real, três contas, impacto e repetição após reset com fallback ma
   let mapTiles = 0;
   driver.on("response", (response) => {
     if (
-      response.url().startsWith("https://tile.openstreetmap.org/") &&
+      (response.url().startsWith("https://tile.openstreetmap.org/") ||
+        /tiles\.openfreemap\.org\/planet\/.*\.pbf/.test(response.url())) &&
       response.ok() &&
-      response.headers()["content-type"]?.startsWith("image/")
+      /image\/|protobuf|octet-stream/.test(response.headers()["content-type"] || "")
     )
       mapTiles++;
   });
