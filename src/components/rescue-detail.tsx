@@ -34,7 +34,7 @@ export async function RescueDetail({ id }: { id: string }) {
         <ArrowLeft size={16} />
         Voltar aos resgates
       </Link>
-      <div className="between">
+      <div className="between page-heading">
         <div className="title-block">
           <span className="eyebrow muted">Resgate #{r.id.slice(0, 8)}</span>
           <h1>{r.status === "DELIVERED" ? "Missão concluída" : r.surplus_batches?.title}</h1>
@@ -51,11 +51,11 @@ export async function RescueDetail({ id }: { id: string }) {
       {r.status === "DELIVERED" && (
         <div className="impact-banner">
           <div>
-            <PackageCheck size={30} color="#8fce9f" />
-            <h1 style={{ marginTop: 15 }}>{number(weight)} kg resgatados</h1>
+            <PackageCheck size={30} color="var(--primary)" />
+            <div className="impact-total">{number(weight)} kg resgatados</div>
             <p>
-              ≈ {number(weight * 2)} refeições viabilizadas · {number(Number(r.mock_distance_km))}{" "}
-              km solidários simulados
+              ≈ {number(weight * 2)} refeições estimadas · {number(Number(r.mock_distance_km))} km
+              solidários simulados
             </p>
           </div>
           <HeartHandshake className="art" />
@@ -70,6 +70,7 @@ export async function RescueDetail({ id }: { id: string }) {
                 <Store size={18} />
               </span>
               <div>
+                <span className="stop-label">Coleta · Supermercado</span>
                 <h3>{o.data?.find((org) => org.id === r.supermarket_id)?.name}</h3>
                 <p className="small muted" style={{ marginTop: 5 }}>
                   {r.pickup_address}
@@ -81,6 +82,7 @@ export async function RescueDetail({ id }: { id: string }) {
                 <MapPin size={18} />
               </span>
               <div>
+                <span className="stop-label">Entrega · Instituição</span>
                 <h3>{o.data?.find((org) => org.id === r.ngo_id)?.name}</h3>
                 <p className="small muted" style={{ marginTop: 5 }}>
                   {r.delivery_address}
@@ -120,9 +122,7 @@ export async function RescueDetail({ id }: { id: string }) {
             ))}
             {r.status !== "DELIVERED" && r.status !== "CANCELLED" && (
               <div className="timeline-item">
-                <span className="timeline-dot" style={{ background: "#f3f4f6", color: "#9ca3af" }}>
-                  •
-                </span>
+                <span className="timeline-dot next">•</span>
                 <p className="muted">
                   {r.status === "WAITING_DRIVER"
                     ? "Aguardando motorista"

@@ -1,5 +1,15 @@
 # Verificação — 3 de outubro de 2026
 
+## Design da landing aplicado ao produto — 3 de outubro de 2026
+
+Login, demonstração e as áreas dos três papéis passaram a compartilhar cores, tipografia, superfícies, botões, navegação e estados da landing. A revisão inclui dashboards, doações, lotes, missões, resgates, impacto, perfil, relatórios, notificações, formulários, carregamento, erros e página offline.
+
+Build de produção, ESLint e TypeScript aprovados. Os 25 testes unitários passaram. O teste SQL local de instituição pausada teve seu prazo de fixture ajustado em PGlite para continuar verificando a regra de recebimento após a data histórica do seed; nenhuma alteração foi feita no banco hospedado.
+
+Os 27 cenários do navegador passaram em Chrome em 3,2 minutos. A verificação cobre os três papéis em 390, 768 e 1440 px, navegação ativa, notificações, preferências agrupadas, lotes e detalhes dos resgates. Os cenários de fotografia, análise, revisão e confirmação interceptam todas as APIs de escrita: validam a confirmação humana e o payload revisado sem publicar lotes ou fotos no Supabase. Os testes públicos incluem acessibilidade por teclado, movimento reduzido, navegação sem JavaScript, PWA, origem das APIs e preparação de foto. O mapa é conferido em 390 e 996 px com tiles reais, rota, seleção e legenda.
+
+Capturas revisadas ficam em `artifacts/product-design/`. Esta rodada preserva os dados existentes e não repete o cenário remoto que reserva, entrega e reseta doações. Os resultados da homologação anterior abaixo continuam identificados separadamente.
+
 ## Landing page ampliada
 
 Após o ajuste do aparelho para um iPhone 16, os dois previews compartilhados também passaram a apresentar “Alimento em boas condições” no cartão de revisão, e fotografias de hortifrúti e pães no feed de doações. Lint, TypeScript e build passaram. Capturas em 390, 1058 e 1440 px confirmaram carregamento das três novas imagens, qualidade legível, troca entre as etapas e abas, sem overflow ou erros JavaScript. As imagens e seus prompts estão documentados em [LANDING-ASSETS.md](LANDING-ASSETS.md).

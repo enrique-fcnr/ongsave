@@ -15,8 +15,12 @@ export default async function Profile() {
     <div className="narrow stack">
       <div className="title-block">
         <span className="eyebrow muted">Sua conexão com a rede</span>
-        <h1>{organization?.name || profile.name}</h1>
-        <p>{organization ? `${organization.neighborhood} · São Paulo` : "Agente de resgate"}</p>
+        <h1>Seu perfil na rede</h1>
+        <p>
+          {organization?.name || profile.name}
+          {organization ? ` · ${organization.neighborhood}, São Paulo` : " · Motorista"}. Mantenha
+          seus dados e sua disponibilidade atualizados.
+        </p>
       </div>
       <ProfileForm profile={profile} prefs={p.data} driver={d.data} />
     </div>

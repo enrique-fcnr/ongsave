@@ -1,7 +1,7 @@
 .page {
-  --landing-green: #22694f;
-  --landing-ink: #1d3026;
-  --landing-muted: #6d776f;
+  --landing-green: var(--primary);
+  --landing-ink: var(--foreground);
+  --landing-muted: var(--muted-foreground);
   background: #fff;
   color: var(--landing-ink);
   overflow: clip;

@@ -36,7 +36,7 @@ export function MissionBoard({
           <div className="between">
             <span className="eyebrow muted">
               {selected.status === "WAITING_DRIVER"
-                ? "Uma oportunidade de fazer a diferença"
+                ? "Sua próxima oportunidade"
                 : "Sua missão em andamento"}
             </span>
             <StatusPill status={selected.status} />
@@ -48,6 +48,7 @@ export function MissionBoard({
                   <Store size={18} />
                 </span>
                 <div>
+                  <span className="stop-label">Coleta · Supermercado</span>
                   <h3>{orgs.find((o) => o.id === selected.supermarket_id)?.name}</h3>
                   <p className="small muted" style={{ marginTop: 4 }}>
                     {selected.pickup_address}
@@ -59,6 +60,7 @@ export function MissionBoard({
                   <MapPin size={18} />
                 </span>
                 <div>
+                  <span className="stop-label">Entrega · Instituição</span>
                   <h3>{orgs.find((o) => o.id === selected.ngo_id)?.name}</h3>
                   <p className="small muted" style={{ marginTop: 4 }}>
                     {selected.delivery_address}
@@ -94,8 +96,8 @@ export function MissionBoard({
             </div>
           </div>
           <p className="small muted">
-            Distância, rota, posição e tempo são simulações. A coleta e a entrega são registradas de
-            verdade.
+            Rota, posição e tempo são demonstrativos. As etapas da coleta e da entrega ficam
+            registradas no resgate.
           </p>
         </section>
       ) : (
@@ -111,6 +113,7 @@ export function MissionBoard({
               className="rescue-row"
               key={r.id}
               onClick={() => setSelectedId(r.id)}
+              aria-pressed={selected?.id === r.id}
               style={{ textAlign: "left" }}
             >
               <span className="symbol">

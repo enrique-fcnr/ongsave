@@ -124,7 +124,8 @@ test("landing mantém conteúdo, navegação e FAQ sem JavaScript", async ({ bro
     .filter({ hasText: "Quem pode participar da ONGSave?" })
     .click();
   await expect(page.locator("#faq-answer-0")).toBeVisible();
-  await page.getByRole("link", { name: "Começar um resgate", exact: true }).click();
+  // Native keyboard activation also proves this link works without hydration.
+  await page.getByRole("link", { name: "Começar um resgate", exact: true }).press("Enter");
   await expect(page.getByRole("heading", { name: "Bom ter você aqui." })).toBeVisible();
   await context.close();
 });

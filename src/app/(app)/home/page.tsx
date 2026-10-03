@@ -70,18 +70,18 @@ export default async function Home() {
   }
   return (
     <div className="stack">
-      <div className="between">
+      <div className="between page-heading">
         <div className="title-block">
-          <span className="muted small">{greeting},</span>
+          <span className="eyebrow">{greeting} · Sua rede de resgates</span>
           <h1>{organization?.name || profile.name}</h1>
-          <p>Há sempre um novo destino para fazer a diferença.</p>
+          <p>
+            {profile.role === "SUPERMARKET"
+              ? "Registre o que pode ser doado e acompanhe os alimentos até a entrega."
+              : "Encontre o que sua instituição pode receber e acompanhe cada resgate."}
+          </p>
         </div>
         {profile.role === "SUPERMARKET" && (
-          <Button
-            className="mobile-hide"
-            render={<Link href="/supermarket/surplus/new" />}
-            nativeButton={false}
-          >
+          <Button render={<Link href="/supermarket/surplus/new" />} nativeButton={false}>
             <Plus size={18} />
             Registrar excedente
           </Button>
@@ -92,11 +92,11 @@ export default async function Home() {
         <>
           <div className="impact-banner">
             <div>
-              <span className="eyebrow impact-eyebrow">Uma foto. Muitas possibilidades.</span>
-              <h2 style={{ marginTop: 12 }}>O próximo resgate começa com você.</h2>
+              <span className="eyebrow impact-eyebrow">Um gesto abre novos caminhos</span>
+              <h2 style={{ marginTop: 12 }}>Dê um novo destino ao excedente.</h2>
               <p>
-                Registre os alimentos disponíveis. Sua equipe revisa, e a rede encontra um novo
-                destino.
+                Fotografe, confira as informações e publique. A rede conecta sua doação a quem pode
+                recebê-la.
               </p>
               <Button
                 className="impact-cta"
@@ -109,18 +109,24 @@ export default async function Home() {
             </div>
             <Leaf className="art" />
           </div>
-          <div className="mobile-hide">
+          <section className="stack">
+            <div className="section-heading">
+              <h2>Seu impacto até aqui</h2>
+              <Link href="/supermarket/reports" className="text-link">
+                Ver relatório <ArrowRight size={15} />
+              </Link>
+            </div>
             <Charts rescues={rescues} asOf={data.asOf} />
-          </div>
+          </section>
         </>
       ) : (
         feed
       )}
       <section className="stack">
-        <div className="between">
+        <div className="section-heading">
           <h2>Seus resgates recentes</h2>
-          <Link className="small muted" href="/rescues">
-            Ver histórico
+          <Link className="text-link" href="/rescues">
+            Ver todos <ArrowRight size={15} />
           </Link>
         </div>
         <RescueList rescues={rescues.slice(0, 5)} orgs={orgs} />

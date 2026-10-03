@@ -106,6 +106,13 @@ describe("Fluxo real nas funções PostgreSQL e RLS", () => {
     ).toHaveLength(0);
   });
   it("ONG pausada não pode reservar", async () => {
+    // Keep the local fixture available so this assertion tests paused receiving,
+    // independently of the expiry timestamp in the historical seed file.
+    await db.exec("reset role");
+    await db.query(
+      "update public.surplus_batches set expires_at=now()+interval '1 hour' where id=$1",
+      [id("batch:18")],
+    );
     await actor("viver@ongsave.demo");
     await db.exec("update public.ngo_preferences set receiving_enabled=false");
     await expect(db.query("select public.reserve_donation($1)", [id("batch:18")])).rejects.toThrow(

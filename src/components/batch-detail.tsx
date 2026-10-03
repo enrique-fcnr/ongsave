@@ -42,7 +42,7 @@ export async function BatchDetail({ id }: { id: string }) {
           <div className="panel" style={{ padding: 0, overflow: "hidden" }}>
             <FoodPhoto url={await signedPhoto(batch.image_url)} title={batch.title} />
           </div>
-          <section className="panel stack">
+          <section className="panel stack detail-items">
             <h2>O que tem neste lote</h2>
             {batch.surplus_items?.map((i, n) => (
               <div className="between small" key={n}>
@@ -61,20 +61,20 @@ export async function BatchDetail({ id }: { id: string }) {
             </p>
           </section>
         </div>
-        <section className="panel stack">
+        <section className="panel stack detail-summary">
           <div className="between">
             <span className="eyebrow muted">{categoryLabels[batch.category]}</span>
             <StatusPill status={batch.status} />
           </div>
           <h1>{batch.title}</h1>
-          <h1 style={{ fontSize: 44, color: "var(--primary)" }}>
-            {number(Number(batch.estimated_weight_kg))} <span style={{ fontSize: 22 }}>kg</span>
-          </h1>
+          <div className="detail-weight">
+            {number(Number(batch.estimated_weight_kg))} <span>kg disponíveis</span>
+          </div>
           <div className="row small muted">
             <Utensils size={17} />≈ {number(Number(batch.estimated_weight_kg) * 2)} refeições
             estimadas
           </div>
-          <hr style={{ borderColor: "#e7e9ee" }} />
+          <hr />
           <div>
             <h3>{market?.name}</h3>
             <p className="small muted" style={{ marginTop: 8 }}>
@@ -89,7 +89,7 @@ export async function BatchDetail({ id }: { id: string }) {
             <Clock size={17} />
             Retirada até {deadline} · {priorities[batch.pickup_priority]}
           </div>
-          <div className="small">
+          <div className="small detail-condition">
             <span className="muted">Condição visual aparente</span>
             <p style={{ marginTop: 6 }}>{conditions[batch.visual_condition]}</p>
           </div>

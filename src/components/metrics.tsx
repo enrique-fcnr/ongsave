@@ -38,10 +38,12 @@ export function Metrics({ rescues, role }: { rescues: Rescue[]; role: Role }) {
             <v.Icon className="metric-icon" />
           </div>
           <span className="value">{v.value}</span>
-          <span className="small muted">
+          <span className="metric-footnote">
             {v.label.includes("estimad")
-              ? "Projeção com fórmula do MVP"
-              : "Com base nos resgates concluídos"}
+              ? "Estimativa a partir do peso entregue"
+              : v.label.includes("simulação")
+                ? "Distâncias demonstrativas"
+                : "Entregas confirmadas"}
           </span>
         </div>
       ))}
@@ -84,8 +86,8 @@ export function Charts({ rescues, asOf }: { rescues: Rescue[]; asOf: number }) {
         >
           <defs>
             <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#86a64b" stopOpacity=".18" />
-              <stop offset="100%" stopColor="#86a64b" stopOpacity="0" />
+              <stop offset="0%" stopColor="#22694f" stopOpacity=".18" />
+              <stop offset="100%" stopColor="#22694f" stopOpacity="0" />
             </linearGradient>
           </defs>
           {[30, 75, 120, 165].map((y) => (
@@ -95,13 +97,13 @@ export function Charts({ rescues, asOf }: { rescues: Rescue[]; asOf: number }) {
           <polyline
             points={points}
             fill="none"
-            stroke="#718f43"
+            stroke="#22694f"
             strokeWidth="3"
             strokeLinejoin="round"
           />
           {weeks.map((v, i) => (
             <g key={i}>
-              <circle cx={30 + i * 105} cy={160 - (v / max) * 130} r="4" fill="#718f43" />
+              <circle cx={30 + i * 105} cy={160 - (v / max) * 130} r="4" fill="#22694f" />
               <text
                 x={30 + i * 105}
                 y={149 - (v / max) * 130}
@@ -121,8 +123,10 @@ export function Charts({ rescues, asOf }: { rescues: Rescue[]; asOf: number }) {
         </div>
       </section>
       <section className="panel stack">
-        <h2>Composição do excedente</h2>
-        <p className="small muted">Peso dos lotes entregues</p>
+        <div className="title-block">
+          <h2>O que ganhou um novo destino</h2>
+          <p className="small muted">Peso entregue por categoria</p>
+        </div>
         {Object.entries(groups)
           .sort((a, b) => b[1] - a[1])
           .map(([cat, kg]) => (

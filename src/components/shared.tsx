@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, Carrot, Leaf, Package, Sprout } from "lucide-react";
+import { ArrowUpRight, Carrot, Clock, Leaf, Package, Sprout } from "lucide-react";
 import {
   categoryLabels,
   number,
@@ -35,7 +35,7 @@ export function FoodPhoto({ url, title }: { url?: string | null; title: string }
       {url ? (
         <Image src={url} alt={title} fill unoptimized sizes="(max-width: 767px) 100vw, 400px" />
       ) : (
-        <div className="food-placeholder">
+        <div className="food-placeholder" role="img" aria-label="Lote sem fotografia">
           <Leaf />
           <Carrot />
           <Sprout />
@@ -84,22 +84,39 @@ export function DonationCard({
         <p className="small muted">
           {market?.name} · {market?.neighborhood}
         </p>
-        <div className="between small">
-          <span className="muted">≈ {number(Number(batch.estimated_weight_kg) * 2)} refeições</span>
+        <p className="small muted row">
+          <Clock size={14} />
+          Retirar até{" "}
+          {new Intl.DateTimeFormat("pt-BR", {
+            timeZone: "America/Sao_Paulo",
+            day: "2-digit",
+            month: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }).format(new Date(batch.expires_at))}
+        </p>
+        <div className="between small card-footer">
+          <span className="muted">
+            ≈ {number(Number(batch.estimated_weight_kg) * 2)} refeições estimadas
+          </span>
           <span style={{ color: "var(--primary)" }}>Ver doação</span>
         </div>
       </div>
     </Link>
   );
 }
-export function RescueList({ rescues, orgs }: { rescues: Rescue[]; orgs: Organization[] }) {
-  if (!rescues.length)
-    return (
-      <Empty
-        title="Nenhum resgate por aqui"
-        body="Os próximos resgates aparecerão aqui, automaticamente."
-      />
-    );
+export function RescueList({
+  rescues,
+  orgs,
+  emptyTitle = "Nenhum resgate por aqui",
+  emptyBody = "Os próximos resgates aparecerão aqui, automaticamente.",
+}: {
+  rescues: Rescue[];
+  orgs: Organization[];
+  emptyTitle?: string;
+  emptyBody?: string;
+}) {
+  if (!rescues.length) return <Empty title={emptyTitle} body={emptyBody} />;
   return (
     <div className="rescue-list">
       {rescues.map((r) => (

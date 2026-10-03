@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { operationalData, summarize } from "@/lib/data";
-import { number, categoryLabels, statusLabels } from "@/lib/domain";
+import { number, categoryLabels } from "@/lib/domain";
 import { Metrics, Charts } from "@/components/metrics";
+import { StatusPill, Empty } from "@/components/shared";
 import { PrintButton } from "@/components/print-button";
 export default async function Reports() {
   const { profile, organization, rescues, orgs, asOf } = await operationalData();
@@ -23,13 +24,13 @@ export default async function Reports() {
   const m = summarize(monthly);
   return (
     <div className="stack">
-      <div className="between">
+      <div className="between page-heading">
         <div className="title-block">
           <span className="eyebrow muted">
             {organization?.name} · {period}
           </span>
           <h1>Impacto ESG</h1>
-          <p>Alimentos redirecionados, conexões e estimativas ambientais.</p>
+          <p>O resultado das entregas deste mês, pronto para acompanhar e compartilhar.</p>
         </div>
         <PrintButton />
       </div>
@@ -44,7 +45,7 @@ export default async function Reports() {
         <span className="pill">Impacto social</span>
       </div>
       <Charts rescues={monthly} asOf={asOf} />
-      <div className="panel stack">
+      <section className="panel stack">
         <h2>Registro de resgates</h2>
         <div className="scroll-x">
           <table className="report-table">
@@ -68,18 +69,31 @@ export default async function Reports() {
                   <td>{categoryLabels[r.surplus_batches?.category || "other"]}</td>
                   <td>{number(Number(r.surplus_batches?.estimated_weight_kg || 0))} kg</td>
                   <td>{orgs.find((o) => o.id === r.ngo_id)?.name}</td>
-                  <td>{statusLabels[r.status]}</td>
+                  <td>
+                    <StatusPill status={r.status} />
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
+        {!monthly.length && (
+          <Empty
+            title="Nenhum registro neste mês"
+            body="As próximas entregas aparecerão neste relatório."
+          />
+        )}
+      </section>
       <p className="small muted">
-        Inclui histórico simulado. As projeções de economia, água e CO₂e usam fatores ilustrativos
-        do MVP e não constituem certificação ESG. Para exportar, selecione “Salvar como PDF” na
-        janela de impressão.
+        Para exportar, selecione “Salvar como PDF” na janela de impressão.
       </p>
+      <details className="method-note">
+        <summary>Sobre os dados e as estimativas</summary>
+        <p>
+          Inclui histórico simulado. Refeições, economia, água e CO₂e usam fatores ilustrativos a
+          partir das entregas confirmadas e não constituem certificação ESG.
+        </p>
+      </details>
     </div>
   );
 }

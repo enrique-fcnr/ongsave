@@ -24,7 +24,10 @@ export default async function Donations() {
       <div className="title-block">
         <span className="eyebrow muted">Alimentos em busca de um destino</span>
         <h1>Doações próximas</h1>
-        <p>Ordenadas por categoria, capacidade e preferências da sua instituição.</p>
+        <p>
+          Encontre o próximo resgate. As doações mais compatíveis com sua instituição aparecem
+          primeiro.
+        </p>
       </div>
       {!preferences?.receiving_enabled && (
         <p className="notice">
@@ -51,9 +54,13 @@ export default async function Donations() {
           body="Novas oportunidades aparecerão aqui."
         />
       )}
-      <p className="small muted">
-        Compatibilidade calculada por regras simples. A disponibilidade é confirmada ao aceitar.
-      </p>
+      <details className="method-note">
+        <summary>Como as doações são organizadas</summary>
+        <p>
+          A ordem considera as categorias aceitas, a capacidade e as preferências da instituição. A
+          disponibilidade do lote é confirmada ao aceitar.
+        </p>
+      </details>
     </div>
   );
 }

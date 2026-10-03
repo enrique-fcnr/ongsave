@@ -1,8 +1,9 @@
 import Link from "next/link";
+import Image from "next/image";
+import { ArrowLeft } from "lucide-react";
 import { Brand } from "@/components/shared";
 import { LoginForm } from "@/components/login-form";
 import { isConfigured } from "@/lib/supabase/config";
-import { FoodOrbit } from "@/components/design/food-orbit";
 export default async function Login({
   searchParams,
 }: {
@@ -12,51 +13,63 @@ export default async function Login({
   return (
     <main className="auth-page">
       <section className="auth-story">
-        <FoodOrbit className="story-orbit" />
         <Brand />
-        <div>
-          <span className="eyebrow auth-eyebrow">Cada alimento importa</span>
-          <h1 style={{ marginTop: 24 }}>
-            O excedente de hoje.
-            <br />A esperança de amanhã.
+        <div className="auth-story-copy">
+          <span className="eyebrow auth-eyebrow">Conexões que alimentam</span>
+          <h1>
+            O próximo destino
+            <br />
+            começa com você.
           </h1>
           <p>
-            Uma rede de pessoas conectadas por um propósito: levar alimentos mais longe e
-            desperdício a zero.
+            Mercados, instituições e motoristas conectados para que o alimento chegue mais longe.
           </p>
+        </div>
+        <div className="auth-team">
+          <Image
+            src="/landing/rescue-team.png"
+            alt="Equipe ilustrativa de supermercado, instituição e motorista com uma caixa de alimentos"
+            fill
+            sizes="(max-width: 767px) 0px, 50vw"
+          />
         </div>
         <span className="small auth-location">São Paulo · Conexões que alimentam</span>
       </section>
       <section className="auth-form">
         <div className="stack">
-          <div className="md:hidden">
+          <div className="auth-mobile-brand">
             <Brand />
           </div>
           <div className="title-block">
+            <span className="eyebrow">Sua rede de resgates</span>
             <h1>Bom ter você aqui.</h1>
-            <p>Entre para acompanhar seus resgates e fazer a diferença.</p>
+            <p>Acesse sua conta para acompanhar doações, missões e entregas.</p>
           </div>
           {!isConfigured() && (
             <div className="notice">
-              Primeiro, copie <code>.env.example</code> para <code>.env.local</code>, preencha o
-              Supabase e execute o bootstrap descrito no README.
+              O acesso está temporariamente indisponível. Fale com a equipe responsável pela
+              plataforma.
             </div>
           )}
           {query.profile && (
             <p className="error">
-              Sua conta ainda não tem um perfil operacional. Execute <code>npm run demo:users</code>{" "}
-              ou peça o cadastro ao administrador.
+              Sua conta ainda precisa de um perfil na rede. Peça à equipe responsável para concluir
+              seu cadastro.
             </p>
           )}
           <LoginForm configured={isConfigured()} />
-          {process.env.ENABLE_DEMO_MODE === "true" && (
-            <Link href="/demo" className="small muted" style={{ textAlign: "center" }}>
-              Acessar ambiente de demonstração
+          <div className="auth-footer">
+            <p className="small muted">Acesso para participantes cadastrados.</p>
+            {process.env.ENABLE_DEMO_MODE === "true" && (
+              <Link href="/demo" className="text-link">
+                Conhecer a demonstração
+              </Link>
+            )}
+            <Link href="/" className="back">
+              <ArrowLeft size={15} />
+              Voltar ao site
             </Link>
-          )}
-          <p className="small muted" style={{ textAlign: "center" }}>
-            Acesso exclusivo para participantes cadastrados.
-          </p>
+          </div>
         </div>
       </section>
     </main>

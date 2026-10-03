@@ -163,7 +163,7 @@ export function RescueActions({
                 }
               }}
             >
-              Confirmar recebimento · Mostrar código
+              Mostrar código de recebimento
             </Button>
           )}
           <p className="small muted">Confira os alimentos recebidos antes de informar o código.</p>
