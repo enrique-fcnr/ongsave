@@ -1,4 +1,12 @@
-# Verificação — 1 de outubro de 2026
+# Verificação — 3 de outubro de 2026
+
+## Landing page ampliada
+
+Lint, build de produção e TypeScript passaram. Os nove testes existentes de páginas públicas, PWA, origem das APIs e preparação de foto passaram em Chrome, incluindo larguras de 375 a 1440 px. Os quatro novos cenários da landing passaram em 40 segundos: menu desktop/mobile, abas com navegação por teclado, seletor de etapas, FAQ exclusivo, pausa de animação, movimento reduzido e conteúdo/FAQ/login sem JavaScript.
+
+Capturas de desktop (1440 px) e celular (390 px) foram revisadas, incluindo a imagem PNG com transparência real e seu carregamento otimizado pelo Next.js. Não houve erros JavaScript ou overflow horizontal. Os números dos previews são exemplos identificados. Fontes, fluxos autenticados, banco e dados existentes foram preservados; o cenário que publica, entrega e reseta doações não foi repetido nesta revisão. Capturas locais ficam em `artifacts/landing/`.
+
+O código visual da landing está isolado em `src/components/landing/`, descrito em [DESIGN.md](DESIGN.md), e o prompt da imagem está em [LANDING-ASSETS.md](LANDING-ASSETS.md).
 
 ## Refinamento visual
 

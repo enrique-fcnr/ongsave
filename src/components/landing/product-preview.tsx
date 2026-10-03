@@ -1,0 +1,251 @@
+import {
+  Bell,
+  Camera,
+  Check,
+  CheckCheck,
+  CircleCheck,
+  HeartHandshake,
+  House,
+  Leaf,
+  MapPin,
+  Package,
+  Sprout,
+  Truck,
+  ArrowUpRight,
+} from "lucide-react";
+import styles from "./landing.module.css";
+
+export function DashboardPreview({ compact = false }: { compact?: boolean }) {
+  return (
+    <div
+      className={`${styles.dashboard} ${compact ? styles.dashboardCompact : ""}`}
+      aria-label="Prévia ilustrativa do painel ONGSave"
+    >
+      <div className={styles.previewTop}>
+        <span className={styles.previewBrand}>
+          <Sprout size={23} />
+          ONGSave
+        </span>
+        <span className={styles.previewLabel}>Prévia ilustrativa</span>
+        <Bell size={16} />
+        <span className={styles.previewAvatar}>MP</span>
+      </div>
+      <div className={styles.previewLayout}>
+        <aside className={styles.previewSidebar} aria-hidden="true">
+          <span className={styles.previewNavActive}>
+            <House size={16} />
+            Início
+          </span>
+          <span>
+            <Package size={16} />
+            Resgates
+          </span>
+          <span>
+            <Leaf size={16} />
+            Impacto
+          </span>
+          <div className={styles.sidebarSprout}>
+            <Sprout size={36} />
+            <p>
+              Pequenas ações.
+              <br />
+              Novos destinos.
+            </p>
+          </div>
+        </aside>
+        <div className={styles.previewContent}>
+          <div className={styles.previewGreeting}>
+            <div>
+              <span>Uma boa ação começa aqui</span>
+              <h3>Olá, Mercado Paulista.</h3>
+            </div>
+            <span className={styles.previewAction}>
+              <Camera size={14} />
+              Registrar excedente
+            </span>
+          </div>
+          <div className={styles.previewMetrics}>
+            {[
+              ["38 kg", "Alimentos resgatados"],
+              ["≈ 76", "Refeições estimadas"],
+              ["01", "Resgate confirmado"],
+            ].map(([value, label]) => (
+              <div key={label}>
+                <span>{label}</span>
+                <strong>{value}</strong>
+                <Leaf size={16} />
+              </div>
+            ))}
+          </div>
+          <div className={styles.previewLower}>
+            <div className={styles.previewChart}>
+              <div className={styles.previewCardHeading}>
+                <strong>Alimentos ganhando destino</strong>
+                <span>Esta semana</span>
+              </div>
+              <div className={styles.chartBars} aria-hidden="true">
+                {[35, 52, 44, 68, 58, 86, 100].map((height, i) => (
+                  <div key={i}>
+                    <span style={{ height: `${height}%` }} />
+                    <small>{["S", "T", "Q", "Q", "S", "S", "D"][i]}</small>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className={styles.previewDonation}>
+              <span className={styles.previewPill}>
+                <span />
+                Entrega confirmada
+              </span>
+              <div className={styles.produceIcon}>
+                <Leaf size={38} />
+              </div>
+              <strong>Hortifrúti misto</strong>
+              <span>38 kg de novas possibilidades</span>
+              <div className={styles.previewRecipient}>
+                <HeartHandshake size={17} />
+                <span>Recebido pela instituição</span>
+                <Check size={15} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function FeaturePreview({ view }: { view: number }) {
+  if (view === 0)
+    return (
+      <div className={styles.photoPreview}>
+        <div className={styles.cameraFrame}>
+          <span className={styles.previewPill}>
+            <Camera size={13} />
+            Foto do excedente
+          </span>
+          <div className={styles.bigProduce}>
+            <Leaf size={78} />
+            <Sprout size={52} />
+            <Package size={58} />
+          </div>
+          <span>Um registro. Um novo começo.</span>
+        </div>
+        <div className={styles.reviewCard}>
+          <span className={styles.miniEyebrow}>Sua equipe tem a última palavra</span>
+          <h3>Revisar antes de publicar</h3>
+          <div className={styles.reviewField}>
+            <span>Alimento</span>
+            <strong>Hortifrúti misto</strong>
+          </div>
+          <div className={styles.reviewField}>
+            <span>Peso revisado</span>
+            <strong>38 kg</strong>
+          </div>
+          <div className={styles.reviewCheck}>
+            <CircleCheck size={17} />
+            Informações conferidas
+          </div>
+        </div>
+      </div>
+    );
+  if (view === 1)
+    return (
+      <div className={styles.feedPreview}>
+        <div className={styles.previewCardHeading}>
+          <strong>Encontre o próximo resgate</strong>
+          <span className={styles.previewPill}>Disponível</span>
+        </div>
+        <div className={styles.feedCards}>
+          {[
+            { name: "Hortifrúti misto", weight: "38 kg", Icon: Leaf },
+            { name: "Pães do dia", weight: "24 kg", Icon: Package },
+          ].map(({ name, weight, Icon }) => (
+            <div key={name}>
+              <div className={styles.feedFood}>
+                <Icon size={48} />
+              </div>
+              <strong>{name}</strong>
+              <span>
+                <MapPin size={12} />
+                São Paulo · {weight}
+              </span>
+              <div className={styles.feedReserve}>
+                Escolher uma doação
+                <ArrowUpRight size={15} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className={styles.previewFootnote}>Disponibilidade, endereço e prazo em um só lugar.</p>
+      </div>
+    );
+  if (view === 2)
+    return (
+      <div className={styles.routePreview}>
+        <div className={styles.abstractMap} aria-hidden="true">
+          <svg viewBox="0 0 500 300" fill="none">
+            <path
+              d="M-30 75 530 250M75-30 270 330M-40 260 540 100M330-20 130 340M-20 145 520 170"
+              stroke="#fff"
+              strokeWidth="22"
+            />
+            <path d="M90 230V130H370V72" stroke="#fff" strokeWidth="13" strokeLinejoin="round" />
+            <path
+              d="M90 230V130H370V72"
+              stroke="#6b873f"
+              strokeWidth="6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span className={styles.routePickup}>C</span>
+          <span className={styles.routeDestination}>D</span>
+          <span className={styles.routeDriver}>
+            <Truck size={18} />
+          </span>
+        </div>
+        <div className={styles.routeCard}>
+          <span className={styles.previewPill}>
+            <Truck size={13} />
+            Cada trajeto importa
+          </span>
+          <h3>Da coleta à entrega</h3>
+          <div>
+            <MapPin size={15} />
+            <span>Supermercado → Instituição</span>
+          </div>
+          <div className={styles.reviewCheck}>
+            <CheckCheck size={17} />
+            Recebimento confirmado por código
+          </div>
+        </div>
+      </div>
+    );
+  return (
+    <div className={styles.impactPreview}>
+      <div className={styles.impactCircle}>
+        <Leaf size={24} />
+        <strong>
+          38<span>kg</span>
+        </strong>
+        <p>Alimentos resgatados</p>
+      </div>
+      <div className={styles.impactPreviewStats}>
+        <span className={styles.miniEyebrow}>Uma entrega deixa sua marca</span>
+        <h3>O resultado fica visível.</h3>
+        <div>
+          <strong>≈ 76</strong>
+          <span>refeições estimadas</span>
+        </div>
+        <div>
+          <strong>1</strong>
+          <span>resgate registrado</span>
+        </div>
+        <p className={styles.previewFootnote}>
+          Exemplo ilustrativo. Estimativas calculadas a partir do peso entregue.
+        </p>
+      </div>
+    </div>
+  );
+}

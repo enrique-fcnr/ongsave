@@ -1,0 +1,378 @@
+"use client";
+import Link from "next/link";
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import {
+  ArrowRight,
+  Camera,
+  ChartNoAxesCombined,
+  Check,
+  ChevronDown,
+  Clock3,
+  HeartHandshake,
+  Link2,
+  Menu,
+  Package,
+  Pause,
+  Play,
+  Sprout,
+  Truck,
+  X,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { FeaturePreview } from "./product-preview";
+import styles from "./landing.module.css";
+
+const navigation = [
+  ["Como funciona", "#como-funciona"],
+  ["A plataforma", "#plataforma"],
+  ["Para quem", "#para-quem"],
+];
+export function LandingHeader() {
+  const [open, setOpen] = useState(false);
+  const toggle = useRef<HTMLButtonElement>(null);
+  return (
+    <header
+      className={styles.header}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          setOpen(false);
+          toggle.current?.focus();
+        }
+      }}
+    >
+      <Link href="/" className={styles.brand} aria-label="ONGSave início">
+        <span>
+          <Sprout size={23} />
+        </span>
+        ONGSave
+      </Link>
+      <nav className={styles.desktopNav} aria-label="Navegação principal">
+        {navigation.map(([label, href]) => (
+          <a href={href} key={href}>
+            {label}
+          </a>
+        ))}
+        <details
+          className={styles.resources}
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget))
+              event.currentTarget.open = false;
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              event.stopPropagation();
+              event.currentTarget.open = false;
+              event.currentTarget.querySelector("summary")?.focus();
+            }
+          }}
+        >
+          <summary>
+            Explore
+            <ChevronDown size={14} />
+          </summary>
+          <div>
+            <a
+              href="#impacto"
+              onClick={(event) => {
+                event.currentTarget.closest("details")!.open = false;
+              }}
+            >
+              O impacto de cada entrega
+            </a>
+            <a
+              href="#perguntas"
+              onClick={(event) => {
+                event.currentTarget.closest("details")!.open = false;
+              }}
+            >
+              Perguntas frequentes
+            </a>
+            <Link href="/demo">
+              Ambiente de demonstração
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+        </details>
+      </nav>
+      <div className={styles.headerActions}>
+        <Button
+          render={<Link href="/login" />}
+          nativeButton={false}
+          variant="outline"
+          className={styles.loginButton}
+        >
+          Entrar
+        </Button>
+        <Link href="/login" className={`${styles.cta} ${styles.headerCta}`}>
+          Fazer parte
+          <ArrowRight size={15} />
+        </Link>
+        <button
+          ref={toggle}
+          type="button"
+          className={styles.menuToggle}
+          aria-label={open ? "Fechar menu" : "Abrir menu"}
+          aria-expanded={open}
+          aria-controls="landing-mobile-menu"
+          onClick={() => setOpen(!open)}
+        >
+          {open ? <X size={21} /> : <Menu size={21} />}
+        </button>
+      </div>
+      {open ? (
+        <nav id="landing-mobile-menu" className={styles.mobileMenu} aria-label="Navegação mobile">
+          {[...navigation, ["Impacto", "#impacto"], ["Perguntas frequentes", "#perguntas"]].map(
+            ([label, href]) => (
+              <a key={href} href={href} onClick={() => setOpen(false)}>
+                {label}
+                <ArrowRight size={16} />
+              </a>
+            ),
+          )}
+          <Link href="/demo" onClick={() => setOpen(false)}>
+            Conhecer a demo
+            <ArrowRight size={16} />
+          </Link>
+        </nav>
+      ) : null}
+    </header>
+  );
+}
+export function ScrollReveal({ children }: { children: ReactNode }) {
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const element = root.current;
+    if (
+      !element ||
+      matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      !("IntersectionObserver" in window)
+    )
+      return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries)
+          if (entry.isIntersecting) {
+            entry.target.setAttribute("data-visible", "true");
+            observer.unobserve(entry.target);
+          }
+      },
+      { threshold: 0.06 },
+    );
+    element.setAttribute("data-reveal-ready", "true");
+    element
+      .querySelectorAll<HTMLElement>("[data-reveal]")
+      .forEach((target) => observer.observe(target));
+    return () => observer.disconnect();
+  }, []);
+  return (
+    <div ref={root} className={styles.page}>
+      {children}
+    </div>
+  );
+}
+const problems = [
+  { Icon: Clock3, text: "Excedente com prazo curto" },
+  { Icon: Link2, text: "Contatos espalhados" },
+  { Icon: Package, text: "Alimentos sem destino" },
+  { Icon: Truck, text: "Coletas difíceis de combinar" },
+];
+export function ProblemTicker() {
+  const [paused, setPaused] = useState(false);
+  return (
+    <div className={styles.ticker} data-paused={paused}>
+      <div className={styles.tickerViewport}>
+        {[0, 1].map((row) => (
+          <div className={styles.tickerTrack} key={row} aria-hidden={row === 1 ? true : undefined}>
+            {[
+              ...problems.slice(row),
+              ...problems.slice(0, row),
+              ...problems.slice(row),
+              ...problems.slice(0, row),
+            ].map(({ Icon, text }, index) => (
+              <div
+                className={styles.problemCard}
+                key={`${row}-${index}`}
+                aria-hidden={index >= 4 ? true : undefined}
+              >
+                <Icon size={25} />
+                <span>{text}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <button
+        className={styles.motionControl}
+        type="button"
+        onClick={() => setPaused(!paused)}
+        aria-pressed={paused}
+      >
+        {paused ? <Play size={13} /> : <Pause size={13} />}{" "}
+        {paused ? "Retomar movimento" : "Pausar movimento"}
+      </button>
+    </div>
+  );
+}
+const features = [
+  {
+    Icon: Camera,
+    label: "Foto & revisão",
+    title: "Uma foto abre novas possibilidades.",
+    body: "Registre o excedente e organize as informações do lote. Antes de publicar, sua equipe confere o alimento, o peso e o prazo.",
+    items: [
+      "Registro com foto do alimento",
+      "Informações revisadas pela equipe",
+      "Publicação com disponibilidade e prazo",
+    ],
+  },
+  {
+    Icon: HeartHandshake,
+    label: "Doações",
+    title: "O alimento certo encontra quem precisa.",
+    body: "Instituições visualizam as doações disponíveis e escolhem o que conseguem receber. O próximo destino começa com uma conexão.",
+    items: [
+      "Feed com alimentos disponíveis",
+      "Endereços e prazos à vista",
+      "Reserva vinculada à instituição",
+    ],
+  },
+  {
+    Icon: Truck,
+    label: "Missões",
+    title: "Cada trajeto tem um propósito.",
+    body: "Motoristas encontram as missões, consultam os endereços e acompanham as etapas. Um código confirma que a entrega chegou ao destino.",
+    items: [
+      "Mapa e detalhes da missão",
+      "Etapas de coleta e entrega",
+      "Código de confirmação no recebimento",
+    ],
+  },
+  {
+    Icon: ChartNoAxesCombined,
+    label: "Impacto",
+    title: "Uma entrega. Um resultado que fica.",
+    body: "Acompanhe o peso dos alimentos entregues, os resgates concluídos e as refeições estimadas. Transforme a operação em uma história que dá para acompanhar.",
+    items: [
+      "Histórico de resgates concluídos",
+      "Peso entregue e refeições estimadas",
+      "Indicadores e relatórios da operação",
+    ],
+  },
+];
+export function FeatureExplorer() {
+  const [active, setActive] = useState(0);
+  const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  const feature = features[active];
+  function move(event: KeyboardEvent<HTMLButtonElement>, index: number) {
+    let next = index;
+    if (event.key === "ArrowRight") next = (index + 1) % features.length;
+    else if (event.key === "ArrowLeft") next = (index + features.length - 1) % features.length;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = features.length - 1;
+    else return;
+    event.preventDefault();
+    setActive(next);
+    buttons.current[next]?.focus();
+  }
+  return (
+    <div>
+      <div role="tablist" aria-label="Recursos da plataforma" className={styles.featureTabs}>
+        {features.map(({ Icon, label }, index) => (
+          <button
+            type="button"
+            ref={(element) => {
+              buttons.current[index] = element;
+            }}
+            role="tab"
+            id={`feature-tab-${index}`}
+            aria-controls={`feature-panel-${index}`}
+            aria-selected={active === index}
+            tabIndex={active === index ? 0 : -1}
+            key={label}
+            onClick={() => setActive(index)}
+            onKeyDown={(event) => move(event, index)}
+          >
+            <span>
+              <Icon size={24} />
+            </span>
+            {label}
+          </button>
+        ))}
+      </div>
+      <div
+        className={styles.featurePanel}
+        id={`feature-panel-${active}`}
+        role="tabpanel"
+        aria-labelledby={`feature-tab-${active}`}
+        tabIndex={0}
+      >
+        <div className={styles.featureCopy} key={`copy-${active}`}>
+          <span className={styles.miniEyebrow}>{feature.label}</span>
+          <h3>{feature.title}</h3>
+          <p>{feature.body}</p>
+          <ul>
+            {feature.items.map((item) => (
+              <li key={item}>
+                <Check size={16} />
+                {item}
+              </li>
+            ))}
+          </ul>
+          <a href="/login" className={styles.textLink}>
+            Conhecer na prática
+            <ArrowRight size={16} />
+          </a>
+        </div>
+        <div className={styles.featureVisual} key={`visual-${active}`}>
+          <FeaturePreview view={active} />
+        </div>
+      </div>
+    </div>
+  );
+}
+const process = [
+  {
+    title: "Registre o que pode ser doado.",
+    text: "Fotografe, revise e publique os alimentos disponíveis. O cuidado começa com informação clara.",
+    view: 0,
+  },
+  {
+    title: "Conecte a doação a uma instituição.",
+    text: "A ONG escolhe o lote que pode receber. Uma missão conecta a reserva ao próximo trajeto.",
+    view: 1,
+  },
+  {
+    title: "Resgate, entregue e acompanhe.",
+    text: "O motorista realiza o trajeto. A instituição confirma o recebimento, e o impacto fica registrado.",
+    view: 2,
+  },
+];
+export function ProcessExplorer() {
+  const [active, setActive] = useState(0);
+  return (
+    <div className={styles.processLayout}>
+      <div className={styles.processSteps}>
+        {process.map((step, index) => (
+          <div className={styles.processStep} data-active={active === index} key={step.title}>
+            <button
+              type="button"
+              aria-expanded={active === index}
+              aria-controls={`process-copy-${index}`}
+              onClick={() => setActive(index)}
+            >
+              <span>{index + 1}</span>
+              <h3>{step.title}</h3>
+              <ArrowRight size={20} />
+            </button>
+            <p id={`process-copy-${index}`} hidden={active !== index}>
+              {step.text}
+            </p>
+          </div>
+        ))}
+      </div>
+      <div className={styles.processVisual} key={active}>
+        <FeaturePreview view={process[active].view} />
+      </div>
+    </div>
+  );
+}
