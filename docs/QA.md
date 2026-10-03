@@ -2,6 +2,8 @@
 
 ## Landing page ampliada
 
+O preview de foto e revisão passou a mostrar uma fotografia de celular com dez maçãs e caixas de detecção numeradas. O cartão apresenta Maçãs, 10 unidades e peso estimado de 1,8 kg. Lint, TypeScript e build passaram após a atualização; seis capturas dos previews em 390, 1058 e 1440 px confirmaram carregamento da imagem, informações correspondentes, ausência de overflow e de erros JavaScript. A representação da visão de IA está identificada como ilustrativa.
+
 Lint, build de produção e TypeScript passaram. Os nove testes existentes de páginas públicas, PWA, origem das APIs e preparação de foto passaram em Chrome, incluindo larguras de 375 a 1440 px. Os quatro novos cenários da landing passaram em 40 segundos: menu desktop/mobile, abas com navegação por teclado, seletor de etapas, FAQ exclusivo, pausa de animação, movimento reduzido e conteúdo/FAQ/login sem JavaScript.
 
 Capturas de desktop (1440 px) e celular (390 px) foram revisadas, incluindo a imagem PNG com transparência real e seu carregamento otimizado pelo Next.js. Não houve erros JavaScript ou overflow horizontal. Os números dos previews são exemplos identificados. Fontes, fluxos autenticados, banco e dados existentes foram preservados; o cenário que publica, entrega e reseta doações não foi repetido nesta revisão. Capturas locais ficam em `artifacts/landing/`.

@@ -1,4 +1,4 @@
-# Imagem da landing — ONGSave
+# Imagens da landing — ONGSave
 
 Arquivo: `public/landing/rescue-team.png`, 1536 × 1024 px, PNG RGBA com canal alfa transparente. Gerado com a ferramenta integrada `image_gen` e `transparent_background: true`. Não houve remoção de fundo ou alteração manual da imagem. Representa os três participantes da rede; as pessoas são fictícias. O arquivo é servido pelo componente Image do Next.js, com tamanhos responsivos e carregamento sob demanda.
 
@@ -6,4 +6,14 @@ Arquivo: `public/landing/rescue-team.png`, 1536 × 1024 px, PNG RGBA com canal a
 
 ```text
 Use case: photorealistic-natural. Generate one premium editorial website PNG cutout with a truly transparent alpha background for ONGSave, a Brazilian food rescue app. Three adult coworkers standing closely together, photographed from waist up, warm genuine smiles, diverse ordinary Brazilian appearance with realistic skin and fabric texture. Center: a Black Brazilian female NGO coordinator about 35 with naturally curly hair, cream cotton shirt and dark sage-green apron, holding a wooden crate of fresh carrots, tomatoes and leafy vegetables at waist level. Left: a Brazilian male supermarket employee about 40, short dark hair, cream polo shirt and subtle light sage apron. Right: a Brazilian female delivery driver about 30, brown skin, dark hair tied back, olive utility overshirt over white T-shirt, holding a small plain reusable tote. All faces and hands anatomically natural, every head fully visible and generous transparent margins, no cutoff fingers or props. Cohesive warm studio daylight, polished but authentic documentary feel. No background, no floor, no backdrop, no drop shadow, no scene, no logos, no text, no watermark. Wide horizontal composition approximately 3:2, silhouettes clean and genuinely isolated on transparency, friendly confident people, no poverty imagery. Asset will sit over soft green and mint website gradients.
+```
+
+## Câmera identificando maçãs
+
+Arquivo: `public/landing/apple-ai-camera.png`, 1024 × 1536 px, PNG fotográfico com fundo opaco. Gerado pela ferramenta integrada `image_gen`. A fotografia ilustrativa mostra exatamente dez maçãs e dez caixas de detecção numeradas na tela do celular. A landing identifica a cena como exemplo de visão de IA e mostra Maçãs, 10 unidades e peso estimado de 1,8 kg para revisão da equipe.
+
+### Prompt utilizado
+
+```text
+Use case: photorealistic-natural. Asset: portrait editorial photograph for the ONGSave food rescue website, to sit in a narrow rounded card. Show a realistic modern unbranded smartphone camera held in one human hand, pointed down at exactly TEN red apples arranged neatly in two rows of five on a clean pale wooden supermarket sorting counter. Photograph from just behind the person so the front screen of the smartphone is clearly visible and dominates the center of the composition. The actual apples on the counter and the live camera image on the phone match in arrangement and perspective. On the phone screen, show an AI computer-vision demonstration: exactly one thin vivid mint green rectangular detection bounding box around each of the ten apples, ten boxes total, all aligned precisely to individual fruits, with small numbered green labels 01 to 10. The phone screen fills most of the image and every apple and every detection box on the screen is clearly separated and visible. Clean natural soft daylight, believable skin and hand anatomy, realistic glass screen, premium photographic detail, harmonious cream and sage environment, natural red apple skins. Portrait composition approximately 2:3 with generous safety margins so neither phone nor any screen apples or boxes are cropped. This is a product illustration, not a real capture from the app. No logos, no watermark, no brand name, no extra fruits, no extra phone, no extra fingers, no dense HUD, no long sentences. Keep the screen clear and the AI boxes unmistakable. Opaque photographic background, not transparent.
 ```

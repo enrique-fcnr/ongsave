@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   Bell,
   Camera,
@@ -120,27 +121,34 @@ export function FeaturePreview({ view }: { view: number }) {
     return (
       <div className={styles.photoPreview}>
         <div className={styles.cameraFrame}>
+          <Image
+            src="/landing/apple-ai-camera.png"
+            alt="Celular apontado para dez maçãs, com uma demonstração de visão de IA identificando cada fruta em caixas numeradas de 01 a 10"
+            width={1024}
+            height={1536}
+            sizes="(max-width: 767px) 320px, 300px"
+            className={styles.cameraImage}
+          />
           <span className={styles.previewPill}>
             <Camera size={13} />
             Foto do excedente
           </span>
-          <div className={styles.bigProduce}>
-            <Leaf size={78} />
-            <Sprout size={52} />
-            <Package size={58} />
-          </div>
-          <span>Um registro. Um novo começo.</span>
+          <span className={styles.cameraCaption}>Visão de IA · exemplo ilustrativo</span>
         </div>
         <div className={styles.reviewCard}>
           <span className={styles.miniEyebrow}>Sua equipe tem a última palavra</span>
           <h3>Revisar antes de publicar</h3>
           <div className={styles.reviewField}>
             <span>Alimento</span>
-            <strong>Hortifrúti misto</strong>
+            <strong>Maçãs</strong>
           </div>
           <div className={styles.reviewField}>
-            <span>Peso revisado</span>
-            <strong>38 kg</strong>
+            <span>Quantidade</span>
+            <strong>10 unidades</strong>
+          </div>
+          <div className={styles.reviewField}>
+            <span>Peso estimado</span>
+            <strong>1,8 kg</strong>
           </div>
           <div className={styles.reviewCheck}>
             <CircleCheck size={17} />

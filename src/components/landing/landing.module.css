@@ -900,46 +900,52 @@
 .photoPreview {
   display: flex;
   align-items: center;
-  min-height: 300px;
+  min-height: 350px;
 }
 .cameraFrame {
   flex: 1;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 270px;
+  position: relative;
+  aspect-ratio: 2 / 3;
+  min-height: 350px;
+  overflow: hidden;
   border: 5px solid white;
-  padding: 16px;
-  background: linear-gradient(145deg, #e2edcd, #bfd59e);
+  background: #efe8da;
   border-radius: 26px;
   box-shadow: 0 10px 30px #44692e0a;
 }
-.bigProduce {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  padding: 32px 0;
-  color: #719848;
+.cameraImage {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  object-position: 50% 52%;
 }
-.bigProduce svg:first-child {
-  transform: rotate(-20deg);
+.cameraFrame > .previewPill {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 1;
+  background: #fffffff0;
 }
-.bigProduce svg {
-  flex-shrink: 1;
-}
-.cameraFrame > span:last-child {
-  color: #577244;
-  font-size: 10px;
+.cameraCaption {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  border-radius: 12px;
+  padding: 6px;
+  background: #fffffff0;
+  color: #42633e;
+  font-size: 9px;
   text-align: center;
 }
 .reviewCard {
   z-index: 1;
   position: relative;
-  width: 57%;
-  margin-left: -20px;
+  width: 53%;
+  margin-left: -12px;
   background: white;
   border: 1px solid #e7ebe1;
   border-radius: 20px;
@@ -2089,11 +2095,15 @@
     font-size: 9px;
   }
   .photoPreview {
-    min-height: 260px;
+    min-height: 0;
+    flex-direction: column;
+    align-items: stretch;
   }
   .cameraFrame {
-    min-height: 240px;
-    padding: 10px;
+    flex: none;
+    width: 100%;
+    min-height: 0;
+    height: 380px;
     border-width: 3px;
     border-radius: 20px;
   }
@@ -2101,23 +2111,14 @@
     font-size: 7px;
     padding: 4px 7px;
   }
-  .bigProduce {
-    padding: 25px 0;
-  }
-  .bigProduce svg:first-child {
-    width: 48px;
-  }
-  .bigProduce svg {
-    width: 32px;
-  }
-  .cameraFrame > span:last-child {
+  .cameraCaption {
     font-size: 8px;
   }
   .reviewCard {
-    width: 61%;
-    padding: 15px;
+    width: calc(100% - 20px);
+    padding: 20px;
     border-radius: 16px;
-    margin-left: -24px;
+    margin: -14px auto 0;
   }
   .reviewCard .miniEyebrow {
     font-size: 7px;
