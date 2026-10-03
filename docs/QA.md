@@ -2,6 +2,8 @@
 
 ## Landing page ampliada
 
+Após o ajuste do aparelho para um iPhone 16, os dois previews compartilhados também passaram a apresentar “Alimento em boas condições” no cartão de revisão, e fotografias de hortifrúti e pães no feed de doações. Lint, TypeScript e build passaram. Capturas em 390, 1058 e 1440 px confirmaram carregamento das três novas imagens, qualidade legível, troca entre as etapas e abas, sem overflow ou erros JavaScript. As imagens e seus prompts estão documentados em [LANDING-ASSETS.md](LANDING-ASSETS.md).
+
 O preview de foto e revisão passou a mostrar uma fotografia de celular com dez maçãs e caixas de detecção numeradas. O cartão apresenta Maçãs, 10 unidades e peso estimado de 1,8 kg. Lint, TypeScript e build passaram após a atualização; seis capturas dos previews em 390, 1058 e 1440 px confirmaram carregamento da imagem, informações correspondentes, ausência de overflow e de erros JavaScript. A representação da visão de IA está identificada como ilustrativa.
 
 Lint, build de produção e TypeScript passaram. Os nove testes existentes de páginas públicas, PWA, origem das APIs e preparação de foto passaram em Chrome, incluindo larguras de 375 a 1440 px. Os quatro novos cenários da landing passaram em 40 segundos: menu desktop/mobile, abas com navegação por teclado, seletor de etapas, FAQ exclusivo, pausa de animação, movimento reduzido e conteúdo/FAQ/login sem JavaScript.

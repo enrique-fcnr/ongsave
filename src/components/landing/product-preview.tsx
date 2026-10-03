@@ -122,8 +122,8 @@ export function FeaturePreview({ view }: { view: number }) {
       <div className={styles.photoPreview}>
         <div className={styles.cameraFrame}>
           <Image
-            src="/landing/apple-ai-camera.png"
-            alt="Celular apontado para dez maçãs, com uma demonstração de visão de IA identificando cada fruta em caixas numeradas de 01 a 10"
+            src="/landing/apple-ai-iphone16.png"
+            alt="iPhone 16 apontado para dez maçãs, com uma demonstração de visão de IA identificando cada fruta em caixas numeradas de 01 a 10"
             width={1024}
             height={1536}
             sizes="(max-width: 767px) 320px, 300px"
@@ -150,6 +150,13 @@ export function FeaturePreview({ view }: { view: number }) {
             <span>Peso estimado</span>
             <strong>1,8 kg</strong>
           </div>
+          <div className={`${styles.reviewField} ${styles.reviewQuality}`}>
+            <span>Qualidade do alimento</span>
+            <strong>
+              <CircleCheck size={14} />
+              Alimento em boas condições
+            </strong>
+          </div>
           <div className={styles.reviewCheck}>
             <CircleCheck size={17} />
             Informações conferidas
@@ -166,12 +173,22 @@ export function FeaturePreview({ view }: { view: number }) {
         </div>
         <div className={styles.feedCards}>
           {[
-            { name: "Hortifrúti misto", weight: "38 kg", Icon: Leaf },
-            { name: "Pães do dia", weight: "24 kg", Icon: Package },
-          ].map(({ name, weight, Icon }) => (
+            {
+              name: "Hortifrúti misto",
+              weight: "38 kg",
+              image: "/landing/donation-produce.png",
+              alt: "Caixa de madeira com hortaliças e frutas frescas para doação",
+            },
+            {
+              name: "Pães do dia",
+              weight: "24 kg",
+              image: "/landing/donation-bread.png",
+              alt: "Cesto com pães franceses dourados para doação",
+            },
+          ].map(({ name, weight, image, alt }) => (
             <div key={name}>
               <div className={styles.feedFood}>
-                <Icon size={48} />
+                <Image src={image} alt={alt} width={1536} height={1024} sizes="250px" />
               </div>
               <strong>{name}</strong>
               <span>

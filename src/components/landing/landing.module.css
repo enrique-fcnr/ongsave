@@ -978,6 +978,23 @@
   font-size: 11px;
   font-weight: 550;
 }
+.reviewQuality {
+  background: #f1f7e9;
+  border-color: #dce9cf;
+}
+.reviewQuality > span {
+  color: #6b805e;
+}
+.reviewQuality strong {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #426b31;
+  line-height: 1.5;
+}
+.reviewQuality svg {
+  flex-shrink: 0;
+}
 .reviewCheck {
   display: flex;
   align-items: center;
@@ -1010,12 +1027,19 @@
   gap: 9px;
 }
 .feedFood {
+  position: relative;
+  overflow: hidden;
   height: 105px;
   display: grid;
   place-items: center;
   color: #90ac59;
   background: #eef4e4;
   border-radius: 12px;
+}
+.feedFood img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .feedCards > div:nth-child(2) .feedFood {
   background: #f3e9dd;

@@ -1,5 +1,33 @@
 # Imagens da landing — ONGSave
 
+## iPhone 16 e fotos das doações
+
+As três imagens foram produzidas pela ferramenta integrada `image_gen`, com fundo fotográfico opaco. A versão atual da câmera, `public/landing/apple-ai-iphone16.png` (1024 × 1536 px), é uma edição da fotografia anterior: o aparelho passa a representar um iPhone 16 com Dynamic Island, preservando as dez maçãs e as dez detecções. O cartão de revisão também apresenta o exemplo de qualidade “Alimento em boas condições”.
+
+Os cards de doação usam `public/landing/donation-produce.png` (caixa de hortifrúti) e `public/landing/donation-bread.png` (cesto de pães franceses), ambos de 1536 × 1024 px. Todos os arquivos são servidos pelo componente Image do Next.js e são ilustrações da landing.
+
+### Prompts utilizados
+
+#### Edição do iPhone 16
+
+```text
+Edit the attached target photograph. Change ONLY the smartphone hardware into a realistic BLACK base-model Apple iPhone 16 seen from the front: thin uniform bezels, rounded rectangular flat-edge aluminum frame, and the distinctive small pill-shaped Dynamic Island floating near the top center of the display, with NO broad notch touching the upper screen edge. Preserve the existing hand, counter, warm natural lighting, camera angle, portrait 2:3 composition, exactly ten red apples on the counter, and exactly ten matching apples on the phone display arranged two rows of five. Preserve one mint-green AI detection bounding box around every screen apple with numbered labels 01 through 10, ten boxes total, legible and correctly aligned. Do not add any extra apples, hands, phones or labels. Keep all ten apples and all ten boxes fully visible. Photorealistic premium product photograph. No watermark, no added branding text, no extra UI. Keep the background opaque. The provided image is the edit target; preserve everything except replacing its old notched phone with the iPhone 16 and its Dynamic Island.
+```
+
+#### Hortifrúti
+
+```text
+Use case: photorealistic-natural. Website donation-card photo for ONGSave. A shallow clean wooden produce crate full of wholesome fresh mixed supermarket produce: carrots, red tomatoes, green lettuce, zucchini, a few apples and yellow bell peppers. All produce looks intact, fresh and cared for. Editorial close-up shot from a slight overhead three-quarter angle, entire crate centered, on a clean pale cream supermarket sorting counter, soft natural daylight, subtle sage-green background softly out of focus, warm authentic textures, tasteful restrained styling. Landscape 3:2 composition with generous margins for crop into a wide rounded card. No people, no hands, no text, no logos, no watermark, no pricing stickers, no packaging branding. Opaque photographic background, not transparent.
+```
+
+#### Pães
+
+```text
+Use case: photorealistic-natural. Website donation-card photo for ONGSave, matching a premium natural food photograph in a cream and sage website. A clean shallow wicker bakery basket lined with neutral beige linen, full of golden freshly baked Brazilian pão francês bread rolls with crisp crusts and visible scoring. Several rolls arranged naturally, wholesome and cared for, no mold or damage. Close-up editorial photograph from a slight overhead three-quarter angle, entire basket centered on a clean pale cream supermarket bakery counter, warm soft daylight, gently blurred subtle cream background, realistic crust texture. Landscape 3:2 composition with generous margins for a wide rounded card crop. No people, no hands, no text, no logos, no watermark, no pricing stickers or packaging. Opaque photographic background, not transparent.
+```
+
+## Pessoas da rede
+
 Arquivo: `public/landing/rescue-team.png`, 1536 × 1024 px, PNG RGBA com canal alfa transparente. Gerado com a ferramenta integrada `image_gen` e `transparent_background: true`. Não houve remoção de fundo ou alteração manual da imagem. Representa os três participantes da rede; as pessoas são fictícias. O arquivo é servido pelo componente Image do Next.js, com tamanhos responsivos e carregamento sob demanda.
 
 ## Prompt utilizado
