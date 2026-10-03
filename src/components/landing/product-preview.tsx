@@ -122,8 +122,8 @@ export function FeaturePreview({ view }: { view: number }) {
       <div className={styles.photoPreview}>
         <div className={styles.cameraFrame}>
           <Image
-            src="/landing/apple-ai-iphone16.png"
-            alt="iPhone 16 apontado para dez maçãs, com uma demonstração de visão de IA identificando cada fruta em caixas numeradas de 01 a 10"
+            src="/landing/apple-ai-iphone16-portrait.png"
+            alt="iPhone 16 na vertical apontado para dez maçãs, com uma demonstração de visão de IA identificando cada fruta em caixas numeradas de 01 a 10"
             width={1024}
             height={1536}
             sizes="(max-width: 767px) 320px, 300px"
