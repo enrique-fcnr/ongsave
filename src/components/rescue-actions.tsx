@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { LoaderCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { browserClient } from "@/lib/supabase/client";
+import { callApi } from "@/lib/api-client";
 import { driverActions, tokenSchema, type RescueStatus } from "@/lib/domain";
 export function ReserveButton({
   batchId,
@@ -37,11 +37,8 @@ export function ReserveButton({
           setBusy(true);
           setError("");
           try {
-            const { data, error } = await browserClient().rpc("reserve_donation", {
-              batch: batchId,
-            });
-            if (error) throw error;
-            router.push(`/rescue/${data}`);
+            const { id } = await callApi<{ id: string }>(`/api/batches/${batchId}/reserve`);
+            router.push(`/rescue/${id}`);
           } catch (e) {
             setError(e instanceof Error ? e.message : "A doação não está mais disponível.");
             router.refresh();
@@ -73,21 +70,17 @@ export function RescueActions({
     setBusy(true);
     setError("");
     try {
-      const client = browserClient();
       if (status === "WAITING_DRIVER") {
-        const { error } = await client.rpc("accept_mission", { rescue: id });
-        if (error) throw error;
+        await callApi(`/api/rescues/${id}/accept`);
       } else {
         const next = status === "AT_DESTINATION" ? "DELIVERED" : driverActions[status]?.next;
         if (!next) return;
         if (next === "DELIVERED") tokenSchema.parse(token);
-        const { data, error } = await client.rpc("advance_rescue", {
-          rescue: id,
-          next_status: next,
+        const { ok } = await callApi<{ ok: boolean }>(`/api/rescues/${id}/advance`, {
+          status: next,
           token: next === "DELIVERED" ? token : null,
         });
-        if (error) throw error;
-        if (data !== true)
+        if (ok !== true)
           throw new Error("Código incorreto. Confira os quatro dígitos com a instituição.");
       }
       router.refresh();
@@ -151,11 +144,8 @@ export function RescueActions({
                 setBusy(true);
                 setError("");
                 try {
-                  const { data, error } = await browserClient().rpc("delivery_token", {
-                    rescue: id,
-                  });
-                  if (error) throw error;
-                  setCode(data);
+                  const { token } = await callApi<{ token: string }>(`/api/rescues/${id}/token`);
+                  setCode(token);
                 } catch (e) {
                   setError(e instanceof Error ? e.message : "Não foi possível consultar o código.");
                 } finally {

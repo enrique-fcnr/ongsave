@@ -16,7 +16,7 @@ import {
 import { Brand } from "./shared";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
-import { browserClient } from "@/lib/supabase/client";
+import { callApi } from "@/lib/api-client";
 import { authClient } from "@/lib/auth-client";
 import { Realtime } from "./realtime";
 import type { Profile, Organization } from "@/lib/domain";
@@ -163,10 +163,9 @@ export function Shell({
                               : "/rescues"
                         }
                         onClick={() =>
-                          void browserClient()
-                            .from("notifications")
-                            .update({ read_at: new Date().toISOString() })
-                            .eq("id", n.id)
+                          void callApi("/api/notifications/read", { id: n.id }).catch(
+                            () => undefined,
+                          )
                         }
                       >
                         <h3>{n.title}</h3>

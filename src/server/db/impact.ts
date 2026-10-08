@@ -1,6 +1,6 @@
 // Same result as private.impact_for_weight(numeric). Postgres numeric rounds half away from
 // zero on exact decimals; the exponent trick avoids binary float noise (1.005 → 1.01).
-const round = (value: number, digits = 0) => {
+export const round = (value: number, digits = 0) => {
   const exact = Number(value.toPrecision(12));
   return Number(`${Math.round(Number(`${exact}e${digits}`))}e-${digits}`);
 };
