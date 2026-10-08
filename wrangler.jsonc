@@ -23,6 +23,8 @@
       "migrations_dir": "drizzle/migrations"
     }
   ],
+  // Bucket privado: sem domínio público nem r2.dev. Fotos saem só por /api/photos.
+  "r2_buckets": [{ "binding": "PHOTOS", "bucket_name": "ongsave-photos" }],
   "vars": {
     "AI_MODE": "demo",
     "BETTER_AUTH_URL": "https://ongsave.eduardofonseca1401.workers.dev",

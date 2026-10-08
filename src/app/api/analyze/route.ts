@@ -1,32 +1,37 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { apiUser, apiError } from "@/lib/http";
-import { adminClient } from "@/lib/supabase/admin";
-import { serverClient } from "@/lib/supabase/server";
 import { analyzeSurplus } from "@/lib/ai/analyze-surplus";
+import { recordAnalysis } from "@/server/services/analysis";
+import { MAX_PHOTO_BYTES } from "@/server/storage";
+import { photoBucket } from "@/server/bindings";
 export const maxDuration = 60;
+function base64(bytes: Uint8Array) {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000)
+    binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(binary);
+}
 export async function POST(request: Request) {
   try {
-    const { user } = await apiUser(request, ["SUPERMARKET"]);
-    // Temporário: Storage/RPC Supabase saem nas etapas 13 e 12.
-    const client = await serverClient();
+    const { db, actor } = await apiUser(request, ["SUPERMARKET"]);
     const { path } = z.object({ path: z.string().max(200) }).parse(await request.json());
-    if (!path.startsWith(`${user.id}/`)) throw new Error("Fotografia não autorizada.");
-    const { data: image, error } = await client.storage.from("surplus").download(path);
-    if (error || !image || image.size > 4194304)
+    if (!path.startsWith(`${actor.authUserId}/`)) throw new Error("Fotografia não autorizada.");
+    const image = await photoBucket().get(path);
+    if (!image || image.size > MAX_PHOTO_BYTES)
       throw new Error("Não foi possível carregar a fotografia.");
     const result = await analyzeSurplus({
-      image: Buffer.from(await image.arrayBuffer()).toString("base64"),
-      mimeType: image.type,
+      image: base64(new Uint8Array(await image.arrayBuffer())),
+      mimeType: image.httpMetadata?.contentType || "image/jpeg",
     });
-    const { data: analysisId, error: recordError } = await adminClient().rpc("record_analysis", {
-      image_path: path,
-      result: result.analysis,
-      provider_name: result.provider,
-      model_name: result.model,
-      actor_auth_id: user.id,
-    });
-    if (recordError) throw new Error(recordError.message);
+    const analysisId = await recordAnalysis(
+      db,
+      actor,
+      path,
+      result.analysis,
+      result.provider,
+      result.model,
+    );
     return NextResponse.json({ ...result, analysisId });
   } catch (e) {
     return apiError(e);

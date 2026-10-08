@@ -16,5 +16,5 @@ export async function createTestDb() {
       .filter(Boolean);
     await d1.batch(statements.map((s) => d1.prepare(s)));
   }
-  return { d1, db: createDb(d1), dispose: () => proxy.dispose() };
+  return { d1, env: proxy.env, db: createDb(d1), dispose: () => proxy.dispose() };
 }
