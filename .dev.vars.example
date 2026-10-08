@@ -1,0 +1,3 @@
+# Copie para .dev.vars (ignorado pelo git) para rodar `npm run cf:preview` localmente.
+# Variáveis não secretas ficam em `vars` no wrangler.jsonc.
+NEXTJS_ENV=development

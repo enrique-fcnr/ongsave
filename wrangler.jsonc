@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ongsave",
+  // Eduardofonseca1401@gmail.com's Account. Nunca publique o ONGSave em outra conta.
+  "account_id": "51f772f7656a812951d1ee9ce5c3f9c0",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-08",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+    // Mantém /offline.html e demais arquivos de public/ com o caminho exato (o service worker depende disso).
+    "html_handling": "none",
+  },
+  "observability": {
+    "enabled": true,
+  },
+  "vars": {
+    "AI_MODE": "demo",
+    "ENABLE_DEMO_MODE": "true",
+    "NEXT_PUBLIC_MAP_PROVIDER": "maplibre",
+  },
+}

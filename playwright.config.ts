@@ -14,11 +14,14 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
-  webServer: {
-    command: "npm run dev",
-    url: "http://127.0.0.1:3000",
-    reuseExistingServer: true,
-    timeout: 120000,
-  },
+  // Com E2E_BASE_URL (cf:preview ou produção) o servidor já está no ar.
+  webServer: process.env.E2E_BASE_URL
+    ? undefined
+    : {
+        command: "npm run dev",
+        url: "http://127.0.0.1:3000",
+        reuseExistingServer: true,
+        timeout: 120000,
+      },
   reporter: [["list"], ["html", { open: "never" }]],
 });

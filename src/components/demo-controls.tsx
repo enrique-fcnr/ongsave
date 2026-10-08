@@ -87,7 +87,7 @@ export function DemoControls({ configured }: { configured: boolean }) {
             setMessage("");
             try {
               const response = await fetch("/api/demo/reset", { method: "POST" });
-              const data = await response.json();
+              const data = (await response.json()) as { error?: string; warning?: string };
               if (!response.ok) throw new Error(data.error);
               setMessage(
                 data.warning || "Demonstração resetada. Tudo pronto para um novo resgate.",

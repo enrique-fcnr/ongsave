@@ -37,7 +37,9 @@ export const openaiProvider: AIProvider = {
       throw new Error(
         "Não conseguimos analisar bem esta imagem. Tente novamente ou preencha manualmente.",
       );
-    const data = await response.json();
+    const data = (await response.json()) as {
+      choices?: { message?: { content?: string } }[];
+    };
     return {
       analysis: analysisSchema.parse(JSON.parse(data.choices?.[0]?.message?.content || "{}")),
       provider: "openai",

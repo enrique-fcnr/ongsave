@@ -18,7 +18,11 @@
     "demo:users": "tsx scripts/create-demo-users.ts",
     "demo:reset": "tsx scripts/reset-demo.ts",
     "db:migrate": "tsx scripts/migrate.ts",
-    "pwa:icons": "tsx scripts/generate-icons.ts"
+    "pwa:icons": "tsx scripts/generate-icons.ts",
+    "cf:build": "node scripts/prepare-maplibre.mjs && opennextjs-cloudflare build",
+    "cf:preview": "npm run cf:build && opennextjs-cloudflare preview",
+    "cf:deploy": "npm run cf:build && opennextjs-cloudflare deploy",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv --strict-vars=false cloudflare-env.d.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -41,6 +45,7 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.8",
+    "@opennextjs/cloudflare": "^1.20.9",
     "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "22.20.4",
@@ -56,7 +61,8 @@
     "tsx": "4.23.15",
     "typescript": "^5",
     "vite": "7.3.6",
-    "vitest": "4.1.11"
+    "vitest": "4.1.11",
+    "wrangler": "^4.149.0"
   },
   "overrides": {
     "esbuild": "0.28.1",

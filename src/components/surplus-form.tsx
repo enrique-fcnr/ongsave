@@ -31,13 +31,13 @@ const manual: SurplusAnalysis = {
   confidence: 0,
   warnings: [],
 };
-async function post(url: string, body: BodyInit, isJson = false) {
+async function post<T>(url: string, body: BodyInit, isJson = false): Promise<T> {
   const r = await fetch(url, {
     method: "POST",
     body,
     headers: isJson ? { "Content-Type": "application/json" } : undefined,
   });
-  const data = await r.json();
+  const data = (await r.json()) as T & { error?: string };
   if (!r.ok) throw new Error(data.error || "Não foi possível concluir a operação.");
   return data;
 }
@@ -65,7 +65,11 @@ export function SurplusForm() {
     setStage("analyzing");
     setAiError("");
     try {
-      const result = await post("/api/analyze", JSON.stringify({ path: imagePath }), true);
+      const result = await post<{
+        analysis: SurplusAnalysis;
+        analysisId: string;
+        provider: string;
+      }>("/api/analyze", JSON.stringify({ path: imagePath }), true);
       setAnalysis(result.analysis);
       setAnalysisId(result.analysisId);
       setProvider(result.provider);
@@ -88,7 +92,7 @@ export function SurplusForm() {
       const photo = await preparePhoto(file);
       setPreview(URL.createObjectURL(photo));
       form.set("file", photo);
-      const upload = await post("/api/upload", form);
+      const upload = await post<{ path: string; analysisId: string }>("/api/upload", form);
       setPath(upload.path);
       setAnalysisId(upload.analysisId);
       await analyze(upload.path);
@@ -289,7 +293,7 @@ export function SurplusForm() {
                   user_confirmed: confirmed,
                   items: analysis.items,
                 });
-                const result = await post(
+                const result = await post<{ id: string }>(
                   "/api/batches",
                   JSON.stringify({ payload, analysisId }),
                   true,

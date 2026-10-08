@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1", "localhost"],
@@ -18,3 +19,6 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+// Habilita os bindings da Cloudflare (D1, R2, DO, AI) no `next dev`.
+void initOpenNextCloudflareForDev();

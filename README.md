@@ -157,6 +157,25 @@ Conecte este projeto, configure as mesmas variáveis e execute build padrão Nex
 
 Para demonstração: `ENABLE_DEMO_MODE=true`, `AI_MODE=demo`. Fora da apresentação: desative demo, remova/controle as contas acadêmicas e use contas reais provisionadas pelo administrador.
 
+## Cloudflare
+
+Migração em andamento na branch `feat/edu` (plano em `prompts/00-PLANO-MIGRACAO-CLOUDFLARE.md`). O app roda num Cloudflare Worker via `@opennextjs/cloudflare`.
+
+- **Conta:** somente `Eduardofonseca1401@gmail.com's Account` (`51f772f7656a812951d1ee9ce5c3f9c0`), fixada em `account_id` no `wrangler.jsonc`. As outras contas do mesmo login não recebem nada do ONGSave.
+- **URL:** https://ongsave.eduardofonseca1401.workers.dev
+- **Plano:** Workers Paid. O Worker tem ~3,2 MiB gzip, acima do limite de 3 MiB do Free, e o SSR passa dos 10 ms de CPU do Free.
+
+```bash
+npx wrangler login        # uma vez; confira com npx wrangler whoami
+cp .dev.vars.example .dev.vars
+npm run cf:build          # copia o MapLibre para public/ e gera .open-next/
+npm run cf:preview        # build + Worker local em http://localhost:8787
+npm run cf:deploy         # build + publicação
+npm run cf-typegen        # regenera cloudflare-env.d.ts após mudar bindings
+```
+
+Variáveis não secretas ficam em `vars` no `wrangler.jsonc` (`AI_MODE`, `ENABLE_DEMO_MODE`, `NEXT_PUBLIC_MAP_PROVIDER`). `NEXT_PUBLIC_APP_URL` entra no build por `.env.production`. Segredos vão por `npx wrangler secret put <NOME>` e, localmente, por `.dev.vars` (ignorado pelo Git). Para rodar os testes de navegador contra o preview ou a produção, defina `E2E_BASE_URL`; nesse caso o Playwright não sobe o `next dev`.
+
 ## Limites conhecidos
 
 - Auth, upload, RLS, Realtime e entregas foram homologados no Supabase remoto pelo Chrome. A chamada OpenAI live depende de `OPENAI_API_KEY`; câmera e instalação PWA ainda precisam de homologação nos aparelhos físicos.

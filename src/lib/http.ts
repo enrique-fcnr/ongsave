@@ -1,6 +1,7 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import { serverClient } from "./supabase/server";
+import { isConfigured } from "./supabase/config";
 import type { Role } from "./domain";
 export async function apiUser(request: Request, allowed?: Role[]) {
   const origin = request.headers.get("origin");
@@ -12,6 +13,8 @@ export async function apiUser(request: Request, allowed?: Role[]) {
     if (host) destination.host = host;
     if (origin !== destination.origin) throw new Error("Origem não autorizada.");
   }
+  // Sem banco configurado não existe sessão possível.
+  if (!isConfigured()) throw new Error("Faça login para continuar.");
   const client = await serverClient();
   const {
     data: { user },

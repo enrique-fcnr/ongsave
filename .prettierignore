@@ -8,3 +8,6 @@ playwright-report
 docs/SPECIFICATION.md
 .env.local
 public/maplibre
+.open-next
+.wrangler
+cloudflare-env.d.ts
