@@ -25,7 +25,7 @@ Neste computador o projeto Ongsave `xhsbrwksbmxdzhujpyeb` já foi conectado via 
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Alternativa moderna; tem precedência sobre ANON_KEY                                |
 | `SUPABASE_SERVICE_ROLE_KEY`            | Somente servidor/scripts; bootstrap, proveniência da IA e reset                    |
 | `AI_MODE`                              | `demo` para fixture identificada; `live` para análise real                         |
-| `AI_PROVIDER`                          | `openai`                                                                           |
+| `AI_PROVIDER`                          | `openai` ou `workers-ai` (sem chave, usa o binding `AI`)                           |
 | `OPENAI_API_KEY`                       | Necessária somente em live                                                         |
 | `AI_MODEL`                             | Modelo multimodal; exemplo `gpt-4.1-mini`                                          |
 | `NEXT_PUBLIC_MAP_PROVIDER`             | `maplibre`; é o provider implementado                                              |
@@ -83,11 +83,22 @@ AI_MODEL=gpt-4.1-mini
 
 O provider real usa imagens na API OpenAI, JSON estrito e validação Zod. Troque o modelo por outro multimodal disponível à sua conta, se necessário. A revisão salva dados corrigidos e preserva o JSON original e a proveniência. Se a IA falha, o upload permanece e o usuário pode tentar novamente ou preencher manualmente.
 
+Sem chave nenhuma, a análise real também pode usar o **Workers AI** da própria conta Cloudflare:
+
+```env
+AI_MODE=live
+AI_PROVIDER=workers-ai
+# Opcional; padrão @cf/meta/llama-3.2-11b-vision-instruct
+AI_MODEL=@cf/meta/llama-3.2-11b-vision-instruct
+```
+
+Use o binding `AI` do `wrangler.jsonc`. Na primeira chamada o app aceita sozinho a licença Meta exigida pelo modelo. A resposta passa pelo mesmo schema Zod; se vier fora do formato, o upload permanece e o usuário preenche manualmente. A qualidade é inferior à da OpenAI (veja `prompts/RELATORIO-15.md`).
+
 ```env
 AI_MODE=demo
 ```
 
-Nesse modo a fixture é explicitamente rotulada como demo. Upload, publicação e resgate continuam reais no Supabase. A análise não determina segurança alimentar.
+Nesse modo a fixture é explicitamente rotulada como demo. Upload, publicação e resgate continuam reais no banco. A análise não determina segurança alimentar.
 
 ## Demonstração e reset
 
