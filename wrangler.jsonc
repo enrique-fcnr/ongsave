@@ -3,7 +3,7 @@
   "name": "ongsave",
   // Eduardofonseca1401@gmail.com's Account. Nunca publique o ONGSave em outra conta.
   "account_id": "51f772f7656a812951d1ee9ce5c3f9c0",
-  "main": ".open-next/worker.js",
+  "main": "worker.ts",
   "compatibility_date": "2026-10-08",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": {
@@ -27,6 +27,9 @@
   "r2_buckets": [{ "binding": "PHOTOS", "bucket_name": "ongsave-photos" }],
   // Workers AI: usado só com AI_MODE=live e AI_PROVIDER=workers-ai.
   "ai": { "binding": "AI" },
+  // Hub de tempo real (WebSocket Hibernation, backend SQLite).
+  "durable_objects": { "bindings": [{ "name": "REALTIME", "class_name": "RealtimeHub" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["RealtimeHub"] }],
   "vars": {
     "AI_MODE": "demo",
     "BETTER_AUTH_URL": "https://ongsave.eduardofonseca1401.workers.dev",

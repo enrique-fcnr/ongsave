@@ -3,6 +3,8 @@ import { apiUser, apiError } from "@/lib/http";
 import { resetDemo } from "@/server/services/demo";
 import { deletePhotos } from "@/server/storage";
 import { photoBucket } from "@/server/bindings";
+import { notify } from "@/server/realtime/notify";
+import { ALL } from "@/server/realtime/channels";
 export async function POST(request: Request) {
   try {
     if (process.env.ENABLE_DEMO_MODE !== "true") throw new Error("Modo demonstração desativado.");
@@ -10,6 +12,7 @@ export async function POST(request: Request) {
     if (actor.email !== "mercado@ongsave.demo")
       throw new Error("Entre como Mercado Paulista para resetar a demonstração.");
     await resetDemo(db, actor);
+    notify([ALL]);
     // Photo cleanup limited to the official account's folder, after the data reset.
     try {
       await deletePhotos(photoBucket(), `${actor.authUserId}/`);
