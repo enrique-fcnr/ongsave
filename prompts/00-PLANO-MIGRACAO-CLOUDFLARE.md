@@ -53,6 +53,9 @@ Depois do 16 vem uma rodada de otimização e melhorias para a apresentação (C
 7. Commits pequenos na `feat/edu`, mensagem em inglês no padrão do repositório (`feat(cf): ...`), e push.
 8. Ao terminar, diga exatamente: **"Prompt <numero> concluído."**
 
+## Tamanho do Worker
+64 MiB descomprimido, igual no Free e no Paid, sem limite comprimido (doc atualizada em 08/10/2026). O build atual tem ~14,9 MiB: cabe no Free.
+
 ## Custo: plano **Free**, meta de R$ 0 (decisão do Edu, 08/10)
 Nada de Workers Paid. Isso muda o projeto em um ponto: **no Free cada requisição tem 10 ms de CPU**. Esperar banco, R2 ou fetch não conta, só o processamento. Há uma folga para estouros ocasionais, mas estouro constante gera o erro **1102 "Worker exceeded resource limits"**. Regras para todos os prompts:
 1. **Renderizar o mínimo no servidor.** A landing e as páginas públicas são estáticas (prerender). Nas páginas logadas, só o necessário; nada de cálculo pesado por request.

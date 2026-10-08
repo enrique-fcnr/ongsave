@@ -1,0 +1,3 @@
+
+## Correção ao RELATORIO-02 (08/10, conferido na doc oficial)
+O relatório diz que o Worker de 3.245 KiB gzip passa do limite de 3 MiB do Free e que o Workers Paid seria obrigatório. **Isso está desatualizado.** A página oficial de limites (https://developers.cloudflare.com/workers/platform/limits/, atualizada em 08/10/2026) diz que Free e Paid têm o mesmo limite, **64 MiB descomprimido**, e que "There is no compressed size limit". O gzip do `--dry-run` é só referência. Nosso Worker tem 14.885 KiB descomprimido: **cabe no Free**. Decisão do Edu: **plano Free, custo zero**. Siga o deploy no Free.

@@ -45,6 +45,19 @@ Ao parar: registre em `prompts/DUVIDAS.md` (o quê, onde, o que tentou, o que pr
 ## Plano Free
 O projeto roda no plano **Free** (decisão do Edu, custo zero). Nunca assine nem ative serviço pago. Se algo só funcionar no pago, siga a alternativa gratuita do plano (00, seção "Custo"). Se não houver alternativa, PARE.
 
+## Deploy pelo GitHub (decisão do Edu, 08/10)
+O deploy de produção é feito pela **integração Git da Cloudflare (Workers Builds)**: cada push na branch configurada dispara build e deploy na Cloudflare, como no projeto da Moss. Você **não precisa** rodar `cf:deploy` para publicar: faça commit e push, e a Cloudflare publica.
+- Comando de build no painel: `npm run cf:build`.
+- Comando de deploy no painel: `npx wrangler d1 migrations apply ongsave-db --remote && npx opennextjs-cloudflare deploy` (a parte do D1 só depois que o prompt 10 criar o banco).
+- Variáveis `NEXT_PUBLIC_*` em **Build variables** no painel; segredos em **Variables and Secrets**.
+- Se precisar mudar o comando de build ou de deploy, ou criar uma variável no painel, anote em `prompts/COMANDOS-PARA-O-EDU.md`.
+
+## Permissão de deploy
+Comandos `wrangler deploy`, `opennextjs-cloudflare deploy`, `wrangler d1 ... --remote`, `wrangler secret put` e criação de recursos precisam de permissão no Claude Code. O Edu vai liberar. Se ainda assim forem bloqueados, **não pare a migração**: anote o comando exato em `prompts/COMANDOS-PARA-O-EDU.md` e siga com o que der localmente (`--local`, `cf:preview`).
+
+## Tamanho do Worker
+O limite é **64 MiB descomprimido, igual no Free e no Paid**, sem limite comprimido (doc oficial, atualizada em 08/10/2026). O aviso de "3 MiB gzip" é antigo: ignore.
+
 ## Cuidados de execução
 - **Contexto longo:** depois de cada etapa, resuma para si o que importa e confie nos relatórios e no `PROGRESSO.md` como memória. Se a sessão reiniciar, o passo 4 de "Antes de começar" retoma de onde parou.
 - **Comandos que pedem confirmação interativa** (`wrangler d1 migrations apply --remote`, criação de recursos): confirme apenas se o destino for a conta acima.

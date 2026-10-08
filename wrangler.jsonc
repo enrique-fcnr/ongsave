@@ -15,6 +15,14 @@
   "observability": {
     "enabled": true,
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ongsave-db",
+      "database_id": "00fa9a8f-288f-4f62-9e54-1bf371087c75",
+      "migrations_dir": "drizzle/migrations"
+    }
+  ],
   "vars": {
     "AI_MODE": "demo",
     "ENABLE_DEMO_MODE": "true",
