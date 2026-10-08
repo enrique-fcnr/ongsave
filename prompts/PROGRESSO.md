@@ -8,6 +8,7 @@
 | 4 | 13-PROMPT-B4-R2-FOTOS | concluído (bucket remoto pendente) | 2026-10-08 19:15 | 7bf3667 | Upload/leitura via R2 com checagem de permissão; R2 precisa ser habilitado no painel |
 | 5 | 15-PROMPT-B6-IA | concluído | 2026-10-08 19:30 | d3d5e16 | Provider workers-ai com aceite de licença e extração de JSON; chamada real feita, qualidade fraca (documentada) |
 | 6 | 12-PROMPT-B3-REGRAS-DE-NEGOCIO | concluído | 2026-10-08 19:55 | 5468961 | RPCs viraram services com guardas atômicas; 23 testes de fluxo/concorrência; fluxo completo nas telas ok |
+| 7 | 14-PROMPT-B5-REALTIME | concluído | 2026-10-08 20:15 | 7322ed0 | DO RealtimeHub com hibernation; upgrade no worker.ts, canais decididos no Next; 299 ms entre sessões no preview |
 
 ## Comandos remotos pendentes (bloqueados pela permissão do Claude Code; rodar manualmente)
 0. Painel Cloudflare (conta Eduardofonseca1401) → R2 Object Storage → ativar. Depois `npx wrangler r2 bucket create ongsave-photos`
