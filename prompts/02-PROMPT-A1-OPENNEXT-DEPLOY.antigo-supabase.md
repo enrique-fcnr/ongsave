@@ -3,12 +3,15 @@
 Você está no repositório `ongsave`, branch `feat/edu`. Leia antes: `prompts/00-PLANO-MIGRACAO-CLOUDFLARE.md`, `AGENTS.md`, `README.md`, `docs/ARCHITECTURE.md`, `next.config.ts`, `src/proxy.ts`, `package.json`.
 
 ## Objetivo
+
 O app atual, sem mudar nenhuma funcionalidade, roda em produção num Cloudflare Worker via `@opennextjs/cloudflare`, ainda usando o Supabase. Ao fim existe uma URL `https://ongsave.<subdominio>.workers.dev` com login, foto, publicação, aceite, missão, entrega e impacto funcionando.
 
 ## Conta Cloudflare (obrigatório)
+
 O login do wrangler enxerga três contas. O ONGSave vai **somente** em `Eduardofonseca1401@gmail.com's Account`. Antes de qualquer comando que crie ou publique algo, rode `npx wrangler whoami`, mostre as contas ao Edu e peça o Account ID dessa conta, caso ele não tenha colado. Grave como `"account_id"` no `wrangler.jsonc`. Nunca crie recurso em Agentdoctoradm nem em Paulatoridol. Se o `whoami` não listar a conta Eduardofonseca1401, pare e peça ao Edu para refazer `npx wrangler login`.
 
 ## Passos
+
 1. **Dependências:** instale `@opennextjs/cloudflare@^1.20.8` e `wrangler@latest` como devDependencies. Confirme no changelog oficial (https://github.com/opennextjs/opennextjs-cloudflare/releases) que a versão instalada suporta Next 16.3.8 e `proxy.ts`. Se o suporte a `proxy.ts` (node middleware) falhar no build ou no preview, siga o que a doc indicar; se ela não indicar nada, **pare e registre em `prompts/DUVIDAS.md`**, sem trocar o proxy por outra coisa por conta própria.
 2. **Config**, seguindo https://opennext.js.org/cloudflare/get-started:
    - `wrangler.jsonc` com `name: "ongsave"`, `main: ".open-next/worker.js"`, `compatibility_date` recente (hoje), `compatibility_flags: ["nodejs_compat", "global_fetch_strictly_public"]`, `assets: { directory: ".open-next/assets", binding: "ASSETS" }` e `observability.enabled: true`.
@@ -27,6 +30,7 @@ O login do wrangler enxerga três contas. O ONGSave vai **somente** em `Eduardof
 9. Relatório em `prompts/RELATORIO-02.md`: URL publicada, versão do adapter, o que foi testado, tempo de resposta percebido, avisos do build e pendências.
 
 ## Não fazer
+
 - Não trocar Supabase por nada ainda.
 - Não mexer em telas, textos ou regras.
 - Não fazer merge na `main` nem desligar a Vercel. Isso só depois que o Edu validar.

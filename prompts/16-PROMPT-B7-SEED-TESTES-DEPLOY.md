@@ -3,9 +3,11 @@
 Leia antes todos os `prompts/RELATORIO-*.md`, `scripts/`, `e2e/`, `docs/` e `README.md`.
 
 ## Objetivo
+
 Remover o Supabase do projeto, popular o D1 de produção com a mesma demo, passar em todos os testes e publicar.
 
 ## Passos
+
 1. **Seed:**
    - `scripts/seed-data.ts` continua sendo a fonte;
    - crie `scripts/seed-d1.ts`, que gera SQL ou usa a API para popular o D1 (local e remoto) com 8 organizações, 3 motoristas, 4 lotes disponíveis, 3 missões seed e 16 entregas históricas com métricas, preservando `is_seed`, `is_demo` e `seed_kind`;
@@ -14,8 +16,9 @@ Remover o Supabase do projeto, popular o D1 de produção com a mesma demo, pass
 3. **Remover Supabase:**
    - apague `src/lib/supabase/`, `supabase/` (mova as migrations antigas para `docs/legacy-supabase/` como referência), `@supabase/*` e `supabase` do package.json, e `scripts/migrate.ts`;
    - tire as variáveis Supabase do `.env.example`.
-   
+
    `grep -ri supabase src scripts tests e2e` deve voltar vazio, salvo docs.
+
 4. **Testes:**
    - Vitest: domínio + `tests/d1/`. Remova os testes PGlite antigos depois de confirmar que todos os cenários foram portados (liste a correspondência no relatório);
    - Playwright: ajuste `e2e/live-flow.spec.ts`. Antes ele checava frames do Supabase Realtime no WebSocket; agora checa o WebSocket do `/api/realtime`. Rode contra o `cf:preview` e depois contra produção.
@@ -29,8 +32,9 @@ Remover o Supabase do projeto, popular o D1 de produção com a mesma demo, pass
    - durante o e2e em produção, acompanhe `wrangler tail` (ou Observability);
    - liste a CPU por rota (landing, login, home de cada papel, feed, missão, upload, analyze, avançar etapa, entrega);
    - qualquer rota com `exceededCpu` ou acima de ~8 ms: otimize e repita.
-   
+
    O relatório precisa mostrar zero erro 1102 no fluxo completo.
+
 7. **Documentação:**
    - reescreva as seções de instalação, variáveis, banco, deploy e reset do `README.md`, além de `docs/ARCHITECTURE.md`, `docs/HANDOFF.md` e `docs/QA.md`, para a stack Cloudflare;
    - tire os caminhos Windows antigos.

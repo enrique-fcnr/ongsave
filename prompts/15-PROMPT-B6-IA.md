@@ -3,11 +3,14 @@
 Leia antes: `src/lib/ai/` inteiro, `src/app/api/analyze/route.ts`, README (seção IA) e `.env.example`.
 
 ## Objetivo
+
 Manter os modos atuais e acrescentar o provider **Workers AI**:
+
 - `AI_MODE=demo`: fixture identificada (continua o padrão);
 - `AI_MODE=live` com `AI_PROVIDER=openai`: mantido como está, só troca de onde vem a foto (R2).
 
 ## Passos
+
 1. **Binding:** `ai` (`"ai": { "binding": "AI" }`) no `wrangler.jsonc`.
 2. **Provider `src/lib/ai/providers/workers-ai.ts`**, implementando a mesma interface de `provider.ts`:
    - modelo padrão `@cf/meta/llama-3.2-11b-vision-instruct`; confira na doc atual (https://developers.cloudflare.com/workers-ai/models/) se continua disponível e se exige aceite de licença na primeira chamada. Se exigir, implemente e documente;

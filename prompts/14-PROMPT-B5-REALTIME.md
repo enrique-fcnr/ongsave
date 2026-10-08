@@ -3,12 +3,15 @@
 Leia antes: `prompts/00-...`, `src/components/realtime.tsx`, `docs/ARCHITECTURE.md` (seção Realtime), a lista de tabelas da publicação `supabase_realtime` nas migrations e os services do prompt 12.
 
 ## Como funciona hoje
+
 O componente assina `postgres_changes` de 6 tabelas e, a cada evento, chama `router.refresh()`. Também faz refresh a cada 15 s, no foco da janela e quando a rede volta. Mostra o selo "Atualizações ao vivo" / "Sincronizando".
 
 ## Objetivo
+
 Mesmo comportamento sem Supabase: um **Durable Object `RealtimeHub`** (backend SQLite, WebSocket Hibernation) recebe avisos do servidor e repassa aos navegadores conectados. O aviso não carrega dado sensível, só `{ type: "changed", scope }`. O navegador continua buscando os dados pelo servidor (`router.refresh()`), que aplica as permissões.
 
 ## Passos
+
 1. **Classe `RealtimeHub`** em `src/server/realtime/hub.ts`, com `ctx.acceptWebSocket()`, `webSocketMessage` (ping/pong) e `webSocketClose`.
    - Canais por público: `org:<organizationId>`, `driver:<driverId>`, `drivers` (missões disponíveis), `ngos` (feed de doações) e `profile:<profileId>` (notificações).
    - Guarde o canal com `serializeAttachment`.

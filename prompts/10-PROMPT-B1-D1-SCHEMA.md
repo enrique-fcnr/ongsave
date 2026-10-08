@@ -3,9 +3,11 @@
 Leia antes: `prompts/00-PLANO-MIGRACAO-CLOUDFLARE.md` (regras), `prompts/RELATORIO-02.md`, as duas migrations em `supabase/migrations/`, `src/lib/domain.ts`, `src/lib/data.ts`, `scripts/seed-data.ts` e `tests/database.test.ts`.
 
 ## Objetivo
+
 Criar o banco **D1** `ongsave-db` com o schema equivalente ao Postgres atual, usando **Drizzle ORM**. Fornecer uma camada de acesso `src/server/db/` que as próximas etapas vão usar. O banco é novo e nasce vazio nesta conta (nenhum dado do Supabase antigo é migrado; os dados demo vêm de `scripts/seed-data.ts` no prompt 16). As telas só passam a ler do D1 a partir dos prompts 11 e 12.
 
 ## Passos
+
 1. `npx wrangler d1 create ongsave-db` e coloque o binding `DB` no `wrangler.jsonc`, com `migrations_dir` apontando para `drizzle/migrations`. Rode `npm run cf-typegen` para tipar `CloudflareEnv`.
 2. Instale `drizzle-orm` e `drizzle-kit`. Crie `drizzle.config.ts` (dialect `sqlite`, driver `d1-http` só para o studio, se quiser).
 3. Escreva `src/server/db/schema.ts` portando **todas** as tabelas, incluindo as do schema `private` (`rescue_tokens`, `analyses`). Convenções:
@@ -26,8 +28,9 @@ Criar o banco **D1** `ongsave-db` com o schema equivalente ao Postgres atual, us
    - os `CHECK` rejeitam valores inválidos;
    - o `UNIQUE` de `donation_reservations.batch_id` e de `rescues.batch_id` impede reserva dupla;
    - `impactForWeight` dá os mesmos valores da função SQL para 10, 23 e 100 kg.
-   
+
    Mantenha os testes PGlite antigos rodando por enquanto. Eles saem no prompt 16.
+
 9. Relatório `prompts/RELATORIO-10.md`: mapa tabela Postgres → D1, decisões de tipo e o que ficou diferente.
 
 Ao terminar: **"Prompt 10 concluído."**
