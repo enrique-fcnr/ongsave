@@ -6,6 +6,7 @@
 | 2 | 10-PROMPT-B1-D1-SCHEMA | concluído (migration remota pendente) | 2026-10-08 18:45 | 56c6421 | D1 ongsave-db criado; 14 tabelas via Drizzle; guardas atômicas batch_guards; 10 testes D1 |
 | 3 | 11-PROMPT-B2-AUTH | concluído (segredo remoto pendente) | 2026-10-08 19:05 | 787abc6 | Better Auth + D1, login 35–58 ms no preview; leituras das telas já no D1; proxy removido |
 | 4 | 13-PROMPT-B4-R2-FOTOS | concluído (bucket remoto pendente) | 2026-10-08 19:15 | 7bf3667 | Upload/leitura via R2 com checagem de permissão; R2 precisa ser habilitado no painel |
+| 5 | 15-PROMPT-B6-IA | concluído | 2026-10-08 19:30 | d3d5e16 | Provider workers-ai com aceite de licença e extração de JSON; chamada real feita, qualidade fraca (documentada) |
 
 ## Comandos remotos pendentes (bloqueados pela permissão do Claude Code; rodar manualmente)
 0. Painel Cloudflare (conta Eduardofonseca1401) → R2 Object Storage → ativar. Depois `npx wrangler r2 bucket create ongsave-photos`
