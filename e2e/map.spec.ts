@@ -5,8 +5,8 @@ for (const width of [390, 996]) {
     page,
   }) => {
     test.skip(
-      !process.env.NEXT_PUBLIC_SUPABASE_URL,
-      "Requer as contas demo do Supabase configurado.",
+      !process.env.E2E_BASE_URL,
+      "Requer as contas demo no D1 (cf:preview ou produção em E2E_BASE_URL).",
     );
     const errors: string[] = [];
     let vectorTiles = 0;

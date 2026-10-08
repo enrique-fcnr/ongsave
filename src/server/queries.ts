@@ -1,4 +1,4 @@
-// Read queries that replace the Supabase selects. Each one filters with permissions.ts,
+// Read queries that replace the former PostgREST selects. Each one filters with permissions.ts,
 // mirroring the RLS policy of every table it touches (including joined tables).
 import { and, asc, desc, eq, gt, inArray, sql } from "drizzle-orm";
 import type { Batch, Organization, Preferences, Rescue } from "@/lib/domain";

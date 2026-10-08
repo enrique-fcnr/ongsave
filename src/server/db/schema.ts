@@ -1,4 +1,4 @@
-// D1 (SQLite) port of supabase/migrations/20261001113753_ongsave_core.sql.
+// D1 (SQLite) port of the original Postgres schema (docs/legacy-*/…_ongsave_core.sql).
 // Conventions: ids are text UUIDs generated in code; dates are ISO-8601 UTC strings
 // (same format as Date#toISOString); booleans are 0/1 integers; jsonb and text[] are JSON text.
 // Property names stay snake_case so rows keep the shape the UI already consumes.

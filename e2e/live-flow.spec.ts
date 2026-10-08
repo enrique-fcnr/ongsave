@@ -1,35 +1,31 @@
 import { test, expect, type Page } from "@playwright/test";
 import { resolve } from "node:path";
 import { analysisSchema } from "../src/lib/ai/schema";
-import { createClient } from "@supabase/supabase-js";
 
-type Change = { table: string; record: Record<string, unknown> };
+// Frames of the RealtimeHub WebSocket. They only say "changed" (no data); the page then
+// refreshes through the server. Each page keeps the scopes it was told about.
 function observeRealtime(page: Page) {
-  const changes: Change[] = [];
+  const changes: string[] = [];
   page.on("websocket", (socket) => {
-    if (!socket.url().includes("/realtime/v1/")) return;
+    if (!socket.url().endsWith("/api/realtime")) return;
     socket.on("framereceived", ({ payload }) => {
       try {
         const message = JSON.parse(payload.toString());
-        const event = Array.isArray(message) ? message[3] : message.event;
-        const body = Array.isArray(message) ? message[4] : message.payload;
-        if (event === "postgres_changes" && body?.data?.table) {
-          changes.push({ table: body.data.table, record: body.data.record || {} });
-        }
+        if (message.type === "changed") changes.push(String(message.scope));
       } catch {
-        /* Ignore heartbeat frames. Only Postgres frames prove Realtime. */
+        /* Ignore heartbeat frames. Only change notices prove the realtime hub. */
       }
     });
   });
   return changes;
 }
-async function change(changes: Change[], table: string, id: string, status: string) {
+// Wait for a live notice that arrived after `since` notices had been seen.
+async function change(changes: string[], since: number, what: string) {
   await expect
-    .poll(
-      () =>
-        changes.some((c) => c.table === table && c.record.id === id && c.record.status === status),
-      { timeout: 15000, message: `Aguardar evento real ${table}:${id}:${status}` },
-    )
+    .poll(() => changes.length > since, {
+      timeout: 15000,
+      message: `Aguardar aviso ao vivo: ${what}`,
+    })
     .toBe(true);
 }
 async function subscribed(page: Page) {
@@ -90,7 +86,7 @@ test("foto real, três contas, impacto e repetição após reset com fallback ma
 }, testInfo) => {
   test.skip(
     process.env.RUN_LIVE_E2E !== "true",
-    "Requer Supabase dedicado e contas seed. RUN_LIVE_E2E=true autoriza resetar dados demo.",
+    "Requer D1 dedicado com contas seed (cf:preview ou produção em E2E_BASE_URL). RUN_LIVE_E2E=true autoriza resetar dados demo.",
   );
   test.setTimeout(300000);
   const contexts = await Promise.all(
@@ -118,19 +114,6 @@ test("foto real, três contas, impacto e repetição após reset com fallback ma
   let previous: { title: string; photoPath: string } | undefined;
   let seeded: Awaited<ReturnType<typeof totals>>[] | undefined;
   try {
-    // Check deletion against authenticated Storage metadata, because signed
-    // downloads can remain cached at the CDN after the origin object is gone.
-    const storage = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!,
-      { auth: { persistSession: false, autoRefreshToken: false } },
-    );
-    const { data: storageAuth, error: storageAuthError } = await storage.auth.signInWithPassword({
-      email: "mercado@ongsave.demo",
-      password: "demo123",
-    });
-    expect(storageAuthError).toBeNull();
     await Promise.all([
       login(market, "mercado@ongsave.demo"),
       login(ngo, "ong@ongsave.demo"),
@@ -161,11 +144,9 @@ test("foto real, três contas, impacto e repetição após reset com fallback ma
       if (previous) {
         for (const page of history)
           await expect(page.getByRole("heading", { name: previous.title })).toHaveCount(0);
-        const { data: photos, error: photosError } = await storage.storage
-          .from("surplus")
-          .list(storageAuth.user!.id, { search: previous.photoPath.split("/").pop() });
-        expect(photosError).toBeNull();
-        expect(photos).toEqual([]);
+        // The owner may read its own folder, so 404 proves the R2 object is gone.
+        const removed = await market.request.get(`/api/photos/${previous.photoPath}`);
+        expect(removed.status()).toBe(404);
       }
       await Promise.all([
         ngo.goto("/ngo/donations"),
@@ -207,7 +188,9 @@ test("foto real, três contas, impacto e repetição após reset com fallback ma
         expect(analysisResponse.ok()).toBe(true);
         const result = await analysisResponse.json();
         expect(analysisSchema.safeParse(result.analysis).success).toBe(true);
-        expect(result.provider).toBe(process.env.AI_MODE === "live" ? "openai" : "demo");
+        expect(result.provider).toBe(
+          process.env.AI_MODE === "live" ? process.env.AI_PROVIDER || "openai" : "demo",
+        );
         expect(result.analysisId).toMatch(/^[\da-f-]{36}$/);
         await expect(
           market.getByText(
@@ -226,13 +209,14 @@ test("foto real, três contas, impacto e repetição após reset com fallback ma
       const published = market.waitForResponse(
         (r) => r.url().endsWith("/api/batches") && r.request().method() === "POST",
       );
+      const ngoSeen = changes[1].length;
       await market.getByRole("button", { name: "Confirmar e publicar" }).click();
       const publication = await published;
       expect(publication.ok()).toBe(true);
       const batch = await publication.json();
       expect(batch.id).toMatch(/^[\da-f-]{36}$/);
       await expect(market.getByRole("heading", { name: "Excedente publicado" })).toBeVisible();
-      await change(changes[1], "surplus_batches", batch.id, "AVAILABLE");
+      await change(changes[1], ngoSeen, `lote ${batch.id} disponível para a ONG`);
       const donation = ngo
         .getByRole("link")
         .filter({ has: ngo.getByRole("heading", { name: title, exact: true }) });
@@ -242,21 +226,22 @@ test("foto real, três contas, impacto e repetição após reset com fallback ma
         .poll(() => photo.evaluate((image) => (image as HTMLImageElement).naturalWidth))
         .toBeGreaterThan(0);
       const signedPhoto = await photo.getAttribute("src");
-      expect(signedPhoto).toContain(`/storage/v1/object/sign/surplus/${upload.path}`);
+      expect(signedPhoto).toContain(`/api/photos/${upload.path}`);
       await ngo.getByRole("button", { name: /^Notificações,/ }).click();
       await expect(
         ngo.getByRole("dialog").getByText(`${weight} kg de ${title}`, { exact: true }),
       ).toBeVisible();
-      await ngo.getByRole("dialog").getByRole("button", { name: "Close", exact: true }).click();
+      await ngo.getByRole("dialog").getByRole("button", { name: "Fechar", exact: true }).click();
       await donation.click();
       await expect(ngo.getByRole("heading", { name: title, exact: true })).toBeVisible();
       ngo.once("dialog", (dialog) => void dialog.accept());
+      const driverSeen = changes[2].length;
       await ngo.getByRole("button", { name: "Aceitar doação" }).click();
       await expect(ngo).toHaveURL(/\/rescue\/[\da-f-]+$/);
       const rescueId = new URL(ngo.url()).pathname.split("/").pop()!;
       await Promise.all([
         subscribed(ngo),
-        change(changes[2], "rescues", rescueId, "WAITING_DRIVER"),
+        change(changes[2], driverSeen, `missão ${rescueId} para o motorista`),
       ]);
       await driver
         .getByRole("button")
@@ -274,6 +259,7 @@ test("foto real, três contas, impacto e repetição após reset com fallback ma
       await driver.getByRole("link", { name: "Continuar missão", exact: true }).click();
       await expect(driver).toHaveURL(new RegExp(`/driver/missions/${rescueId}$`));
       await subscribed(driver);
+      const atDoor = changes[1].length;
       for (const action of [
         "Iniciar coleta",
         "Cheguei ao supermercado",
@@ -287,7 +273,7 @@ test("foto real, três contas, impacto e repetição após reset com fallback ma
         body: await driver.getByRole("region", { name: "Mapa dos resgates" }).screenshot(),
         contentType: "image/png",
       });
-      await change(changes[1], "rescues", rescueId, "AT_DESTINATION");
+      await change(changes[1], atDoor, `resgate ${rescueId} na instituição`);
       await expect(ngo.getByRole("button", { name: /Mostrar código/ })).toBeVisible({
         timeout: 15000,
       });
@@ -303,6 +289,7 @@ test("foto real, três contas, impacto e repetição após reset com fallback ma
       await expect(driver.getByRole("alert").filter({ hasText: "Código incorreto" })).toBeVisible();
       await expect(driver.getByRole("heading", { name: "Missão concluída" })).toHaveCount(0);
       await driver.getByLabel("Digite o código da instituição").fill(token);
+      const delivered = [changes[0].length, changes[1].length];
       await driver.getByRole("button", { name: "Confirmar entrega", exact: true }).click();
       await Promise.all(
         main.map((page) =>
@@ -312,8 +299,8 @@ test("foto real, três contas, impacto e repetição após reset com fallback ma
         ),
       );
       await Promise.all([
-        change(changes[0], "rescues", rescueId, "DELIVERED"),
-        change(changes[1], "rescues", rescueId, "DELIVERED"),
+        change(changes[0], delivered[0], `entrega ${rescueId} no mercado`),
+        change(changes[1], delivered[1], `entrega ${rescueId} na ONG`),
       ]);
       for (const page of main) {
         await expect(page.locator(".timeline-item")).toHaveCount(9);

@@ -43,7 +43,7 @@ async function fits(page: Page) {
 
 for (const width of [390, 768, 1440]) {
   test(`foto, revisão e confirmação em ${width}px com APIs isoladas`, async ({ page }) => {
-    test.skip(!process.env.NEXT_PUBLIC_SUPABASE_URL, "Requer login de demonstração.");
+    test.skip(!process.env.E2E_BASE_URL, "Requer login de demonstração.");
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/login");
     await page.getByLabel("E-mail", { exact: true }).fill("mercado@ongsave.demo");
@@ -117,10 +117,7 @@ for (const width of [390, 768, 1440]) {
 for (const width of [390, 768, 1440]) {
   for (const account of roles) {
     test(`${account.role}: telas e navegação em ${width}px`, async ({ page }) => {
-      test.skip(
-        !process.env.NEXT_PUBLIC_SUPABASE_URL,
-        "Requer contas de demonstração configuradas.",
-      );
+      test.skip(!process.env.E2E_BASE_URL, "Requer contas de demonstração configuradas.");
       test.setTimeout(180000);
       const errors: string[] = [];
       page.on("pageerror", (error) => errors.push(error.message));

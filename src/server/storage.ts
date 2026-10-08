@@ -1,4 +1,4 @@
-// Private surplus photos in R2 (former Supabase Storage bucket "surplus").
+// Private surplus photos in R2 (the former private storage bucket "surplus").
 import { eq } from "drizzle-orm";
 import type { Db } from "./db/client";
 import { rescues, surplusBatches } from "./db/schema";

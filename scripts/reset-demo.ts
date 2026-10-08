@@ -1,44 +1,38 @@
-import { serviceClient } from "./environment";
+// Resets the demo through the app itself (same resetDemo + R2 cleanup as the /demo button),
+// signed in as the official supermarket account.
+//   npm run demo:reset                       → produção (NEXT_PUBLIC_APP_URL de .env.production)
+//   npm run demo:reset -- http://localhost:8787   → cf:preview local
+import { readFileSync } from "node:fs";
+
+function productionUrl() {
+  const line = readFileSync(".env.production", "utf8")
+    .split("\n")
+    .find((l) => l.startsWith("NEXT_PUBLIC_APP_URL="));
+  return line?.split("=")[1]?.trim();
+}
+
 async function main() {
-  if (process.env.ENABLE_DEMO_MODE !== "true")
-    throw new Error("Defina ENABLE_DEMO_MODE=true para resetar.");
-  const client = serviceClient();
-  const { data: profile, error } = await client
-    .from("profiles")
-    .select("auth_user_id")
-    .eq("email", "mercado@ongsave.demo")
-    .single();
-  if (error) throw error;
-  const paths: string[] = [];
-  for (let offset = 0; ; offset += 1000) {
-    const { data: objects, error: listError } = await client.storage
-      .from("surplus")
-      .list(profile.auth_user_id, {
-        limit: 1000,
-        offset,
-        sortBy: { column: "name", order: "asc" },
-      });
-    if (listError) throw listError;
-    paths.push(
-      ...(objects || [])
-        .filter((object) => object.id)
-        .map((object) => `${profile.auth_user_id}/${object.name}`),
-    );
-    if (!objects || objects.length < 1000) break;
-  }
-  const { error: resetError } = await client.rpc("reset_demo", {
-    actor_auth_id: profile.auth_user_id,
+  const base = (process.argv[2] || productionUrl() || "").replace(/\/$/, "");
+  if (!base) throw new Error("Informe a URL do app.");
+  const signIn = await fetch(`${base}/api/auth/sign-in/email`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: base },
+    body: JSON.stringify({ email: "mercado@ongsave.demo", password: "demo123" }),
   });
-  if (resetError) throw resetError;
-  for (let offset = 0; offset < paths.length; offset += 100) {
-    const { error } = await client.storage
-      .from("surplus")
-      .remove(paths.slice(offset, offset + 100));
-    if (error) throw error;
-  }
-  console.log("Demonstração resetada. Histórico inicial preservado.");
+  if (!signIn.ok) throw new Error(`Login da conta oficial falhou (${signIn.status}).`);
+  const cookie = signIn.headers
+    .getSetCookie()
+    .map((c) => c.split(";")[0])
+    .join("; ");
+  const reset = await fetch(`${base}/api/demo/reset`, {
+    method: "POST",
+    headers: { cookie, Origin: base },
+  });
+  const body = (await reset.json()) as { ok?: boolean; error?: string; warning?: string };
+  if (!reset.ok) throw new Error(body.error || `Reset falhou (${reset.status}).`);
+  console.log(body.warning || `Demonstração resetada em ${base}. Histórico inicial preservado.`);
 }
 main().catch((e) => {
-  console.error(e.message);
+  console.error(e instanceof Error ? e.message : e);
   process.exitCode = 1;
 });

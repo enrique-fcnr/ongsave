@@ -1,4 +1,4 @@
-// Ports of the plpgsql RPCs in supabase/migrations/20261001113753_ongsave_core.sql.
+// Ports of the plpgsql RPCs of the original Postgres schema (docs/legacy-*/…_ongsave_core.sql).
 // Pattern for every function that used FOR UPDATE: read and validate (for the friendly
 // error), then one D1 batch whose guards re-check the same rules inside the transaction.
 // Nothing is written outside a guarded batch, so concurrent calls cannot both win.
