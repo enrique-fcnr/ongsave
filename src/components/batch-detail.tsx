@@ -3,29 +3,16 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Clock, MapPin, Utensils } from "lucide-react";
 import { requireProfile } from "@/lib/auth";
 import { signedPhoto } from "@/lib/data";
-import { categoryLabels, conditions, number, priorities, type Batch } from "@/lib/domain";
+import { categoryLabels, conditions, number, priorities } from "@/lib/domain";
 import { FoodPhoto, StatusPill } from "./shared";
 import { ReserveButton } from "./rescue-actions";
+import { batchDetail } from "@/server/queries";
+import { operationalTime } from "@/server/db/time";
 export async function BatchDetail({ id }: { id: string }) {
-  const { client, profile } = await requireProfile();
-  const { data: b, error } = await client
-    .from("surplus_batches")
-    .select("*,surplus_items(*)")
-    .eq("id", id)
-    .maybeSingle();
-  if (error) throw new Error(error.message);
-  if (!b) notFound();
-  const batch = b as Batch;
-  const { data: market } = await client
-    .from("organizations")
-    .select("*")
-    .eq("id", batch.supermarket_id)
-    .single();
-  const { data: rescue } = await client
-    .from("rescues")
-    .select("id")
-    .eq("batch_id", id)
-    .maybeSingle();
+  const { db, actor, profile } = await requireProfile();
+  const detail = await batchDetail(db, actor, id, operationalTime());
+  if (!detail) notFound();
+  const { batch, market, rescue } = detail;
   const deadline = new Intl.DateTimeFormat("pt-BR", {
     timeZone: "America/Sao_Paulo",
     hour: "2-digit",

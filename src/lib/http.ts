@@ -1,7 +1,9 @@
 import "server-only";
 import { NextResponse } from "next/server";
-import { serverClient } from "./supabase/server";
-import { isConfigured } from "./supabase/config";
+import { getDb } from "@/server/db/client";
+import { getAuth } from "@/server/auth";
+import { isConfigured } from "@/server/config";
+import { loadActor } from "@/server/permissions";
 import type { Role } from "./domain";
 export async function apiUser(request: Request, allowed?: Role[]) {
   const origin = request.headers.get("origin");
@@ -15,19 +17,13 @@ export async function apiUser(request: Request, allowed?: Role[]) {
   }
   // Sem banco configurado não existe sessão possível.
   if (!isConfigured()) throw new Error("Faça login para continuar.");
-  const client = await serverClient();
-  const {
-    data: { user },
-  } = await client.auth.getUser();
-  if (!user) throw new Error("Faça login para continuar.");
-  const { data: profile } = await client
-    .from("profiles")
-    .select("*")
-    .eq("auth_user_id", user.id)
-    .single();
-  if (!profile || (allowed && !allowed.includes(profile.role)))
+  const db = getDb();
+  const session = await getAuth().api.getSession({ headers: request.headers });
+  if (!session) throw new Error("Faça login para continuar.");
+  const actor = await loadActor(db, session.user.id);
+  if (!actor || (allowed && !allowed.includes(actor.role)))
     throw new Error("Seu perfil não pode realizar esta ação.");
-  return { client, user, profile };
+  return { db, user: session.user, actor };
 }
 export function apiError(error: unknown) {
   return NextResponse.json(

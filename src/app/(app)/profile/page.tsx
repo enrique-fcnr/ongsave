@@ -1,16 +1,14 @@
 import { requireProfile } from "@/lib/auth";
 import { ProfileForm } from "@/components/profile-form";
+import { ownDriver, preferencesFor } from "@/server/queries";
 export default async function Profile() {
-  const { client, profile, organization } = await requireProfile();
-  const [p, d] = await Promise.all([
+  const { db, actor, profile, organization } = await requireProfile();
+  const [prefs, driver] = await Promise.all([
     profile.role === "NGO" && organization
-      ? client.from("ngo_preferences").select("*").eq("organization_id", organization.id).single()
-      : Promise.resolve({ data: null, error: null }),
-    profile.role === "DRIVER"
-      ? client.from("drivers").select("*").eq("profile_id", profile.id).single()
-      : Promise.resolve({ data: null, error: null }),
+      ? preferencesFor(db, actor, organization.id)
+      : Promise.resolve(null),
+    profile.role === "DRIVER" ? ownDriver(db, actor) : Promise.resolve(null),
   ]);
-  if (p.error || d.error) throw new Error(p.error?.message || d.error?.message);
   return (
     <div className="narrow stack">
       <div className="title-block">
@@ -22,7 +20,7 @@ export default async function Profile() {
           seus dados e sua disponibilidade atualizados.
         </p>
       </div>
-      <ProfileForm profile={profile} prefs={p.data} driver={d.data} />
+      <ProfileForm profile={profile} prefs={prefs} driver={driver} />
     </div>
   );
 }

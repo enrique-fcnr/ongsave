@@ -5,7 +5,7 @@ import { ArrowRight, LoaderCircle } from "lucide-react";
 import { z } from "zod";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { browserClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 export function LoginForm({ configured }: { configured: boolean }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -22,7 +22,7 @@ export function LoginForm({ configured }: { configured: boolean }) {
           const { email, password } = z
             .object({ email: z.email(), password: z.string().min(6) })
             .parse(values);
-          const { error } = await browserClient().auth.signInWithPassword({ email, password });
+          const { error } = await authClient.signIn.email({ email, password });
           if (error)
             throw new Error("E-mail ou senha incorretos. Confira sua conta e tente novamente.");
           router.replace("/home");

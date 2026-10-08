@@ -1,15 +1,12 @@
 import { redirect } from "next/navigation";
 import { operationalData } from "@/lib/data";
 import { MissionBoard } from "@/components/mission-board";
+import { ownDriver } from "@/server/queries";
 export default async function Missions() {
-  const { client, profile, rescues, orgs } = await operationalData();
+  const { db, actor, profile, rescues, orgs } = await operationalData();
   if (profile.role !== "DRIVER") redirect("/home");
-  const { data: d, error } = await client
-    .from("drivers")
-    .select("*")
-    .eq("profile_id", profile.id)
-    .single();
-  if (error) throw new Error(error.message);
+  const d = await ownDriver(db, actor);
+  if (!d) throw new Error("Cadastro de motorista não encontrado.");
   return (
     <div className="stack">
       <div className="title-block">

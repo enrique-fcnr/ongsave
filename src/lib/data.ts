@@ -1,59 +1,41 @@
 import "server-only";
 import { requireProfile } from "./auth";
-import type { Batch, Organization, Preferences, Rescue } from "./domain";
+import type { Rescue } from "./domain";
+import { operationalTime } from "@/server/db/time";
+import {
+  availableBatches,
+  organizationDirectory,
+  preferencesFor,
+  rescueList,
+} from "@/server/queries";
 export async function operationalData() {
   const context = await requireProfile();
-  const { client, profile, organization } = context;
-  let query = client
-    .from("rescues")
-    .select("*,surplus_batches(*),impact_metrics(*)")
-    .order("created_at", { ascending: false })
-    .limit(200);
-  if (profile.role === "SUPERMARKET" && organization)
-    query = query.eq("supermarket_id", organization.id);
-  if (profile.role === "NGO" && organization) query = query.eq("ngo_id", organization.id);
-  const [rescueResult, orgResult, timeResult] = await Promise.all([
-    query,
-    client.from("organizations").select("*"),
-    client.rpc("operational_time"),
+  const { db, actor, profile, organization } = context;
+  const scope =
+    profile.role === "SUPERMARKET" && organization
+      ? { supermarketId: organization.id }
+      : profile.role === "NGO" && organization
+        ? { ngoId: organization.id }
+        : {};
+  const [rescues, orgs] = await Promise.all([
+    rescueList(db, actor, scope),
+    organizationDirectory(db),
   ]);
-  if (rescueResult.error || orgResult.error || timeResult.error)
-    throw new Error(
-      rescueResult.error?.message || orgResult.error?.message || timeResult.error?.message,
-    );
-  return {
-    ...context,
-    asOf: new Date(timeResult.data).getTime(),
-    rescues: (rescueResult.data || []) as Rescue[],
-    orgs: (orgResult.data || []) as Organization[],
-  };
+  return { ...context, asOf: operationalTime().getTime(), rescues, orgs };
 }
+// Private photos are served by an authenticated route that re-checks batch access.
 export async function signedPhoto(path: string | null | undefined) {
   if (!path) return undefined;
-  const { client } = await requireProfile();
-  const { data } = await client.storage.from("surplus").createSignedUrl(path, 3600);
-  return data?.signedUrl;
+  return `/api/photos/${path.split("/").map(encodeURIComponent).join("/")}`;
 }
 export async function donationFeed() {
   const context = await operationalData();
-  const { client, organization } = context;
-  const [b, p] = await Promise.all([
-    client
-      .from("surplus_batches")
-      .select("*,surplus_items(*)")
-      .eq("status", "AVAILABLE")
-      .gt("expires_at", new Date(context.asOf).toISOString())
-      .order("created_at", { ascending: false }),
-    organization
-      ? client.from("ngo_preferences").select("*").eq("organization_id", organization.id).single()
-      : Promise.resolve({ data: null, error: null }),
+  const { db, actor, organization } = context;
+  const [batches, preferences] = await Promise.all([
+    availableBatches(db, actor, new Date(context.asOf)),
+    organization ? preferencesFor(db, actor, organization.id) : Promise.resolve(null),
   ]);
-  if (b.error || p.error) throw new Error(b.error?.message || p.error?.message);
-  return {
-    ...context,
-    batches: (b.data || []) as Batch[],
-    preferences: p.data as Preferences | null,
-  };
+  return { ...context, batches, preferences };
 }
 export function ownRescues(rescues: Rescue[], driverId?: string) {
   return driverId ? rescues.filter((r) => r.driver_id === driverId) : rescues;

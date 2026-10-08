@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { apiError, apiUser } from "@/lib/http";
 import { adminClient } from "@/lib/supabase/admin";
+import { serverClient } from "@/lib/supabase/server";
 export async function POST(request: Request) {
   try {
-    const { client, user } = await apiUser(request, ["SUPERMARKET"]);
+    const { user } = await apiUser(request, ["SUPERMARKET"]);
+    // Temporário: Storage/RPC Supabase saem nas etapas 13 e 12.
+    const client = await serverClient();
     const form = await request.formData();
     const file = form.get("file");
     if (!(file instanceof File) || file.size > 4 * 1024 * 1024 || file.size < 16)

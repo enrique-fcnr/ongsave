@@ -1,3 +1,7 @@
-# Copie para .dev.vars (ignorado pelo git) para rodar `npm run cf:preview` localmente.
-# Variáveis não secretas ficam em `vars` no wrangler.jsonc.
+# Copie para .dev.vars (ignorado pelo git) para rodar `npm run cf:preview` e `npm run dev`.
+# Variáveis não secretas de produção ficam em `vars` no wrangler.jsonc; estas as substituem localmente.
 NEXTJS_ENV=development
+# Gere com: openssl rand -base64 32
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=http://localhost:8787
+BETTER_AUTH_TRUSTED_ORIGINS=http://127.0.0.1:8787,http://localhost:3000,http://127.0.0.1:3000

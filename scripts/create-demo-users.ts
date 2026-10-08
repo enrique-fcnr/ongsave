@@ -1,67 +1,66 @@
-import { serviceClient } from "./environment";
-import { accountData, id, organizationData } from "./seed-data";
-import { seed } from "./seed";
-async function main() {
-  const client = serviceClient();
-  const users = [];
-  for (let page = 1; ; page++) {
-    const { data, error } = await client.auth.admin.listUsers({ page, perPage: 1000 });
-    if (error) throw error;
-    users.push(...data.users);
-    if (data.users.length < 1000) break;
-  }
-  const { error: orgError } = await client
-    .from("organizations")
-    .upsert(organizationData, { onConflict: "id" });
-  if (orgError) throw orgError;
-  for (const account of accountData) {
-    let user = users.find((u) => u.email === account.email);
-    if (!user) {
-      const { data, error } = await client.auth.admin.createUser({
-        email: account.email,
-        password: "demo123",
-        email_confirm: true,
-        app_metadata: { ongsave_demo: true },
-      });
-      if (error) throw error;
-      user = data.user!;
-    } else {
-      const { error } = await client.auth.admin.updateUserById(user.id, {
-        password: "demo123",
-        email_confirm: true,
-      });
-      if (error) throw error;
-    }
-    const profile = {
-      id: id(`profile:${account.email}`),
-      auth_user_id: user.id,
-      name: account.name,
-      email: account.email,
-      role: account.role,
-      phone: "(11) 99999-1000",
-    };
-    const { error } = await client.from("profiles").upsert(profile, { onConflict: "id" });
-    if (error) throw error;
-    if (account.org) {
-      const { error } = await client
-        .from("organization_members")
-        .upsert(
-          {
-            id: id(`member:${account.email}`),
-            organization_id: id(account.org),
-            profile_id: profile.id,
-            member_role: "operator",
-          },
-          { onConflict: "organization_id,profile_id" },
-        );
-      if (error) throw error;
-    }
-    console.log(`Conta pronta: ${account.email}`);
-  }
-  await seed();
-  console.log("Contas demo prontas. Senha: demo123");
+import { hashPassword } from "better-auth/crypto";
+import { accountData, id } from "./seed-data";
+import { execute, target, upsert } from "./d1-sql";
+import { organizationStatements, seedStatements } from "./seed-d1";
+
+// Creates the 11 demo accounts directly in the Better Auth tables (password hashed with
+// Better Auth's own hashPassword), links profiles and memberships, then applies the seed.
+// Sign-up stays disabled in the app; only this server-side script provisions accounts.
+export async function demoUserStatements(password = "demo123") {
+  const hash = await hashPassword(password);
+  const now = Date.now();
+  const users = accountData.map((a) => ({
+    id: id(`auth:${a.email}`),
+    name: a.name,
+    email: a.email,
+    email_verified: true,
+    created_at: now,
+    updated_at: now,
+  }));
+  const accounts = accountData.map((a) => ({
+    id: id(`account:${a.email}`),
+    account_id: id(`auth:${a.email}`),
+    provider_id: "credential",
+    user_id: id(`auth:${a.email}`),
+    password: hash,
+    created_at: now,
+    updated_at: now,
+  }));
+  const profiles = accountData.map((a) => ({
+    id: id(`profile:${a.email}`),
+    auth_user_id: id(`auth:${a.email}`),
+    name: a.name,
+    email: a.email,
+    role: a.role,
+    phone: "(11) 99999-1000",
+  }));
+  const members = accountData
+    .filter((a) => a.org)
+    .map((a) => ({
+      id: id(`member:${a.email}`),
+      organization_id: id(a.org!),
+      profile_id: id(`profile:${a.email}`),
+      member_role: "operator",
+    }));
+  return [
+    ...upsert("user", users, "id", ["created_at"]),
+    ...upsert("account", accounts, "id", ["created_at"]),
+    ...upsert("profiles", profiles),
+    ...upsert("organization_members", members),
+  ];
 }
-main().catch((e) => {
-  console.error(e.message);
-  process.exitCode = 1;
-});
+
+if (process.argv[1]?.endsWith("create-demo-users.ts")) {
+  (async () => {
+    const where = target();
+    execute(
+      [...organizationStatements(), ...(await demoUserStatements()), ...seedStatements()],
+      where,
+    );
+    for (const a of accountData) console.log(`Conta pronta: ${a.email}`);
+    console.log("Contas demo prontas. Senha: demo123");
+  })().catch((e) => {
+    console.error(e instanceof Error ? e.message : e);
+    process.exitCode = 1;
+  });
+}

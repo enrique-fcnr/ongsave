@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Brand } from "@/components/shared";
 import { DemoControls } from "@/components/demo-controls";
-import { isConfigured } from "@/lib/supabase/config";
+import { isConfigured } from "@/server/config";
 export const dynamic = "force-dynamic";
 export default function Demo() {
   if (process.env.ENABLE_DEMO_MODE !== "true") notFound();

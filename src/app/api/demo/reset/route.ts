@@ -4,8 +4,8 @@ import { adminClient } from "@/lib/supabase/admin";
 export async function POST(request: Request) {
   try {
     if (process.env.ENABLE_DEMO_MODE !== "true") throw new Error("Modo demonstração desativado.");
-    const { user, profile } = await apiUser(request, ["SUPERMARKET"]);
-    if (profile.email !== "mercado@ongsave.demo")
+    const { user, actor } = await apiUser(request, ["SUPERMARKET"]);
+    if (actor.email !== "mercado@ongsave.demo")
       throw new Error("Entre como Mercado Paulista para resetar a demonstração.");
     const admin = adminClient();
     // Storage cleanup limited to the official account's non-seed uploads.

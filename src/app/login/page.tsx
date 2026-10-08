@@ -3,7 +3,7 @@ import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { Brand } from "@/components/shared";
 import { LoginForm } from "@/components/login-form";
-import { isConfigured } from "@/lib/supabase/config";
+import { isConfigured } from "@/server/config";
 export default async function Login({
   searchParams,
 }: {

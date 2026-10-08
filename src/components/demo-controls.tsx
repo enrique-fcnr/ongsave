@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { HeartHandshake, RotateCcw, Store, Truck } from "lucide-react";
 import { Button } from "./ui/button";
-import { browserClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 const accounts = [
   {
     name: "Mercado Paulista",
@@ -51,7 +51,7 @@ export function DemoControls({ configured }: { configured: boolean }) {
                 setBusy(a.email);
                 setMessage("");
                 try {
-                  const { error } = await browserClient().auth.signInWithPassword({
+                  const { error } = await authClient.signIn.email({
                     email: a.email,
                     password: "demo123",
                   });

@@ -25,6 +25,7 @@
   ],
   "vars": {
     "AI_MODE": "demo",
+    "BETTER_AUTH_URL": "https://ongsave.eduardofonseca1401.workers.dev",
     "ENABLE_DEMO_MODE": "true",
     "NEXT_PUBLIC_MAP_PROVIDER": "maplibre",
   },

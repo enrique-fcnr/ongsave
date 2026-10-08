@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { apiUser, apiError } from "@/lib/http";
 import { adminClient } from "@/lib/supabase/admin";
+import { serverClient } from "@/lib/supabase/server";
 import { analyzeSurplus } from "@/lib/ai/analyze-surplus";
 export const maxDuration = 60;
 export async function POST(request: Request) {
   try {
-    const { client, user } = await apiUser(request, ["SUPERMARKET"]);
+    const { user } = await apiUser(request, ["SUPERMARKET"]);
+    // Temporário: Storage/RPC Supabase saem nas etapas 13 e 12.
+    const client = await serverClient();
     const { path } = z.object({ path: z.string().max(200) }).parse(await request.json());
     if (!path.startsWith(`${user.id}/`)) throw new Error("Fotografia não autorizada.");
     const { data: image, error } = await client.storage.from("surplus").download(path);

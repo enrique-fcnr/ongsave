@@ -2,6 +2,8 @@
 // Conventions: ids are text UUIDs generated in code; dates are ISO-8601 UTC strings
 // (same format as Date#toISOString); booleans are 0/1 integers; jsonb and text[] are JSON text.
 // Property names stay snake_case so rows keep the shape the UI already consumes.
+// Exception: the Better Auth tables (user, session, account, verification) follow the
+// adapter's camelCase fields and store dates as epoch milliseconds.
 import { relations, sql } from "drizzle-orm";
 import { check, index, integer, real, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 import { categories, roles, statuses } from "../../lib/domain";
@@ -11,13 +13,80 @@ const now = sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`;
 const createdAt = () => text("created_at").notNull().default(now);
 const updatedAt = () => text("updated_at").notNull().default(now);
 const clock = (column: string) => sql.raw(`${column} GLOB '[0-2][0-9]:[0-5][0-9]'`);
+const epochMs = sql`(cast(unixepoch('subsecond') * 1000 as integer))`;
+const stamp = (name: string) => integer(name, { mode: "timestamp_ms" }).notNull().default(epochMs);
+
+// Better Auth core schema (better-auth 1.7, drizzle adapter, provider "sqlite").
+export const user = sqliteTable("user", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: integer("email_verified", { mode: "boolean" }).notNull().default(false),
+  image: text("image"),
+  createdAt: stamp("created_at"),
+  updatedAt: stamp("updated_at"),
+});
+
+export const session = sqliteTable(
+  "session",
+  {
+    id: text("id").primaryKey(),
+    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+    token: text("token").notNull().unique(),
+    createdAt: stamp("created_at"),
+    updatedAt: stamp("updated_at"),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+  },
+  (t) => [index("session_user_id_idx").on(t.userId)],
+);
+
+export const account = sqliteTable(
+  "account",
+  {
+    id: text("id").primaryKey(),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    idToken: text("id_token"),
+    accessTokenExpiresAt: integer("access_token_expires_at", { mode: "timestamp_ms" }),
+    refreshTokenExpiresAt: integer("refresh_token_expires_at", { mode: "timestamp_ms" }),
+    scope: text("scope"),
+    password: text("password"),
+    createdAt: stamp("created_at"),
+    updatedAt: stamp("updated_at"),
+  },
+  (t) => [index("account_user_id_idx").on(t.userId)],
+);
+
+export const verification = sqliteTable(
+  "verification",
+  {
+    id: text("id").primaryKey(),
+    identifier: text("identifier").notNull(),
+    value: text("value").notNull(),
+    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+    createdAt: stamp("created_at"),
+    updatedAt: stamp("updated_at"),
+  },
+  (t) => [index("verification_identifier_idx").on(t.identifier)],
+);
 
 export const profiles = sqliteTable(
   "profiles",
   {
     id: text("id").primaryKey(),
-    // References the Better Auth user.id (FK added with the auth tables).
-    auth_user_id: text("auth_user_id").notNull().unique(),
+    auth_user_id: text("auth_user_id")
+      .notNull()
+      .unique()
+      .references(() => user.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
     phone: text("phone"),

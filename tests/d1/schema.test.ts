@@ -12,6 +12,10 @@ const org = (id: string, type = "SUPERMARKET") =>
       "INSERT INTO organizations(id,name,type,slug,address_line,neighborhood,latitude,longitude) VALUES(?,?,?,?,?,?,?,?)",
     )
     .bind(id, id, type, id, "Rua A, 1", "Centro", -23.5, -46.6);
+const authUser = (id: string) =>
+  ctx.d1
+    .prepare("INSERT INTO user(id,name,email) VALUES(?,?,?)")
+    .bind(`auth-${id}`, id, `${id}@test`);
 const profile = (id: string, role = "SUPERMARKET") =>
   ctx.d1
     .prepare("INSERT INTO profiles(id,auth_user_id,name,email,role) VALUES(?,?,?,?,?)")
@@ -43,6 +47,9 @@ beforeAll(async () => {
   ctx = await createTestDb();
   db = ctx.db;
   await ctx.d1.batch([
+    authUser("p1"),
+    authUser("p2"),
+    authUser("bad"),
     org("m1"),
     org("n1", "NGO"),
     org("n2", "NGO"),

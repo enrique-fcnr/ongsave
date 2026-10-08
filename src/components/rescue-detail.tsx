@@ -2,32 +2,21 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Check, HeartHandshake, MapPin, PackageCheck, Store } from "lucide-react";
 import { requireProfile } from "@/lib/auth";
-import { number, statusLabels, type Rescue, type RescueStatus } from "@/lib/domain";
+import { number, statusLabels, type RescueStatus } from "@/lib/domain";
 import { RescueActions } from "./rescue-actions";
 import { RescueMap } from "./rescue-map";
 import { StatusPill } from "./shared";
+import { rescueDetail } from "@/server/queries";
 export async function RescueDetail({ id }: { id: string }) {
-  const { client, profile } = await requireProfile();
-  const { data, error } = await client
-    .from("rescues")
-    .select("*,surplus_batches(*)")
-    .eq("id", id)
-    .maybeSingle();
-  if (error) throw new Error(error.message);
-  if (!data) notFound();
-  const r = data as Rescue;
-  const [e, o] = await Promise.all([
-    client
-      .from("rescue_events")
-      .select("*")
-      .eq("rescue_id", id)
-      .order("created_at", { ascending: true }),
-    client.from("organizations").select("*").in("id", [r.supermarket_id, r.ngo_id]),
-  ]);
-  if (e.error || o.error) throw new Error(e.error?.message || o.error?.message);
+  const { db, actor, profile } = await requireProfile();
+  const detail = await rescueDetail(db, actor, id);
+  if (!detail) notFound();
+  const r = detail.rescue;
+  const e = { data: detail.events };
+  const o = { data: detail.orgs };
   const weight = Number(r.surplus_batches?.estimated_weight_kg || 0);
-  const driverName = e.data?.find((ev) => ev.event_type === "DRIVER_ASSIGNED")?.metadata
-    ?.driver_name;
+  const driverName = e.data.find((ev) => ev.event_type === "DRIVER_ASSIGNED")?.metadata
+    ?.driver_name as string | undefined;
   return (
     <div className="stack">
       <Link className="back" href={profile.role === "DRIVER" ? "/driver/missions" : "/rescues"}>

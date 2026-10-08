@@ -5,7 +5,7 @@ import { LogOut, Save } from "lucide-react";
 import { z } from "zod";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { browserClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import { categories, categoryLabels, type Preferences, type Profile } from "@/lib/domain";
 export function ProfileForm({
   profile,
@@ -39,9 +39,7 @@ export function ProfileForm({
             const basic = z
               .object({ name: z.string().min(2).max(100), phone: z.string().max(25) })
               .parse({ name: form.get("name"), phone: form.get("phone") });
-            const client = browserClient();
-            const { error } = await client.from("profiles").update(basic).eq("id", profile.id);
-            if (error) throw error;
+            const body: Record<string, unknown> = { profile: basic };
             if (prefs) {
               const update = {
                 daily_capacity_kg: Number(form.get("capacity")),
@@ -54,19 +52,16 @@ export function ProfileForm({
               };
               if (update.receiving_start >= update.receiving_end)
                 throw new Error("O horário de término precisa ser posterior ao início.");
-              const { error } = await client
-                .from("ngo_preferences")
-                .update(update)
-                .eq("organization_id", prefs.organization_id);
-              if (error) throw error;
+              body.preferences = update;
             }
-            if (driver) {
-              const { error } = await client
-                .from("drivers")
-                .update({ availability: form.get("availability") === "on" })
-                .eq("id", driver.id);
-              if (error) throw error;
-            }
+            if (driver) body.driver = { availability: form.get("availability") === "on" };
+            const response = await fetch("/api/profile", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            });
+            const result = (await response.json()) as { error?: string };
+            if (!response.ok) throw new Error(result.error);
             setMessage("Preferências atualizadas.");
             router.refresh();
           } catch (e) {
@@ -193,7 +188,7 @@ export function ProfileForm({
       <Button
         variant="outline"
         onClick={async () => {
-          await browserClient().auth.signOut();
+          await authClient.signOut();
           router.replace("/login");
           router.refresh();
         }}

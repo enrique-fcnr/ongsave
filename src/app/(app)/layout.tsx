@@ -1,16 +1,12 @@
 import { requireProfile } from "@/lib/auth";
+import { ownNotifications } from "@/server/queries";
 import { Shell } from "@/components/shell";
 export const dynamic = "force-dynamic";
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const { client, profile, organization } = await requireProfile();
-  const { data, error } = await client
-    .from("notifications")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(30);
-  if (error) throw new Error(error.message);
+  const { db, actor, profile, organization } = await requireProfile();
+  const notifications = await ownNotifications(db, actor);
   return (
-    <Shell profile={profile} organization={organization} notifications={data || []}>
+    <Shell profile={profile} organization={organization} notifications={notifications}>
       {children}
     </Shell>
   );

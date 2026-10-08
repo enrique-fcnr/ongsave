@@ -17,6 +17,7 @@ import { Brand } from "./shared";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { browserClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import { Realtime } from "./realtime";
 import type { Profile, Organization } from "@/lib/domain";
 type Notification = {
@@ -65,7 +66,7 @@ export function Shell({
     nav.find((item) => active(item.href))?.label ||
     (path.startsWith("/supermarket/reports") ? "Relatórios" : "Detalhes do resgate");
   async function logout() {
-    await browserClient().auth.signOut();
+    await authClient.signOut();
     router.replace("/login");
     router.refresh();
   }
