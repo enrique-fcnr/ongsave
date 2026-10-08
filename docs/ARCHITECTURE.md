@@ -1,51 +1,72 @@
 # Arquitetura do ONGSave
 
-Uma aplicação Next.js 16 App Router com React e TypeScript strict. As páginas operacionais são Server Components dinâmicos. Componentes client cuidam de câmera, formulários, ações, mapa e subscriptions. Layouts protegidos validam o usuário no Supabase Auth; `proxy.ts` renova os cookies. `requireProfile` usa cache por request, sem compartilhar dados entre usuários.
+Next.js 16 App Router, React e TypeScript strict, num único **Cloudflare Worker** gerado pelo `@opennextjs/cloudflare`. Não há backend separado: páginas, Route Handlers e o Durable Object de tempo real rodam no mesmo Worker, com bindings para D1 (banco), R2 (fotos), Durable Objects (tempo real) e Workers AI (análise opcional).
+
+```text
+navegador ──HTTPS──▶ worker.ts ─┬─▶ handler OpenNext (Next.js: páginas + /api/*)
+                                │        ├─ DB        → D1 ongsave-db (Drizzle)
+                                │        ├─ PHOTOS    → R2 ongsave-photos (privado)
+                                │        ├─ AI        → Workers AI (opcional)
+                                │        └─ REALTIME  → notify() após cada escrita
+          ◀──WebSocket──────────┴─▶ /api/realtime → RealtimeHub (Durable Object)
+```
+
+As páginas operacionais são Server Components dinâmicos. Componentes client cuidam de câmera, formulários, ações, mapa e conexão ao vivo. `requireProfile()` lê a sessão do Better Auth, carrega perfil, organização e o `actor` (papel, organizações, motorista) com cache por request.
+
+## Camadas no servidor
+
+| Pasta                       | Papel                                                                                                             |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `src/server/db/`            | `schema.ts` (Drizzle), `client.ts` (`getDb`, `runAtomic`, guardas), `time.ts` (relógio de São Paulo), `impact.ts` |
+| `src/server/auth/`          | Better Auth sobre D1: e-mail e senha, sem autocadastro                                                            |
+| `src/server/permissions.ts` | Antigas policies RLS e funções `private.*` como checagens explícitas                                              |
+| `src/server/queries.ts`     | Todas as leituras, sempre filtradas pelas permissões                                                              |
+| `src/server/services/`      | Uma função por regra de negócio (antigas RPCs plpgsql)                                                            |
+| `src/server/storage.ts`     | Upload, leitura autorizada e limpeza de fotos no R2                                                               |
+| `src/server/realtime/`      | `RealtimeHub`, canais por papel e `notify()`                                                                      |
+| `worker.ts`                 | Entrada do Worker: handler do Next + upgrade de `/api/realtime` + export do DO                                    |
 
 ## Fluxo e persistência
 
-1. `/api/upload` autentica supermercado, verifica tipo pelo conteúdo e envia a fotografia a um bucket privado. Registra uma análise manual provisória em `private.analyses`.
-2. `/api/analyze` lê apenas a fotografia do usuário. `analyzeSurplus` escolhe fixture demo ou provider OpenAI multimodal, valida a resposta com Zod e salva os metadados no banco usando a Service Role. A revisão não pode forjar o provider salvo.
-3. `/api/batches` valida a revisão e invoca `publish_surplus`. A função exige a análise/foto do usuário, confirmação humana e uma organização de supermercado. Salva lote, itens e a estimativa `estimated_impact_json` na mesma transação. A fórmula do banco é centralizada em `private.impact_for_weight`; a entrega promove essa estimativa a métricas de impacto concluído.
-4. `reserve_donation` bloqueia o lote e as preferências da ONG com `FOR UPDATE`, verifica disponibilidade, horário em São Paulo, categorias e capacidade diária acumulada, cria reserva, missão, eventos e notificações.
-5. `accept_mission` bloqueia missão e motorista, verifica disponibilidade, capacidade do veículo e missão já ativa. Define o motorista de forma atômica.
-6. `advance_rescue` verifica o motorista responsável e a próxima transição permitida. Na chegada, `delivery_token` disponibiliza o token somente à ONG envolvida. Na entrega, o token correto registra impacto e conclusão na mesma transação.
-7. Realtime solicita nova renderização de servidor. Um refresh de recuperação a cada 15 segundos e ao retornar foco/rede cobre interrupções. Não há estado operacional persistido em localStorage.
+1. `/api/upload` autentica o supermercado, verifica o tipo pelos bytes (JPEG/PNG/WebP), limita a 4 MB e grava em `PHOTOS` com chave `<id do usuário>/<uuid>.<ext>`. Registra uma análise manual provisória em `analyses`.
+2. `/api/analyze` lê só a foto do próprio usuário no R2. `analyzeSurplus` usa a fixture demo, a OpenAI ou o Workers AI, valida com Zod e grava provider e modelo **do servidor** (`recordAnalysis`).
+3. `/api/batches` valida a revisão e chama `publishSurplus`: exige a análise não publicada do usuário, confirmação humana e organização de supermercado. Lote, itens, `estimated_impact_json` (`impactForWeight`), análise publicada e notificações às ONGs vão num único batch.
+4. `reserveDonation` confere disponibilidade, categoria aceita, capacidade diária acumulada (dia de São Paulo) e horário de recebimento; cria reserva, resgate, token de entrega, eventos e notificações.
+5. `acceptMission` confere disponibilidade e capacidade do veículo e que o motorista não tenha missão ativa; atribui o motorista.
+6. `advanceRescue` aceita só o motorista do resgate e as seis transições permitidas. `deliveryToken` mostra o código só à ONG do resgate, quando o motorista chega. O código certo conclui a entrega e registra o impacto uma única vez.
+7. Depois de cada escrita, `notify()` avisa o `RealtimeHub`; os navegadores conectados fazem `router.refresh()`. Um refresh a cada 15 s, no foco e na volta da rede cobre falhas. Nada operacional fica em `localStorage`.
+
+## Concorrência sem `FOR UPDATE`
+
+O D1 não tem transação interativa. Cada service lê e valida (para dar a mensagem certa) e depois executa **um único `batch()`**, que é atômico. O batch começa com guardas: `INSERT INTO batch_guards SELECT '<regra>' WHERE NOT (<condição>)`. A tabela `batch_guards` tem um `CHECK` nomeado por regra e fica sempre vazia; se a condição deixou de valer entre a leitura e a escrita, o `CHECK` aborta o batch inteiro e `runAtomic` devolve qual regra falhou. Assim a dupla reserva, dois motoristas na mesma missão, a capacidade diária e "uma missão ativa por motorista" são decididos dentro da transação. Os testes provam isso segurando as duas chamadas numa barreira até ambas terem validado o mesmo estado.
 
 ## Modelo
 
-`profiles`, `organizations`, `organization_members`, `ngo_preferences`, `drivers`, `surplus_batches`, `surplus_items`, `donation_reservations`, `rescues`, `rescue_events`, `impact_metrics`, `notifications`.
+`profiles`, `organizations`, `organization_members`, `ngo_preferences`, `drivers`, `surplus_batches`, `surplus_items`, `donation_reservations`, `rescues`, `rescue_events`, `impact_metrics`, `notifications`, `analyses`, `rescue_tokens`, `batch_guards` e as tabelas do Better Auth (`user`, `session`, `account`, `verification`). Migrations em `drizzle/migrations/`, geradas por `npm run db:generate`.
 
-Extensões para segurança/demo:
+- IDs são UUID em texto; datas do ONGSave são ISO-8601 UTC; listas e JSON são texto JSON; enums viram `CHECK`.
+- `rescue_tokens` guarda o código de 4 dígitos (gerado com `crypto.getRandomValues`), tentativas e bloqueio. Nenhuma query de leitura toca essa tabela, então o código nunca viaja junto do resgate. Cinco erros bloqueiam por um minuto; erros não geram impacto.
+- `surplus_batches.is_seed`, `is_demo`, `seed_kind` limitam o reset ao ambiente demonstrativo.
+- A especificação original em PostgreSQL está em `docs/legacy-supabase/` como referência.
 
-- `private.analyses`: fotografia, proveniência de análise e vínculo com o perfil;
-- `private.rescue_tokens`: `confirmation_token`, tentativas e bloqueio temporário;
-- `surplus_batches.is_seed`, `is_demo`, `seed_kind`: reset limitado ao ambiente demonstrativo;
-- `surplus_batches.estimated_impact_json`: estimativa persistida desde a publicação, ainda sem contar como entrega;
-- `private.schema_migrations`: criada somente pelo runner opcional `db:migrate`.
+## Permissões
 
-O token foi movido de `rescues.confirmation_token` para uma tabela privada: colocá-lo na linha que o motorista pode ler revelaria o código de confirmação. Ele continua sendo realmente gerado e persistido para cada rescue. O trigger gera quatro dígitos, incluindo zeros à esquerda. Cinco erros bloqueiam novas tentativas por um minuto; erros não geram impacto.
+Sem RLS no banco: cada leitura passa por `readableRescues`/`readableBatches` ou pelo filtro de dono equivalente à policy original. O diretório de organizações é visível a qualquer usuário autenticado; perfis pessoais só ao próprio dono. As únicas escritas diretas são nome e telefone do próprio perfil, preferências da própria ONG, disponibilidade do próprio motorista e `read_at` das próprias notificações (`PATCH /api/profile`, `POST /api/notifications/read`). Papel, organização, motorista atribuído, status e impacto só mudam pelos services. As APIs recusam origem externa.
 
-## RLS e privilégios
+## Tempo real
 
-Todas as tabelas públicas têm RLS. As privadas também têm RLS sem policies de leitura direta. O diretório de organizações disponibiliza endereços operacionais para os participantes, enquanto perfis pessoais são visíveis apenas ao próprio usuário.
-
-Antes dos grants explícitos, a migration revoga os grants automáticos do Supabase nas tabelas do ONGSave. Usuários podem ler somente os registros autorizados. As únicas alterações diretas são nome/telefone próprios, preferências da própria ONG, disponibilidade do próprio motorista e leitura de notificações. Papel, organização, motorista atribuído, status e impacto não podem ser editados diretamente.
-
-Os RPCs públicos são `SECURITY INVOKER`. Implementações privilegiadas ficam no schema `private`, com `search_path` vazio, permissões restritas e autorização explícita em cada operação. O schema privado não deve ser exposto na Data API. Os RPCs de proveniência e reset são exclusivos da Service Role e recebem o Auth ID verificado pela API; a chave nunca chega ao navegador. O endpoint de reset também exige `ENABLE_DEMO_MODE=true`.
+`RealtimeHub` é um Durable Object com WebSocket Hibernation. O navegador abre `/api/realtime`; o `worker.ts` pergunta à própria app (sem rede) quais canais a sessão pode ouvir e só então conecta ao DO. Canais: `profile:<id>`, `org:<id>`, `ngos`, `drivers`, `driver:<id>`. A mensagem é só `{ "type": "changed", "scope": ... }`, sem dados; o refresh busca tudo de novo pelo servidor, que aplica as permissões.
 
 ## Simulações identificadas
 
 - Matching: regras de categoria, bairro, capacidade, janela de recebimento e necessidades.
-- Mapa: MapLibre real, tiles OpenStreetMap, pan/zoom/markers; posição, geometria, distância e ETA simulados, persistidos no banco. Workers servidos pelo app, copiados da versão instalada no início do dev/build.
-- Histórico: 16 entregas seed. Quatro lotes disponíveis e três missões iniciais.
-- Impacto ambiental/economia: fatores ilustrativos por kg; refeições também são estimadas.
-- `AI_MODE=demo`: fixture explicitamente identificada como `demo`, com upload real.
+- Mapa: MapLibre real com tiles OpenFreeMap; posição, rota, distância e ETA simulados e persistidos. Os workers do MapLibre são copiados para `public/maplibre/` antes de cada build.
+- Histórico: 16 entregas seed, quatro lotes disponíveis e três missões iniciais.
+- Impacto ambiental e economia: fatores ilustrativos por kg.
+- `AI_MODE=demo`: fixture identificada como `demo`, com upload real.
 
 ## PWA e deploy
 
-Manifest standalone, ícones PNG any/maskable, Apple metadata, viewport/safe areas e service worker. Somente ícones e página offline são cacheados. Páginas autenticadas e APIs não são cacheadas pelo service worker. Operações exigem conexão.
+Manifest standalone, ícones any/maskable, metadados Apple e service worker que só guarda ícones e a página offline. Páginas autenticadas e APIs não são cacheadas. Deploy com `npm run cf:deploy` na conta Cloudflare fixada no `wrangler.jsonc`; `NEXT_PUBLIC_*` entram no build, então recompile ao alterá-las.
 
-O app é compatível com Vercel. Use HTTPS para instalação e service worker nos celulares. Chaves públicas são incorporadas ao bundle no build: recompile após alterá-las. O mapa não exige token pago. O provider de mapa deste MVP é exclusivamente MapLibre; `NEXT_PUBLIC_MAPBOX_TOKEN` está reservado no exemplo, sem integração Mapbox.
-
-Fotos originais de até 20 MB são decodificadas no navegador e reduzidas a JPEG com lado máximo de 1600 px. O servidor limita o upload a 4 MB. O conteúdo é novamente verificado no servidor; a fotografia armazenada é a versão reduzida da imagem real capturada.
+Fotos de até 20 MB são reduzidas no navegador a JPEG com lado máximo de 1600 px; o servidor aceita até 4 MB e verifica o conteúdo de novo.

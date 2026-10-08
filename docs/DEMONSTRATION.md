@@ -1,6 +1,6 @@
 # Apresentação com três celulares
 
-Prepare um projeto Supabase separado para a apresentação. Aplique a migration, execute `npm run demo:users`, publique em HTTPS, configure `AI_MODE=demo` e `ENABLE_DEMO_MODE=true`. O modo demo de IA dispensa chave OpenAI, mas não dispensa Supabase: Auth, Storage, banco e realtime continuam reais.
+Use o ambiente Cloudflare da apresentação: aplique as migrations do D1 (`npm run db:migrate:remote`), execute `npm run demo:users -- --remote`, publique com `npm run cf:deploy` e mantenha `AI_MODE=demo` e `ENABLE_DEMO_MODE=true` no `wrangler.jsonc`. O modo demo de IA dispensa chave, mas login, banco D1, fotos no R2 e tempo real continuam reais.
 
 Abra o mesmo endereço `/demo` nos três celulares:
 
@@ -22,7 +22,7 @@ Abra o mesmo endereço `/demo` nos três celulares:
 10. No motorista, digite os quatro dígitos e pressione **Confirmar entrega**.
 11. As três contas acompanham a conclusão. Abra **Impacto** para mostrar os indicadores atualizados. No supermercado desktop, **Relatórios** permite salvar um PDF pela janela de impressão.
 
-O indicador “Atualizações ao vivo” confirma a conexão realtime. Se aparecer “Sincronizando”, verifique a publicação `supabase_realtime` e a conexão. O app também recupera atualizações a cada 15 segundos.
+O indicador “Atualizações ao vivo” confirma a conexão realtime. Se aparecer “Sincronizando”, o WebSocket com o Durable Object `RealtimeHub` caiu; o app reconecta sozinho. O app também recupera atualizações a cada 15 segundos.
 
 ## Reset
 

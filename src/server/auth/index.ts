@@ -12,7 +12,9 @@ export function authOptions() {
     .split(",")
     .map((o) => o.trim())
     .filter(Boolean);
-  return { secret, baseURL, trustedOrigins };
+  // Only raised locally (.dev.vars) so the e2e suite can sign in dozens of times.
+  const signInsPerMinute = Number(process.env.AUTH_SIGNIN_RATE_LIMIT) || 10;
+  return { secret, baseURL, trustedOrigins, signInsPerMinute };
 }
 
 export function getAuth(): Auth {

@@ -1,4 +1,31 @@
-# Verificação — 3 de outubro de 2026
+# Verificação
+
+## Migração para a Cloudflare — 8 de outubro de 2026
+
+Stack: Workers (OpenNext), D1, Better Auth, R2, Durable Object e Workers AI, na conta Eduardofonseca1401. Relatórios por etapa em `prompts/RELATORIO-*.md`.
+
+| Verificação                                  | Resultado                                                                                                                                               |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ESLint                                       | Aprovado                                                                                                                                                |
+| TypeScript strict / tipos Next               | Aprovado                                                                                                                                                |
+| Vitest                                       | 76 testes, 8 arquivos: domínio, providers OpenAI e Workers AI, schema D1, Better Auth, fotos R2, canais de tempo real, regras de negócio e concorrência |
+| `next build` e `opennextjs-cloudflare build` | Aprovados; Worker com 3,2 MiB gzip                                                                                                                      |
+| Playwright no `cf:preview`                   | **30 testes aprovados em 1,4 min**, com `RUN_LIVE_E2E=true`                                                                                             |
+| Fluxo oficial com 3 sessões                  | Aprovado; duas entregas completas com reset entre elas em 24,2 s                                                                                        |
+| Tempo real entre sessões                     | Lote publicado aparece na ONG em 299 ms, sem recarregar                                                                                                 |
+| Login (scrypt no workerd)                    | 35–58 ms por login                                                                                                                                      |
+| Workers AI real                              | Chamado com a foto de teste; resposta válida às vezes, qualidade fraca (ver `prompts/RELATORIO-15.md`)                                                  |
+| Produção                                     | Ver `prompts/PROGRESSO.md` (deploy e recursos remotos dependem de ações do Edu)                                                                         |
+
+O `e2e/live-flow.spec.ts` agora confere os avisos do WebSocket `/api/realtime` (só `{"type":"changed"}`, sem dados), a foto servida por `/api/photos/...` e a exclusão do R2 após o reset (a mesma URL passa a responder 404 ao dono). Os cenários de concorrência do banco usam uma barreira que só libera os `batch()` depois de as duas chamadas validarem o mesmo estado, provando que as guardas dentro da transação barram a segunda.
+
+Correspondência dos cenários do antigo `tests/database.test.ts` (PGlite) em `prompts/RELATORIO-16.md`.
+
+---
+
+_As seções abaixo são a homologação da stack anterior (Vercel + Supabase) e ficam como histórico._
+
+## Histórico — 3 de outubro de 2026
 
 ## Design da landing aplicado ao produto — 3 de outubro de 2026
 

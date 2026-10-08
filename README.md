@@ -1,60 +1,55 @@
 # ONGSave
 
-Uma fotografia inicia um resgate completo. MVP web mobile-first/PWA que conecta supermercados, ONGs e motoristas em uma aplicação Next.js, com Auth, PostgreSQL, Storage e Realtime do Supabase.
+Uma fotografia inicia um resgate completo. MVP web mobile-first/PWA que conecta supermercados, ONGs e motoristas. Next.js 16 rodando 100% na Cloudflare: Workers (via OpenNext), banco D1, login com Better Auth, fotos no R2, tempo real com Durable Object e análise opcional com Workers AI ou OpenAI.
 
 ## Instalação
 
-Requer Node.js 22.14+ e npm. Na pasta `C:\Users\enriq\ongsave`:
+Requer Node.js 22.14+, npm e a CLI `wrangler` logada na conta do projeto (`npx wrangler login`; confira com `npx wrangler whoami`).
 
-```powershell
+```bash
 npm install
-Copy-Item .env.example .env.local
+cp .dev.vars.example .dev.vars        # preencha BETTER_AUTH_SECRET (openssl rand -base64 32)
+npm run db:migrate:local              # cria o D1 local em .wrangler/
+npm run demo:users -- --local         # 11 contas demo + organizações + seed
+npm run cf:preview                    # build + Worker local em http://localhost:8787
 ```
 
-Uma cópia local de `.env.local` já pode existir; preencha-a sem sobrescrever suas credenciais. O arquivo é ignorado pelo Git.
-
-Neste computador o projeto Ongsave `xhsbrwksbmxdzhujpyeb` já foi conectado via MCP OAuth e configurado. Migration, seed, usuários Auth, Storage e Realtime estão prontos, e `.env.local` contém as credenciais Supabase. Para usar o ambiente atual, execute `npm run dev`; não sobrescreva o arquivo nem reaplique a migration.
+O `npm run dev` (http://localhost:3000) também funciona com os bindings locais, mas sem o Durable Object: o selo fica em "Sincronizando" e as telas se atualizam pelo refresh de 15 s. Para o tempo real e para o comportamento de produção, use o `cf:preview`. Para instalar o PWA nos celulares, use o endereço HTTPS publicado.
 
 ## Variáveis
 
-| Variável                               | Uso                                                                                |
-| -------------------------------------- | ---------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_APP_URL`                  | URL do app; localhost no desenvolvimento, HTTPS no deploy                          |
-| `NEXT_PUBLIC_SUPABASE_URL`             | Project URL                                                                        |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY`        | Anon key legada; ou use a publishable key abaixo                                   |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Alternativa moderna; tem precedência sobre ANON_KEY                                |
-| `SUPABASE_SERVICE_ROLE_KEY`            | Somente servidor/scripts; bootstrap, proveniência da IA e reset                    |
-| `AI_MODE`                              | `demo` para fixture identificada; `live` para análise real                         |
-| `AI_PROVIDER`                          | `openai` ou `workers-ai` (sem chave, usa o binding `AI`)                           |
-| `OPENAI_API_KEY`                       | Necessária somente em live                                                         |
-| `AI_MODEL`                             | Modelo multimodal; exemplo `gpt-4.1-mini`                                          |
-| `NEXT_PUBLIC_MAP_PROVIDER`             | `maplibre`; é o provider implementado                                              |
-| `NEXT_PUBLIC_MAP_TILE_URL`             | Override raster opcional; padrão vetorial OpenFreeMap com estilo ONGSave sem chave |
-| `NEXT_PUBLIC_MAPBOX_TOKEN`             | Reservado, não utilizado pelo MVP                                                  |
-| `ENABLE_DEMO_MODE`                     | `true` habilita `/demo` e reset; `false` fora da apresentação                      |
-| `DATABASE_URL`                         | Opcional: conexão PostgreSQL para `npm run db:migrate`; dispensável com SQL Editor |
+Não secretas, em `vars` no `wrangler.jsonc`; segredos com `npx wrangler secret put <NOME>`; localmente tudo pode ser sobrescrito em `.dev.vars` (ignorado pelo Git).
 
-Não exponha Service Role ou OpenAI em variáveis `NEXT_PUBLIC_*`. Nenhum segredo foi adicionado ao código.
+| Variável                      | Onde                               | Uso                                                                     |
+| ----------------------------- | ---------------------------------- | ----------------------------------------------------------------------- |
+| `NEXT_PUBLIC_APP_URL`         | `.env.production` (entra no build) | URL pública do app                                                      |
+| `BETTER_AUTH_URL`             | `vars`                             | Igual à URL pública; `http://localhost:8787` no `.dev.vars`             |
+| `BETTER_AUTH_SECRET`          | segredo                            | Assina as sessões. Obrigatório                                          |
+| `BETTER_AUTH_TRUSTED_ORIGINS` | `.dev.vars`                        | Origens extras aceitas localmente (127.0.0.1, porta 3000)               |
+| `AUTH_SIGNIN_RATE_LIMIT`      | `.dev.vars`                        | Só para a suíte e2e local; produção usa 10 logins/min por IP            |
+| `AI_MODE`                     | `vars`                             | `demo` para fixture identificada; `live` para análise real              |
+| `AI_PROVIDER`                 | `vars`                             | `openai` ou `workers-ai` (sem chave, usa o binding `AI`)                |
+| `OPENAI_API_KEY`              | segredo                            | Só com `AI_PROVIDER=openai`                                             |
+| `AI_MODEL`                    | `vars`                             | Opcional: modelo OpenAI (ex. `gpt-4.1-mini`) ou `@cf/...` do Workers AI |
+| `NEXT_PUBLIC_MAP_PROVIDER`    | `vars`                             | `maplibre`; é o provider implementado                                   |
+| `NEXT_PUBLIC_MAP_TILE_URL`    | build                              | Override raster opcional; padrão vetorial OpenFreeMap sem chave         |
+| `ENABLE_DEMO_MODE`            | `vars`                             | `true` habilita `/demo` e reset; `false` fora da apresentação           |
 
-## Configurar Supabase
+Bindings (no `wrangler.jsonc`): `DB` (D1 `ongsave-db`), `PHOTOS` (R2 `ongsave-photos`, privado), `REALTIME` (Durable Object `RealtimeHub`), `AI` (Workers AI), `ASSETS`. Depois de mudar bindings, rode `npm run cf-typegen`.
 
-Use um projeto novo/dedicado à demo. Não é necessário Docker para Supabase hospedado.
+## Banco (D1)
 
-1. Preencha URL, chave pública e Service Role em `.env.local`.
-2. Aplique **uma vez**, em ordem de nome, os arquivos de `supabase/migrations/` no SQL Editor. Eles criam o schema e a função de relógio operacional. Alternativamente, preencha `DATABASE_URL` e execute `npm run db:migrate` — registra versões e aplica cada migration em transação. As duas migrations já foram aplicadas ao projeto Ongsave `xhsbrwksbmxdzhujpyeb` via MCP; não as reaplique nesse projeto.
-3. Execute `npm run demo:users`. O script cria/confirma os 11 usuários Auth, vincula perfis e organizações e aplica todo o seed. É idempotente e define a senha demo `demo123`.
-4. Em Database → Replication, confira as tabelas da publicação `supabase_realtime`: `surplus_batches`, `donation_reservations`, `rescues`, `rescue_events`, `impact_metrics`, `notifications`. A migration adiciona as tabelas se a publicação padrão existe. Caso não exista, habilite-a no projeto antes da apresentação.
-5. Confira o bucket privado `surplus`, limite 4 MB e policies criados pela migration. Não o torne público.
-6. Configure o Site URL do Auth para o endereço do app. Não exponha o schema `private` na Data API.
+O schema está em `src/server/db/schema.ts` (Drizzle). As migrations SQL ficam em `drizzle/migrations/`.
 
-```powershell
-npm run demo:users
-npm run dev
+```bash
+npm run db:generate          # gera nova migration após mudar o schema
+npm run db:migrate:local     # aplica no D1 local
+npm run db:migrate:remote    # aplica no D1 de produção
+npm run demo:users -- --remote   # contas demo + seed na produção (idempotente)
+npm run seed:d1 -- --local       # só o seed operacional (exige as contas)
 ```
 
-Abra `http://localhost:3000`. O servidor de desenvolvimento escuta em `0.0.0.0` para acesso na rede local. Para instalação PWA nos celulares, use um deploy HTTPS.
-
-`supabase/seed.sql` é uma alternativa SQL versionada, gerada da mesma definição em `scripts/seed-data.ts`. Organizações e preferências podem ser populadas antes do Auth; o histórico só é inserido quando existem os perfis demo. O bootstrap Node é a opção recomendada. `npm run seed` reaplica fixtures via Service Role. `npm run seed:sql` regenera o arquivo SQL.
+`scripts/seed-data.ts` é a fonte da demo: 8 organizações, 3 motoristas, 4 doações disponíveis, 3 missões e 16 entregas históricas com métricas, com `is_seed`, `is_demo` e `seed_kind` preservados. Os scripts geram SQL e aplicam com `wrangler d1 execute`; as senhas usam o hash do próprio Better Auth. As regras de negócio que eram funções PostgreSQL estão em `src/server/services/`, e a especificação original fica em `docs/legacy-supabase/`.
 
 ## Contas oficiais
 
@@ -70,7 +65,7 @@ Também são criadas contas para Aurora, Empório Central, Nova Vida, Casa São 
 
 Supermercado fotografa → upload privado → IA demo/live → revisão humana → publicação → ONG aceita → missão criada → motorista aceita → coleta → transporte → ONG consulta token → motorista valida → entrega → impacto/timeline/notificações atualizados.
 
-As mutações críticas são funções transacionais do PostgreSQL. RLS e grants por coluna impedem alteração arbitrária de papel, status ou impacto. Reservas e missões usam locks; um lote não pode ser reservado duas vezes. O código de entrega é privado e não é enviado ao motorista junto com o rescue.
+As mutações críticas são services no servidor que gravam num único batch atômico do D1, com guardas que reconferem as regras dentro da transação: um lote não pode ser reservado duas vezes, uma missão não tem dois motoristas, a capacidade diária e a do veículo valem mesmo com chamadas simultâneas. Papel, status e impacto não podem ser alterados pelo navegador. O código de entrega é privado e não é enviado ao motorista junto com o resgate.
 
 ## IA
 
@@ -104,98 +99,98 @@ Nesse modo a fixture é explicitamente rotulada como demo. Upload, publicação 
 
 Abra `/demo`, disponível somente com `ENABLE_DEMO_MODE=true`. Cada celular entra em uma das três contas oficiais. Para resetar pela tela, esteja autenticado como Mercado Paulista e confirme a ação.
 
-```powershell
-npm run demo:reset
+```bash
+npm run demo:reset                            # produção
+npm run demo:reset -- http://localhost:8787   # cf:preview local
 ```
 
-O script exige o modo demo e a Service Role. O reset limpa o fluxo criado pela conta oficial, restaura quatro doações e três missões seed e preserva o histórico de 16 entregas/métricas. Consulte `docs/DEMONSTRATION.md` para o roteiro completo e limites. Use bootstrap/seed apenas no ambiente dedicado; eles regravam fixtures.
+O script entra como Mercado Paulista e chama o mesmo reset do botão. O reset limpa o fluxo criado pela conta oficial e as fotos dela no R2, restaura quatro doações e três missões seed e preserva o histórico de 16 entregas e métricas. Consulte `docs/DEMONSTRATION.md` para o roteiro completo.
 
 ## Estrutura
 
 ```text
 src/app/                 páginas públicas, rotas operacionais e APIs
-src/components/          shell, formulários, métricas, timeline e ações
+src/components/          shell, formulários, métricas, timeline, ações e tempo real
 src/components/maps/     MapLibre, markers e rota simulada
 src/components/ui/       componentes shadcn/ui
-src/lib/ai/              provider, prompt, schema, demo e análise
-src/lib/supabase/        clientes browser/server/admin
+src/lib/ai/              providers (OpenAI, Workers AI), prompt, schema, demo e análise
 src/lib/domain.ts        estados, transições, labels, matching e impacto
-supabase/migrations/     schema, RLS, RPCs, Storage e Realtime
-supabase/seed.sql         seed SQL idempotente
-scripts/                 bootstrap, seed, reset, migration e ícones
-tests/                   domínio e integração SQL/RLS com PostgreSQL PGlite
-e2e/                     responsividade pública e cenário real de três sessões
-docs/                    arquitetura, demonstração e resultado do QA
+src/server/db/           schema Drizzle, cliente D1, guardas atômicas, relógio e impacto
+src/server/auth/         Better Auth
+src/server/permissions.ts  antigas policies de leitura, como código
+src/server/queries.ts    leituras filtradas por permissão
+src/server/services/     regras de negócio (publicar, reservar, missão, entrega, reset, perfil)
+src/server/realtime/     Durable Object RealtimeHub, canais e notify
+worker.ts                entrada do Worker: handler do Next + WebSocket + Durable Object
+drizzle/migrations/      SQL do D1
+scripts/                 contas demo, seed, reset, ícones e MapLibre
+tests/                   domínio, IA e tests/d1 (D1 real em memória via wrangler)
+e2e/                     responsividade, login, tempo real e cenário de três sessões
+docs/                    arquitetura, demonstração, QA e o schema PostgreSQL legado
+prompts/                 plano e relatórios da migração para a Cloudflare
 public/                  service worker, fallback offline e ícones PWA
 ```
 
 ## Comandos e validação
 
-```powershell
+```bash
 npm run lint
 npm run typecheck
 npm run test
 npm run build
-npm run start
+npm run cf:build
 ```
 
-Vitest verifica estados, token, impacto, matching, schemas e **executa a migration, seed e fluxo completo em PostgreSQL embarcado PGlite**. Também testa isolamento RLS, proteção de papel, dupla reserva, motorista concorrente, code errado, métrica única e reset. Auth e Storage são schemas substitutos nesse teste; ele não valida a infraestrutura remota do Supabase.
+O Vitest verifica estados, token, impacto, matching, schemas e os providers de IA. Os testes em `tests/d1/` sobem um D1 real em memória (`getPlatformProxy` do wrangler) e rodam o fluxo completo nos services: isolamento entre contas, proteção de papel, dupla reserva e dois motoristas simultâneos (inclusive com as duas chamadas forçadas a validar o mesmo estado), capacidades, horário, bloqueio após cinco códigos errados, métrica única, reset, login do Better Auth e fotos no R2.
 
-```powershell
+```bash
 npx playwright install chromium
-npm run test:e2e
+npm run cf:preview                      # em outro terminal
+E2E_BASE_URL=http://localhost:8787 npm run test:e2e
 ```
 
-Os testes públicos validam 375, 390, 430, 768, 1280 e 1440 px, navegação/login, proteção de rotas, origem das APIs e assets PWA. O cenário completo foi aprovado no projeto Ongsave configurado:
+Sem `E2E_BASE_URL` o Playwright sobe o `next dev` e roda só os testes públicos. Os testes públicos validam 375 a 1440 px, navegação, login, proteção de rotas, origem das APIs e assets PWA. O cenário completo reseta a demo, então rode só num banco dedicado:
 
-```powershell
-# Execute só em um banco dedicado à demonstração: o cenário reseta a demo.
-$env:RUN_LIVE_E2E="true"
-npm run test:e2e -- e2e/live-flow.spec.ts
+```bash
+E2E_BASE_URL=http://localhost:8787 RUN_LIVE_E2E=true npm run test:e2e -- e2e/live-flow.spec.ts
 ```
 
-Use `AI_MODE=demo`, `ENABLE_DEMO_MODE=true` e contas provisionadas antes desse teste. Ele abre três sessões isoladas, envia uma fotografia real, publica, verifica frames Realtime, mapa e rota, coleta, token errado/correto, entrega e indicadores. Depois reseta e repete com fallback manual, conferindo a exclusão da foto pela API do Storage. Para usar o Chrome instalado no Windows, defina `$env:PLAYWRIGHT_CHANNEL="chrome"`. Câmera física e instalação devem ser conferidas nos aparelhos reais. Resultados em `docs/QA.md`.
+Ele abre três sessões isoladas, envia uma fotografia real, publica, confere os avisos do WebSocket `/api/realtime`, mapa e rota, coleta, token errado e correto, entrega e indicadores. Depois reseta e repete com fallback manual, conferindo que a foto anterior saiu do R2. Para usar o Chrome instalado, defina `PLAYWRIGHT_CHANNEL=chrome`. Resultados em `docs/QA.md`.
 
-Os scripts `predev` e `prebuild` copiam o worker MapLibre e seu módulo compartilhado de `node_modules` para `public/maplibre/`. O mapa recebe esses arquivos pelo app, evitando a incompatibilidade do caminho automático do worker com o empacotamento Next.js. A pasta gerada é ignorada pelo Git e regenerada com a versão instalada.
+Os scripts `predev`, `prebuild` e `cf:build` copiam o worker MapLibre e seu módulo compartilhado de `node_modules` para `public/maplibre/`, evitando a incompatibilidade do caminho automático do worker com o empacotamento. A pasta é ignorada pelo Git.
 
-## Deploy Vercel
-
-Publicado em **https://ongsave.vercel.app**, na conta `enrique-fcnrs-projects`, conectado ao repositório `enrique-fcnr/ongsave` e à branch de produção `main`. Login: https://ongsave.vercel.app/login. Demonstração: https://ongsave.vercel.app/demo. As três contas oficiais acima usam a senha `demo123`.
-
-As variáveis de produção e preview foram configuradas na Vercel, com a chave administrativa Supabase restrita ao servidor. O Site URL do Supabase Auth aponta para o domínio publicado; redirecionamentos de desenvolvimento também foram preservados. O deploy mantém `AI_MODE=demo` e `ENABLE_DEMO_MODE=true`. Dez testes de navegador foram aprovados no endereço HTTPS, incluindo duas entregas completas com as três contas e reset entre elas.
-
-Conecte este projeto, configure as mesmas variáveis e execute build padrão Next.js. Adicione a URL HTTPS no Supabase Auth. Chaves `NEXT_PUBLIC_*` exigem um novo build quando alteradas. `/api/analyze` tem timeout do provider de 45 segundos e duração máxima configurada de 60 segundos, sujeita aos limites do plano de hospedagem.
-
-Para demonstração: `ENABLE_DEMO_MODE=true`, `AI_MODE=demo`. Fora da apresentação: desative demo, remova/controle as contas acadêmicas e use contas reais provisionadas pelo administrador.
-
-## Cloudflare
-
-Migração em andamento na branch `feat/edu` (plano em `prompts/00-PLANO-MIGRACAO-CLOUDFLARE.md`). O app roda num Cloudflare Worker via `@opennextjs/cloudflare`.
+## Deploy (Cloudflare)
 
 - **Conta:** somente `Eduardofonseca1401@gmail.com's Account` (`51f772f7656a812951d1ee9ce5c3f9c0`), fixada em `account_id` no `wrangler.jsonc`. As outras contas do mesmo login não recebem nada do ONGSave.
 - **URL:** https://ongsave.eduardofonseca1401.workers.dev
-- **Plano:** Workers Paid. O Worker tem ~3,2 MiB gzip, acima do limite de 3 MiB do Free, e o SSR passa dos 10 ms de CPU do Free.
+- **Plano:** Workers Paid (US$ 5/mês). O Worker tem ~3,2 MiB gzip, acima do limite de 3 MiB do Free, e o SSR passa dos 10 ms de CPU do Free.
+
+Primeira publicação (uma vez):
 
 ```bash
-npx wrangler login        # uma vez; confira com npx wrangler whoami
-cp .dev.vars.example .dev.vars
-npm run cf:build          # copia o MapLibre para public/ e gera .open-next/
-npm run cf:preview        # build + Worker local em http://localhost:8787
-npm run cf:deploy         # build + publicação
-npm run cf-typegen        # regenera cloudflare-env.d.ts após mudar bindings
+# Painel: R2 Object Storage → ativar na conta. Depois:
+npx wrangler r2 bucket create ongsave-photos
+npm run db:migrate:remote
+npm run demo:users -- --remote
+npm run cf:deploy
+openssl rand -base64 32 | npx wrangler secret put BETTER_AUTH_SECRET
 ```
 
-Variáveis não secretas ficam em `vars` no `wrangler.jsonc` (`AI_MODE`, `ENABLE_DEMO_MODE`, `NEXT_PUBLIC_MAP_PROVIDER`). `NEXT_PUBLIC_APP_URL` entra no build por `.env.production`. Segredos vão por `npx wrangler secret put <NOME>` e, localmente, por `.dev.vars` (ignorado pelo Git). Para rodar os testes de navegador contra o preview ou a produção, defina `E2E_BASE_URL`; nesse caso o Playwright não sobe o `next dev`.
+Publicações seguintes: `npm run cf:deploy` (e `npm run db:migrate:remote` quando houver migration nova). `NEXT_PUBLIC_*` entram no build: recompile ao alterá-las. `/api/analyze` tem timeout de 45 s no provider.
+
+Para demonstração: `ENABLE_DEMO_MODE=true`, `AI_MODE=demo`. Fora da apresentação: desative o demo, controle as contas acadêmicas e use contas reais provisionadas pelo administrador.
+
+A versão anterior (Vercel + Supabase, https://ongsave.vercel.app, conta `enrique-fcnrs-projects`, branch `main`) segue no ar até o corte final combinado com o Enrique.
 
 ## Limites conhecidos
 
-- Auth, upload, RLS, Realtime e entregas foram homologados no Supabase remoto pelo Chrome. A chamada OpenAI live depende de `OPENAI_API_KEY`; câmera e instalação PWA ainda precisam de homologação nos aparelhos físicos.
+- Login, upload, permissões, tempo real e entregas foram homologados no `cf:preview` pelo Chrome. A chamada OpenAI live depende de `OPENAI_API_KEY`; câmera e instalação PWA ainda precisam de homologação nos aparelhos físicos.
 - GPS, roteamento, distância, ETA, matching avançado e histórico são simulados e identificados. O mapa é interativo e depende de Internet/WebGL. A base vetorial OpenFreeMap usa dados OpenStreetMap e estilo Positron adaptado à paleta ONGSave, hospedado em `public/maps/`, com licenças e atribuição preservadas. O override raster opcional permanece disponível em `NEXT_PUBLIC_MAP_TILE_URL`.
 - Não há push, tracking GPS real, autoinscrição, painel administrativo completo ou motor de previsão.
 - Impacto ambiental/economia são projeções ilustrativas. O histórico demo participa dos indicadores e é informado na tela.
 - Relatório PDF utiliza impressão do navegador. Não há geração certificada de relatório ESG.
 - PWA opera online; offline exibe uma tela de reconexão e não permite transações.
-- O reset pagina a lista de imagens e remove os arquivos da pasta oficial em lotes. URLs assinadas já usadas podem continuar atendidas pelo cache da CDN até sua invalidação.
+- O reset pagina a lista de imagens e remove os arquivos da pasta oficial do R2 em lotes. Fotos já abertas podem ficar no cache privado do navegador por até 1 hora.
 - Fotos decodificáveis de até 20 MB são reduzidas no celular a JPEG com no máximo 1600 px e 4 MB no upload. HEIC depende de conversão/suporte do navegador; prefira JPEG.
 - UI e banco limitam as consultas atuais a 200 rescues; paginação e índices adicionais são próximos passos para escala.
 
@@ -203,4 +198,4 @@ Próximos passos opcionais: homologação em celulares reais, rate limit distrib
 
 ## Referências de integração
 
-[Next.js Route Handlers](https://nextjs.org/docs/app/getting-started/route-handlers), [Supabase SSR](https://supabase.com/docs/guides/auth/server-side/creating-a-client), [Supabase Realtime](https://supabase.com/docs/guides/realtime/postgres-changes) e [OpenAI Vision](https://developers.openai.com/api/docs/guides/images-vision).
+[OpenNext Cloudflare](https://opennext.js.org/cloudflare), [D1](https://developers.cloudflare.com/d1/), [Durable Objects WebSocket Hibernation](https://developers.cloudflare.com/durable-objects/best-practices/websockets/), [Better Auth](https://better-auth.com/docs), [Drizzle D1](https://orm.drizzle.team/docs/connect-cloudflare-d1), [Workers AI](https://developers.cloudflare.com/workers-ai/) e [OpenAI Vision](https://developers.openai.com/api/docs/guides/images-vision).
