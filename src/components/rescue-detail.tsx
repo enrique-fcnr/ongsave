@@ -1,3 +1,4 @@
+import { FormSections, PagedItems } from "./screen-sections";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Check, HeartHandshake, MapPin, PackageCheck, Store } from "lucide-react";
@@ -29,7 +30,7 @@ export async function RescueDetail({ id }: { id: string }) {
   const driverName = e.data?.find((ev) => ev.event_type === "DRIVER_ASSIGNED")?.metadata
     ?.driver_name;
   return (
-    <div className="stack">
+    <div className="stack detail-workspace">
       <Link className="back" href={profile.role === "DRIVER" ? "/driver/missions" : "/rescues"}>
         <ArrowLeft size={16} />
         Voltar aos resgates
@@ -48,59 +49,18 @@ export async function RescueDetail({ id }: { id: string }) {
         </div>
         <StatusPill status={r.status} />
       </div>
-      {r.status === "DELIVERED" && (
-        <div className="impact-banner">
-          <div>
-            <PackageCheck size={30} color="var(--primary)" />
-            <div className="impact-total">{number(weight)} kg resgatados</div>
-            <p>
-              ≈ {number(weight * 2)} refeições estimadas · {number(Number(r.mock_distance_km))} km
-              solidários simulados
-            </p>
-          </div>
-          <HeartHandshake className="art" />
-        </div>
-      )}
-      <div className="detail-grid">
-        <div className="stack">
-          <RescueMap rescue={r} />
-          <div className="panel">
-            <div className="route-stop">
-              <span className="symbol">
-                <Store size={18} />
-              </span>
-              <div>
-                <span className="stop-label">Coleta · Supermercado</span>
-                <h3>{o.data?.find((org) => org.id === r.supermarket_id)?.name}</h3>
-                <p className="small muted" style={{ marginTop: 5 }}>
-                  {r.pickup_address}
-                </p>
-              </div>
-            </div>
-            <div className="route-stop">
-              <span className="symbol">
-                <MapPin size={18} />
-              </span>
-              <div>
-                <span className="stop-label">Entrega · Instituição</span>
-                <h3>{o.data?.find((org) => org.id === r.ngo_id)?.name}</h3>
-                <p className="small muted" style={{ marginTop: 5 }}>
-                  {r.delivery_address}
-                </p>
-              </div>
-            </div>
-            <p className="small muted" style={{ marginTop: 15 }}>
-              Rota e ETA demonstrativos · {number(Number(r.mock_distance_km))} km · ≈{" "}
-              {r.mock_eta_minutes} min
-            </p>
-          </div>
-        </div>
+      <FormSections labels={["Acompanhamento", "Rota", "Endereços", "Resultado"]}>
         <div className="panel stack">
           <div className="between">
             <h2>Acompanhe o resgate</h2>
             <span className="small muted">{number(weight)} kg</span>
           </div>
-          <div className="timeline">
+          <PagedItems
+            className="timeline"
+            pageSize={4}
+            mobilePageSize={3}
+            label="Etapas do resgate"
+          >
             {e.data?.map((ev) => (
               <div key={ev.id} className="timeline-item">
                 <span className="timeline-dot">
@@ -130,19 +90,63 @@ export async function RescueDetail({ id }: { id: string }) {
                 </p>
               </div>
             )}
-          </div>
+          </PagedItems>
           <RescueActions key={r.status} id={r.id} status={r.status} role={profile.role} />
           {r.status === "DELIVERED" && (
             <Link
               className="notice"
-              href={profile.role === "NGO" ? "/home#impacto" : "/impact"}
+              href={profile.role !== "DRIVER" ? "/home#impacto" : "/impact"}
               style={{ textAlign: "center" }}
             >
               Ver impacto atualizado
             </Link>
           )}
         </div>
-      </div>
+        <RescueMap rescue={r} />
+        <div className="panel">
+          <div className="route-stop">
+            <span className="symbol">
+              <Store size={18} />
+            </span>
+            <div>
+              <span className="stop-label">Coleta · Supermercado</span>
+              <h3>{o.data?.find((org) => org.id === r.supermarket_id)?.name}</h3>
+              <p className="small muted" style={{ marginTop: 5 }}>
+                {r.pickup_address}
+              </p>
+            </div>
+          </div>
+          <div className="route-stop">
+            <span className="symbol">
+              <MapPin size={18} />
+            </span>
+            <div>
+              <span className="stop-label">Entrega · Instituição</span>
+              <h3>{o.data?.find((org) => org.id === r.ngo_id)?.name}</h3>
+              <p className="small muted" style={{ marginTop: 5 }}>
+                {r.delivery_address}
+              </p>
+            </div>
+          </div>
+          <p className="small muted" style={{ marginTop: 15 }}>
+            Rota e ETA demonstrativos · {number(Number(r.mock_distance_km))} km · ≈{" "}
+            {r.mock_eta_minutes} min
+          </p>
+        </div>
+        {r.status === "DELIVERED" && (
+          <div className="impact-banner">
+            <div>
+              <PackageCheck size={30} color="var(--primary)" />
+              <div className="impact-total">{number(weight)} kg resgatados</div>
+              <p>
+                ≈ {number(weight * 2)} refeições estimadas · {number(Number(r.mock_distance_km))} km
+                solidários simulados
+              </p>
+            </div>
+            <HeartHandshake className="art" />
+          </div>
+        )}
+      </FormSections>
     </div>
   );
 }

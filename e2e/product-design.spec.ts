@@ -88,7 +88,13 @@ for (const width of [390, 768, 1440]) {
     const publication = page.getByRole("button", { name: "Confirmar e publicar", exact: true });
     await expect(publication).toBeDisabled();
     await page.getByLabel("Peso revisado (kg)", { exact: true }).fill("12");
+    await page.getByRole("tab", { name: "Itens", exact: true }).click();
     await page.getByRole("button", { name: "Adicionar item" }).click();
+    const nextItems = page.getByRole("button", {
+      name: "Próxima página: Itens do lote",
+      exact: true,
+    });
+    while (await nextItems.isEnabled()) await nextItems.click();
     await page
       .getByRole("textbox", { name: /^Nome do item/ })
       .last()
@@ -103,6 +109,7 @@ for (const width of [390, 768, 1440]) {
       fullPage: true,
       animations: "disabled",
     });
+    await page.getByRole("tab", { name: "Confirmar", exact: true }).click();
     await page.getByRole("checkbox", { name: /^Confirmo que revisei/ }).check();
     await expect(publication).toBeEnabled();
     await publication.click();
@@ -171,7 +178,9 @@ for (const width of [390, 768, 1440]) {
           });
         }
         if (route === "/rescues" && (await page.locator(".rescue-row").count())) {
-          await page.locator(".rescue-row").first().click();
+          if (!(await page.locator(".rescue-row").filter({ visible: true }).count()))
+            await page.getByRole("tab", { name: "Entregas", exact: true }).click();
+          await page.locator(".rescue-row").filter({ visible: true }).first().click();
           await expect(page.locator(".timeline")).toBeVisible();
           await fits(page);
           await page.screenshot({

@@ -1,4 +1,5 @@
 "use client";
+import { FormSections, PagedItems } from "./screen-sections";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { HeartHandshake, RotateCcw, Store, Truck } from "lucide-react";
@@ -32,8 +33,8 @@ export function DemoControls({ configured }: { configured: boolean }) {
   const [message, setMessage] = useState("");
   const router = useRouter();
   return (
-    <div className="stack">
-      <div className="demo-grid">
+    <FormSections labels={["Escolher perfil", "Preparar demonstração"]}>
+      <PagedItems className="demo-grid" pageSize={3} label="Perfis de demonstração">
         {accounts.map((a) => (
           <div key={a.email} className="panel demo-account">
             <span className="avatar">
@@ -71,7 +72,7 @@ export function DemoControls({ configured }: { configured: boolean }) {
             </Button>
           </div>
         ))}
-      </div>
+      </PagedItems>
       <div className="demo-reset">
         <Button
           variant="outline"
@@ -113,6 +114,6 @@ export function DemoControls({ configured }: { configured: boolean }) {
           demo123.
         </p>
       </div>
-    </div>
+    </FormSections>
   );
 }

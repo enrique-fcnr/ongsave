@@ -1,4 +1,5 @@
 "use client";
+import { FormSections, PagedItems } from "./screen-sections";
 import { useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -24,7 +25,7 @@ export function MissionBoard({
   );
   const selected = rescues.find((r) => r.id === selectedId) || rescues[0];
   return (
-    <div className="stack">
+    <FormSections labels={["Rota", "Missão selecionada", "Outras missões"]}>
       <DriverMap
         rescues={rescues}
         selectedId={selected?.id}
@@ -41,7 +42,7 @@ export function MissionBoard({
             </span>
             <StatusPill status={selected.status} />
           </div>
-          <div className="dashboard-grid">
+          <FormSections labels={["Endereços", "Participar"]}>
             <div>
               <div className="route-stop">
                 <span className="symbol">
@@ -94,7 +95,7 @@ export function MissionBoard({
                 Ver rota e detalhes
               </Link>
             </div>
-          </div>
+          </FormSections>
           <p className="small muted">
             Rota, posição e tempo são demonstrativos. As etapas da coleta e da entrega ficam
             registradas no resgate.
@@ -107,7 +108,7 @@ export function MissionBoard({
         />
       )}
       {rescues.length > 1 && (
-        <div className="rescue-list">
+        <PagedItems className="rescue-list" pageSize={3} mobilePageSize={2} label="Missões">
           {rescues.map((r) => (
             <button
               className="rescue-row"
@@ -131,8 +132,8 @@ export function MissionBoard({
               </span>
             </button>
           ))}
-        </div>
+        </PagedItems>
       )}
-    </div>
+    </FormSections>
   );
 }

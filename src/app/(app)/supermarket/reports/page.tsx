@@ -1,3 +1,4 @@
+import { FormSections, PagedItems } from "@/components/screen-sections";
 import { redirect } from "next/navigation";
 import { operationalData, summarize } from "@/lib/data";
 import { number, categoryLabels } from "@/lib/domain";
@@ -34,66 +35,71 @@ export default async function Reports() {
         </div>
         <PrintButton />
       </div>
-      <Metrics rescues={monthly} role={profile.role} />
-      <div className="panel between">
-        <div>
-          <h2>{number(m.co2)} kg CO₂e estimados evitados</h2>
-          <p className="small muted" style={{ marginTop: 8 }}>
-            Estimativa ilustrativa · {m.partners} instituições beneficiadas
-          </p>
+      <FormSections
+        labels={[
+          "Indicadores",
+          "Resultado ambiental",
+          "Gráficos",
+          "Registros",
+          "Exportar",
+          "Metodologia",
+        ]}
+      >
+        <Metrics rescues={monthly} role={profile.role} />
+        <div className="panel between">
+          <div>
+            <h2>{number(m.co2)} kg CO₂e estimados evitados</h2>
+            <p className="small muted" style={{ marginTop: 8 }}>
+              Estimativa ilustrativa · {m.partners} instituições beneficiadas
+            </p>
+          </div>
+          <span className="pill">Impacto social</span>
         </div>
-        <span className="pill">Impacto social</span>
-      </div>
-      <Charts rescues={monthly} asOf={asOf} />
-      <section className="panel stack">
-        <h2>Registro de resgates</h2>
-        <div className="scroll-x">
-          <table className="report-table">
-            <thead>
-              <tr>
-                {["Data", "Categoria", "Peso", "Instituição", "Status"].map((t) => (
-                  <th key={t}>{t}</th>
-                ))}
+        <Charts rescues={monthly} asOf={asOf} />
+        <section className="panel stack">
+          <h2>Registro de resgates</h2>
+          <PagedItems
+            tableHeaders={["Data", "Categoria", "Peso", "Instituição", "Status"]}
+            pageSize={4}
+            mobilePageSize={3}
+            label="Registros do relatório"
+          >
+            {monthly.map((r) => (
+              <tr key={r.id}>
+                <td>
+                  {new Intl.DateTimeFormat("pt-BR", {
+                    timeZone: "America/Sao_Paulo",
+                    day: "2-digit",
+                    month: "2-digit",
+                  }).format(new Date(r.created_at))}
+                </td>
+                <td>{categoryLabels[r.surplus_batches?.category || "other"]}</td>
+                <td>{number(Number(r.surplus_batches?.estimated_weight_kg || 0))} kg</td>
+                <td>{orgs.find((o) => o.id === r.ngo_id)?.name}</td>
+                <td>
+                  <StatusPill status={r.status} />
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {monthly.map((r) => (
-                <tr key={r.id}>
-                  <td>
-                    {new Intl.DateTimeFormat("pt-BR", {
-                      timeZone: "America/Sao_Paulo",
-                      day: "2-digit",
-                      month: "2-digit",
-                    }).format(new Date(r.created_at))}
-                  </td>
-                  <td>{categoryLabels[r.surplus_batches?.category || "other"]}</td>
-                  <td>{number(Number(r.surplus_batches?.estimated_weight_kg || 0))} kg</td>
-                  <td>{orgs.find((o) => o.id === r.ngo_id)?.name}</td>
-                  <td>
-                    <StatusPill status={r.status} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {!monthly.length && (
-          <Empty
-            title="Nenhum registro neste mês"
-            body="As próximas entregas aparecerão neste relatório."
-          />
-        )}
-      </section>
-      <p className="small muted">
-        Para exportar, selecione “Salvar como PDF” na janela de impressão.
-      </p>
-      <details className="method-note">
-        <summary>Sobre os dados e as estimativas</summary>
-        <p>
-          Inclui histórico simulado. Refeições, economia, água e CO₂e usam fatores ilustrativos a
-          partir das entregas confirmadas e não constituem certificação ESG.
+            ))}
+          </PagedItems>
+          {!monthly.length && (
+            <Empty
+              title="Nenhum registro neste mês"
+              body="As próximas entregas aparecerão neste relatório."
+            />
+          )}
+        </section>
+        <p className="small muted">
+          Para exportar, selecione “Salvar como PDF” na janela de impressão.
         </p>
-      </details>
+        <details className="method-note">
+          <summary>Sobre os dados e as estimativas</summary>
+          <p>
+            Inclui histórico simulado. Refeições, economia, água e CO₂e usam fatores ilustrativos a
+            partir das entregas confirmadas e não constituem certificação ESG.
+          </p>
+        </details>
+      </FormSections>
     </div>
   );
 }

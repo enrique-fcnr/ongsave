@@ -47,7 +47,7 @@ export function Shell({
         ? [{ href: "/driver/missions", label: "Missões", icon: MapPinned }]
         : [{ href: "/supermarket/surplus/new", label: "Novo excedente", icon: Plus }]),
     { href: "/rescues", label: "Resgates", icon: Package },
-    ...(profile.role !== "NGO" ? [{ href: "/impact", label: "Impacto", icon: Leaf }] : []),
+    ...(profile.role === "DRIVER" ? [{ href: "/impact", label: "Impacto", icon: Leaf }] : []),
     { href: "/profile", label: "Perfil", icon: User },
   ];
   const active = (href: string) =>

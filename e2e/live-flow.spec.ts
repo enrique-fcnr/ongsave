@@ -220,8 +220,10 @@ test("foto real, três contas, impacto e repetição após reset com fallback ma
       await market.getByLabel("Título", { exact: true }).fill(title);
       await market.getByLabel("Categoria", { exact: true }).selectOption("produce");
       await market.getByLabel("Peso revisado (kg)", { exact: true }).fill(String(weight));
+      await market.getByRole("tab", { name: "Coleta", exact: true }).click();
       await market.getByLabel("Retirar em até (horas)", { exact: true }).fill("8");
       await expect(market.getByRole("button", { name: "Confirmar e publicar" })).toBeDisabled();
+      await market.getByRole("tab", { name: "Confirmar", exact: true }).click();
       await market.getByRole("checkbox").check();
       const published = market.waitForResponse(
         (r) => r.url().endsWith("/api/batches") && r.request().method() === "POST",

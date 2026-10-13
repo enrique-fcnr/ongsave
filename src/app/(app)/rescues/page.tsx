@@ -1,3 +1,4 @@
+import { FormSections } from "@/components/screen-sections";
 import { operationalData } from "@/lib/data";
 import { RescueList } from "@/components/shared";
 export default async function Rescues() {
@@ -16,36 +17,38 @@ export default async function Rescues() {
             : "Da reserva à entrega, acompanhe cada alimento até o novo destino."}
         </p>
       </div>
-      <section className="stack">
-        <div className="section-heading">
-          <h2>Em andamento</h2>
-          <span className="pill">{ongoing.length} resgates</span>
-        </div>
-        <RescueList
-          rescues={ongoing}
-          orgs={orgs}
-          emptyTitle="Nenhum resgate em andamento"
-          emptyBody="Quando um resgate começar, acompanhe as próximas etapas por aqui."
-        />
-      </section>
-      <section className="stack">
-        <div className="section-heading">
-          <h2>Histórico de entregas</h2>
-          <span className="small muted">{delivered.length} entregas confirmadas</span>
-        </div>
-        <RescueList
-          rescues={delivered}
-          orgs={orgs}
-          emptyTitle="Sua primeira entrega ainda está por vir"
-          emptyBody="As entregas confirmadas ficam guardadas aqui para você consultar."
-        />
-      </section>
-      {cancelled.length > 0 && (
+      <FormSections labels={["Em andamento", "Entregas", "Cancelados"]}>
         <section className="stack">
-          <h2>Cancelados</h2>
-          <RescueList rescues={cancelled} orgs={orgs} />
+          <div className="section-heading">
+            <h2>Em andamento</h2>
+            <span className="pill">{ongoing.length} resgates</span>
+          </div>
+          <RescueList
+            rescues={ongoing}
+            orgs={orgs}
+            emptyTitle="Nenhum resgate em andamento"
+            emptyBody="Quando um resgate começar, acompanhe as próximas etapas por aqui."
+          />
         </section>
-      )}
+        <section className="stack">
+          <div className="section-heading">
+            <h2>Histórico de entregas</h2>
+            <span className="small muted">{delivered.length} entregas confirmadas</span>
+          </div>
+          <RescueList
+            rescues={delivered}
+            orgs={orgs}
+            emptyTitle="Sua primeira entrega ainda está por vir"
+            emptyBody="As entregas confirmadas ficam guardadas aqui para você consultar."
+          />
+        </section>
+        {cancelled.length > 0 && (
+          <section className="stack">
+            <h2>Cancelados</h2>
+            <RescueList rescues={cancelled} orgs={orgs} />
+          </section>
+        )}
+      </FormSections>
     </div>
   );
 }

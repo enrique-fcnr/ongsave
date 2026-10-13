@@ -1,4 +1,5 @@
 "use client";
+import { FormSections, PagedItems } from "./screen-sections";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
@@ -122,7 +123,7 @@ export function SurplusForm() {
       </div>
     );
   return (
-    <div className="narrow stack">
+    <div className={`narrow stack surplus-workflow ${stage === "review" ? "surplus-review" : ""}`}>
       <Link href="/home" className="back">
         <ArrowLeft size={16} />
         Voltar ao início
@@ -228,9 +229,6 @@ export function SurplusForm() {
         </div>
       ) : (
         <>
-          <div className="panel" style={{ padding: 0, overflow: "hidden" }}>
-            <FoodPhoto url={preview} title="Fotografia do excedente" />
-          </div>
           <div className="between">
             <span className="pill">
               <Check size={13} />
@@ -303,214 +301,236 @@ export function SurplusForm() {
               }
             }}
           >
-            <fieldset className="form-section">
-              <legend>Dados do lote</legend>
-              <p>Confira o alimento, a categoria e o peso que será disponibilizado.</p>
-              <label className="field">
-                Título
-                <Input
-                  required
-                  minLength={3}
-                  maxLength={120}
-                  value={analysis.title}
-                  onChange={(e) => setAnalysis({ ...analysis, title: e.target.value })}
-                  placeholder="Ex.: Hortifrúti misto"
-                />
-              </label>
-              <div className="form-columns">
+            <FormSections
+              labels={["Dados do lote", "Itens", "Condição", "Coleta", "Confirmar", "Foto"]}
+            >
+              <fieldset className="form-section">
+                <legend>Dados do lote</legend>
+                <p>Confira o alimento, a categoria e o peso que será disponibilizado.</p>
                 <label className="field">
-                  Categoria
-                  <select
-                    aria-label="Categoria"
-                    value={analysis.category}
-                    onChange={(e) =>
-                      setAnalysis({
-                        ...analysis,
-                        category: e.target.value as SurplusAnalysis["category"],
-                      })
-                    }
-                  >
-                    {categories.map((c) => (
-                      <option key={c} value={c}>
-                        {categoryLabels[c]}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="field">
-                  Peso revisado (kg)
+                  Título
                   <Input
-                    type="number"
-                    min="0.1"
-                    max="5000"
-                    step="0.1"
                     required
-                    value={analysis.estimated_weight_kg}
-                    onChange={(e) =>
-                      setAnalysis({ ...analysis, estimated_weight_kg: Number(e.target.value) })
-                    }
+                    minLength={3}
+                    maxLength={120}
+                    value={analysis.title}
+                    onChange={(e) => setAnalysis({ ...analysis, title: e.target.value })}
+                    placeholder="Ex.: Hortifrúti misto"
                   />
                 </label>
-              </div>
-              {provider !== "manual" && (
-                <p className="small muted">
-                  Faixa sugerida: {number(analysis.estimated_weight_range.min)}–
-                  {number(analysis.estimated_weight_range.max)} kg · Confiança:{" "}
-                  {Math.round(analysis.confidence * 100)}%
-                </p>
-              )}
-            </fieldset>
-            <fieldset className="form-section">
-              <legend>Itens do lote</legend>
-              <p>Revise os nomes e as quantidades. Você pode incluir ou remover itens.</p>
-              {analysis.items.map((item, i) => (
-                <div className="row item-fields" key={i}>
-                  <Input
-                    aria-label={`Nome do item ${i + 1}`}
-                    value={item.name}
-                    required
-                    onChange={(e) =>
-                      setAnalysis({
-                        ...analysis,
-                        items: analysis.items.map((it, n) =>
-                          n === i ? { ...it, name: e.target.value } : it,
-                        ),
-                      })
-                    }
-                  />
-                  <Input
-                    aria-label={`Quantidade do item ${i + 1}`}
-                    className="item-quantity"
-                    type="number"
-                    min="0"
-                    value={item.estimated_quantity}
-                    onChange={(e) =>
-                      setAnalysis({
-                        ...analysis,
-                        items: analysis.items.map((it, n) =>
-                          n === i ? { ...it, estimated_quantity: Number(e.target.value) } : it,
-                        ),
-                      })
-                    }
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`Remover ${item.name}`}
-                    onClick={() =>
-                      setAnalysis({ ...analysis, items: analysis.items.filter((_, n) => n !== i) })
-                    }
-                  >
-                    <Trash2 size={16} />
-                  </Button>
+                <div className="form-columns">
+                  <label className="field">
+                    Categoria
+                    <select
+                      aria-label="Categoria"
+                      value={analysis.category}
+                      onChange={(e) =>
+                        setAnalysis({
+                          ...analysis,
+                          category: e.target.value as SurplusAnalysis["category"],
+                        })
+                      }
+                    >
+                      {categories.map((c) => (
+                        <option key={c} value={c}>
+                          {categoryLabels[c]}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="field">
+                    Peso revisado (kg)
+                    <Input
+                      type="number"
+                      min="0.1"
+                      max="5000"
+                      step="0.1"
+                      required
+                      value={analysis.estimated_weight_kg}
+                      onChange={(e) =>
+                        setAnalysis({ ...analysis, estimated_weight_kg: Number(e.target.value) })
+                      }
+                    />
+                  </label>
                 </div>
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                disabled={analysis.items.length >= 30}
-                onClick={() =>
-                  setAnalysis({
-                    ...analysis,
-                    items: [...analysis.items, { name: "", estimated_quantity: 1, confidence: 0 }],
-                  })
-                }
-              >
-                <Plus size={16} />
-                Adicionar item
-              </Button>
-            </fieldset>
-            <fieldset className="form-section">
-              <legend>Condição e retirada</legend>
-              <p>Defina o prazo de coleta e os cuidados para transportar o alimento.</p>
-              <label className="field">
-                Condição visual aparente
-                <select
-                  aria-label="Condição visual aparente"
-                  value={analysis.visual_condition}
-                  onChange={(e) =>
+                {provider !== "manual" && (
+                  <p className="small muted">
+                    Faixa sugerida: {number(analysis.estimated_weight_range.min)}–
+                    {number(analysis.estimated_weight_range.max)} kg · Confiança:{" "}
+                    {Math.round(analysis.confidence * 100)}%
+                  </p>
+                )}
+              </fieldset>
+              <fieldset className="form-section">
+                <legend>Itens do lote</legend>
+                <p>Revise os nomes e as quantidades. Você pode incluir ou remover itens.</p>
+                <PagedItems pageSize={3} mobilePageSize={2} label="Itens do lote">
+                  {analysis.items.map((item, i) => (
+                    <div className="row item-fields" key={i}>
+                      <Input
+                        aria-label={`Nome do item ${i + 1}`}
+                        value={item.name}
+                        required
+                        onChange={(e) =>
+                          setAnalysis({
+                            ...analysis,
+                            items: analysis.items.map((it, n) =>
+                              n === i ? { ...it, name: e.target.value } : it,
+                            ),
+                          })
+                        }
+                      />
+                      <Input
+                        aria-label={`Quantidade do item ${i + 1}`}
+                        className="item-quantity"
+                        type="number"
+                        min="0"
+                        value={item.estimated_quantity}
+                        onChange={(e) =>
+                          setAnalysis({
+                            ...analysis,
+                            items: analysis.items.map((it, n) =>
+                              n === i ? { ...it, estimated_quantity: Number(e.target.value) } : it,
+                            ),
+                          })
+                        }
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label={`Remover ${item.name}`}
+                        onClick={() =>
+                          setAnalysis({
+                            ...analysis,
+                            items: analysis.items.filter((_, n) => n !== i),
+                          })
+                        }
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
+                  ))}
+                </PagedItems>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={analysis.items.length >= 30}
+                  onClick={() =>
                     setAnalysis({
                       ...analysis,
-                      visual_condition: e.target.value as SurplusAnalysis["visual_condition"],
+                      items: [
+                        ...analysis.items,
+                        { name: "", estimated_quantity: 1, confidence: 0 },
+                      ],
                     })
                   }
                 >
-                  {Object.entries(conditions).map(([v, t]) => (
-                    <option key={v} value={v}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="form-columns">
+                  <Plus size={16} />
+                  Adicionar item
+                </Button>
+              </fieldset>
+              <fieldset className="form-section">
+                <legend>Condição do alimento</legend>
+                <p>Confira a condição visual aparente e avalie o alimento com sua equipe.</p>
                 <label className="field">
-                  Prioridade
+                  Condição visual aparente
                   <select
-                    aria-label="Prioridade"
-                    value={analysis.pickup_priority}
+                    aria-label="Condição visual aparente"
+                    value={analysis.visual_condition}
                     onChange={(e) =>
                       setAnalysis({
                         ...analysis,
-                        pickup_priority: e.target.value as SurplusAnalysis["pickup_priority"],
+                        visual_condition: e.target.value as SurplusAnalysis["visual_condition"],
                       })
                     }
                   >
-                    {Object.entries(priorities).map(([v, t]) => (
+                    {Object.entries(conditions).map(([v, t]) => (
                       <option key={v} value={v}>
                         {t}
                       </option>
                     ))}
                   </select>
                 </label>
+              </fieldset>
+              <fieldset className="form-section">
+                <legend>Informações de coleta</legend>
+                <p>Defina o prazo de coleta e os cuidados de transporte.</p>
+                <div className="form-columns">
+                  <label className="field">
+                    Prioridade
+                    <select
+                      aria-label="Prioridade"
+                      value={analysis.pickup_priority}
+                      onChange={(e) =>
+                        setAnalysis({
+                          ...analysis,
+                          pickup_priority: e.target.value as SurplusAnalysis["pickup_priority"],
+                        })
+                      }
+                    >
+                      {Object.entries(priorities).map(([v, t]) => (
+                        <option key={v} value={v}>
+                          {t}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="field">
+                    Retirar em até (horas)
+                    <Input
+                      type="number"
+                      required
+                      min="1"
+                      max="72"
+                      value={analysis.recommended_pickup_hours}
+                      onChange={(e) =>
+                        setAnalysis({
+                          ...analysis,
+                          recommended_pickup_hours: Number(e.target.value),
+                        })
+                      }
+                    />
+                  </label>
+                </div>
                 <label className="field">
-                  Retirar em até (horas)
-                  <Input
-                    type="number"
-                    required
-                    min="1"
-                    max="72"
-                    value={analysis.recommended_pickup_hours}
-                    onChange={(e) =>
-                      setAnalysis({ ...analysis, recommended_pickup_hours: Number(e.target.value) })
-                    }
+                  Observações de coleta
+                  <textarea
+                    name="description"
+                    maxLength={1000}
+                    placeholder="Embalagem, acesso e cuidados para retirada"
                   />
                 </label>
-              </div>
-              <label className="field">
-                Observações de coleta
-                <textarea
-                  name="description"
-                  maxLength={1000}
-                  placeholder="Embalagem, acesso e cuidados para retirada"
-                />
-              </label>
-            </fieldset>
-            <fieldset className="form-section">
-              <legend>Revisão da equipe</legend>
-              {analysis.warnings.map((w, i) => (
-                <p key={i} className="small muted">
-                  {w}
+              </fieldset>
+              <fieldset className="form-section">
+                <legend>Revisão da equipe</legend>
+                {analysis.warnings.map((w, i) => (
+                  <p key={i} className="small muted">
+                    {w}
+                  </p>
+                ))}
+                <p className="notice">
+                  A análise visual não substitui a avaliação da equipe responsável pelo alimento.
                 </p>
-              ))}
-              <p className="notice">
-                A análise visual não substitui a avaliação da equipe responsável pelo alimento.
-              </p>
-              <label className="check-label">
-                <input
-                  type="checkbox"
-                  required
-                  checked={confirmed}
-                  onChange={(e) => setConfirmed(e.target.checked)}
-                />
-                <span>
-                  Confirmo que revisei as informações e que os alimentos atendem às condições
-                  internas da unidade para doação.
-                </span>
-              </label>
-              <Button type="submit" disabled={!confirmed || busy}>
-                {busy ? <LoaderCircle className="spin" size={18} /> : "Confirmar e publicar"}
-              </Button>
-            </fieldset>
+                <label className="check-label">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={confirmed}
+                    onChange={(e) => setConfirmed(e.target.checked)}
+                  />
+                  <span>
+                    Confirmo que revisei as informações e que os alimentos atendem às condições
+                    internas da unidade para doação.
+                  </span>
+                </label>
+                <Button type="submit" disabled={!confirmed || busy}>
+                  {busy ? <LoaderCircle className="spin" size={18} /> : "Confirmar e publicar"}
+                </Button>
+              </fieldset>
+              <div className="panel" style={{ padding: 0, overflow: "hidden" }}>
+                <FoodPhoto url={preview} title="Fotografia do excedente" />
+              </div>
+            </FormSections>
           </form>
         </>
       )}

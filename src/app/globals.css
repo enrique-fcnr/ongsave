@@ -1117,18 +1117,18 @@ label.field {
   gap: 24px;
 }
 .auth-story {
-  padding: 44px;
+  padding: clamp(24px, 4dvh, 44px);
   background: radial-gradient(ellipse at bottom, #dceebf, #e8f2eb 70%);
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
   border-radius: 36px;
-  min-height: 700px;
-  padding-bottom: 360px;
+  min-height: calc(100dvh - 40px);
+  padding-bottom: clamp(220px, 40dvh, 360px);
 }
 .auth-story h1 {
-  font-size: clamp(38px, 3.8vw, 58px);
+  font-size: clamp(32px, min(3.4vw, 6dvh), 54px);
   max-width: 510px;
   line-height: 1.08;
   letter-spacing: -2px;
@@ -1142,7 +1142,7 @@ label.field {
   font-size: 14px;
 }
 .auth-story-copy {
-  margin-top: 50px;
+  margin-top: clamp(16px, 3dvh, 32px);
   position: relative;
   z-index: 1;
 }
@@ -1154,7 +1154,7 @@ label.field {
   left: -10%;
   right: -10%;
   bottom: -12px;
-  height: 380px;
+  height: clamp(220px, 40dvh, 380px);
   pointer-events: none;
 }
 .auth-team img {
@@ -1164,10 +1164,10 @@ label.field {
 .auth-location {
   color: #536a5b;
   font-size: 11px;
-  padding-top: 18px;
+  padding-top: 8px;
   position: relative;
   z-index: 1;
-  margin-top: 24px;
+  margin-top: 12px;
 }
 .auth-form {
   display: grid;
@@ -1469,7 +1469,7 @@ label.field {
     position: static;
   }
   .auth-story {
-    padding: 32px 32px 360px;
+    padding-inline: 28px;
   }
   .profile-chip > span:last-child {
     display: none;
@@ -1712,6 +1712,319 @@ label.field {
   }
   .app-skip-link {
     left: 20px;
+  }
+}
+
+.demo-page {
+  padding-block: 24px;
+  gap: 16px;
+}
+.demo-page .brand-logo {
+  width: 98px;
+  height: 60px;
+}
+.demo-page .demo-intro {
+  margin: 0;
+}
+.demo-page .demo-account {
+  padding: 20px;
+  gap: 14px;
+}
+.demo-page .demo-grid {
+  gap: 16px;
+}
+.demo-page h1 {
+  font-size: 30px;
+}
+/* A bounded workspace: sections and pages replace long vertical stacks. */
+.screen-sections {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.section-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.section-tabs button,
+.pagination button {
+  min-height: 40px;
+  padding: 8px 15px;
+  border: 1px solid var(--border);
+  background: white;
+  border-radius: 999px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 550;
+}
+.section-tabs button[aria-selected="true"] {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+.section-tabs button:focus-visible,
+.pagination button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.pagination button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.paged-item {
+  display: contents;
+}
+.screen-panel[hidden],
+.paged-item[hidden],
+.report-table tr[hidden] {
+  display: none !important;
+}
+.content {
+  padding-top: 20px;
+  padding-bottom: 24px;
+}
+.content .stack {
+  gap: 16px;
+}
+.content .title-block {
+  gap: 8px;
+}
+.content .panel,
+.content .mission-sheet,
+.content .form-section {
+  padding: 20px;
+}
+.content .metric {
+  padding: 18px;
+  gap: 12px;
+}
+.content .dashboard-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.content .chart {
+  height: clamp(100px, 20dvh, 175px);
+}
+.content .map-frame {
+  height: clamp(240px, 48dvh, 480px);
+  min-height: 0;
+}
+.content .camera-zone {
+  min-height: clamp(200px, 35dvh, 330px);
+  padding: 20px;
+  gap: 12px;
+}
+.content .form-section {
+  gap: 12px;
+}
+.content .form-grid {
+  gap: 14px;
+}
+.content .food-photo {
+  height: clamp(120px, 24dvh, 210px);
+}
+.content .donation-card .body {
+  padding: 16px;
+  gap: 10px;
+}
+.content .detail-summary {
+  position: static;
+  max-width: 760px;
+}
+.content .detail-weight {
+  font-size: 36px;
+}
+.content .detail-condition {
+  padding: 12px;
+}
+.content .form-columns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.content .choice-grid .check-label {
+  padding: 8px;
+  gap: 8px;
+  min-height: 40px;
+  font-size: 12px;
+}
+.detail-workspace > .back,
+.surplus-workflow > .back {
+  display: none;
+}
+.content .surplus-workflow {
+  gap: 10px;
+}
+.surplus-workflow .title-block > .eyebrow,
+.surplus-review .title-block > p {
+  display: none;
+}
+.surplus-review textarea {
+  min-height: 64px;
+  height: 64px;
+}
+.auth-story .brand-logo {
+  width: 104px;
+  height: 64px;
+}
+.auth-form > .stack {
+  gap: 20px;
+}
+.auth-form {
+  padding: 24px;
+}
+.auth-footer {
+  gap: 4px;
+}
+@media (max-height: 760px) {
+  .auth-form > .stack {
+    gap: 16px;
+  }
+  .auth-mobile-brand {
+    margin-bottom: 0;
+  }
+  .auth-story h1,
+  .auth-story p {
+    margin-top: 12px;
+  }
+  .auth-story .brand-logo {
+    height: 56px;
+    width: 91px;
+  }
+  .content {
+    padding-top: 16px;
+    padding-bottom: 18px;
+  }
+  .content .stack {
+    gap: 12px;
+  }
+  .content h1 {
+    font-size: 30px;
+  }
+  .content .title-block > .eyebrow {
+    padding: 4px 10px;
+  }
+  .content .panel,
+  .content .form-section,
+  .content .mission-sheet {
+    padding: 16px;
+  }
+  .content .metric {
+    padding: 14px;
+    gap: 8px;
+  }
+  .content .metric-footnote {
+    font-size: 10px;
+  }
+  .content .impact-banner {
+    padding: 20px;
+  }
+  .content .impact-total {
+    font-size: 32px;
+  }
+}
+@media (max-width: 767px) {
+  .content {
+    padding: 16px 16px calc(118px + env(safe-area-inset-bottom));
+  }
+  .content .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .section-tabs {
+    gap: 5px;
+  }
+  .section-tabs button {
+    padding: 7px 10px;
+    min-height: 36px;
+    font-size: 11px;
+  }
+  .content .choice-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .content .rescue-row {
+    padding: 12px;
+    gap: 8px;
+  }
+  .content .rescue-row .pill {
+    margin-left: 48px;
+  }
+  .content .food-photo {
+    height: clamp(110px, 20dvh, 165px);
+  }
+  .content .detail-summary {
+    gap: 10px;
+  }
+  .content .title-block > p {
+    font-size: 12px;
+  }
+  .content .map-frame {
+    height: clamp(240px, 42dvh, 400px);
+  }
+  .auth-form {
+    padding: 24px;
+  }
+  .auth-mobile-brand .brand-logo {
+    height: 60px;
+    width: 98px;
+  }
+}
+@media (max-width: 767px) and (max-height: 760px) {
+  .content .title-block > .eyebrow {
+    display: none;
+  }
+  .content h1 {
+    font-size: 26px;
+  }
+  .content .stack {
+    gap: 10px;
+  }
+  .content .form-section > p {
+    font-size: 12px;
+  }
+  .content .choice-grid {
+    gap: 6px;
+  }
+  .content .check-label {
+    font-size: 11px;
+  }
+  .auth-form > .stack {
+    gap: 12px;
+  }
+  .auth-form .form-grid {
+    gap: 14px;
+  }
+}
+@media print {
+  .section-tabs,
+  .pagination {
+    display: none !important;
+  }
+  .screen-panel[hidden],
+  .paged-item[hidden],
+  .report-table tr[hidden] {
+    display: block !important;
+  }
+  .paged-item {
+    display: contents !important;
+  }
+  .report-table tr[hidden] {
+    display: table-row !important;
+  }
+  .screen-sections,
+  .screen-panel {
+    display: block;
+  }
+  .screen-panel > * {
+    margin-bottom: 20px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

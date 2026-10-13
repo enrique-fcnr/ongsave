@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { donationFeed, signedPhoto } from "@/lib/data";
 import { matchScore } from "@/lib/domain";
+import { PagedItems } from "@/components/screen-sections";
 import { DonationCard, Empty } from "@/components/shared";
 export default async function Donations() {
   const { batches, preferences, organization, profile, orgs } = await donationFeed();
@@ -35,7 +36,7 @@ export default async function Donations() {
         </p>
       )}
       {scored.length ? (
-        <div className="donation-grid">
+        <PagedItems className="donation-grid" pageSize={2} label="Doações disponíveis">
           {await Promise.all(
             scored.map(async ({ b, score }) => (
               <DonationCard
@@ -47,7 +48,7 @@ export default async function Donations() {
               />
             )),
           )}
-        </div>
+        </PagedItems>
       ) : (
         <Empty
           title="Nenhuma doação disponível agora"

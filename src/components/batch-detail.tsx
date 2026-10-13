@@ -1,3 +1,4 @@
+import { FormSections, PagedItems } from "./screen-sections";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Clock, MapPin, Utensils } from "lucide-react";
@@ -32,35 +33,12 @@ export async function BatchDetail({ id }: { id: string }) {
     minute: "2-digit",
   }).format(new Date(batch.expires_at));
   return (
-    <div className="stack">
+    <div className="stack detail-workspace">
       <Link href={profile.role === "NGO" ? "/ngo/donations" : "/home"} className="back">
         <ArrowLeft size={16} />
         Voltar
       </Link>
-      <div className="detail-grid">
-        <div className="stack">
-          <div className="panel" style={{ padding: 0, overflow: "hidden" }}>
-            <FoodPhoto url={await signedPhoto(batch.image_url)} title={batch.title} />
-          </div>
-          <section className="panel stack detail-items">
-            <h2>O que tem neste lote</h2>
-            {batch.surplus_items?.map((i, n) => (
-              <div className="between small" key={n}>
-                <span>{i.name}</span>
-                <span className="muted">≈ {number(Number(i.estimated_quantity))} unidades</span>
-              </div>
-            ))}
-            {!batch.surplus_items?.length && (
-              <p className="small muted">
-                Itens não discriminados. Confira as observações do mercado.
-              </p>
-            )}
-            {batch.description && <p className="small muted">{batch.description}</p>}
-            <p className="notice">
-              A análise visual não substitui a avaliação da equipe responsável pelo alimento.
-            </p>
-          </section>
-        </div>
+      <FormSections labels={["Resumo", "Fotografia", "Alimentos"]}>
         <section className="panel stack detail-summary">
           <div className="between">
             <span className="eyebrow muted">{categoryLabels[batch.category]}</span>
@@ -111,7 +89,30 @@ export async function BatchDetail({ id }: { id: string }) {
             <p className="small muted">Lote revisado a partir de análise demonstrativa.</p>
           )}
         </section>
-      </div>
+        <div className="panel" style={{ padding: 0, overflow: "hidden" }}>
+          <FoodPhoto url={await signedPhoto(batch.image_url)} title={batch.title} />
+        </div>
+        <section className="panel stack detail-items">
+          <h2>O que tem neste lote</h2>
+          <PagedItems pageSize={5} mobilePageSize={3} label="Alimentos do lote">
+            {batch.surplus_items?.map((i, n) => (
+              <div className="between small" key={n}>
+                <span>{i.name}</span>
+                <span className="muted">≈ {number(Number(i.estimated_quantity))} unidades</span>
+              </div>
+            ))}
+          </PagedItems>
+          {!batch.surplus_items?.length && (
+            <p className="small muted">
+              Itens não discriminados. Confira as observações do mercado.
+            </p>
+          )}
+          {batch.description && <p className="small muted">{batch.description}</p>}
+          <p className="notice">
+            A análise visual não substitui a avaliação da equipe responsável pelo alimento.
+          </p>
+        </section>
+      </FormSections>
     </div>
   );
 }

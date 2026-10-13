@@ -1,9 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 for (const width of [390, 996]) {
-  test(`mapa mostra apenas a missão escolhida pela lista em ${width}px`, async ({
-    page,
-  }) => {
+  test(`mapa mostra apenas a missão escolhida pela lista em ${width}px`, async ({ page }) => {
     test.skip(
       !process.env.NEXT_PUBLIC_SUPABASE_URL,
       "Requer as contas demo do Supabase configurado.",
@@ -31,7 +29,13 @@ for (const width of [390, 996]) {
     await expect(map.getByRole("img", { name: "Posição simulada do motorista" })).toBeVisible();
     await expect(map.getByLabel("Legenda do mapa")).toBeVisible();
     const previous = await map.getAttribute("data-route-rescue");
-    await page.locator("button.rescue-row[aria-pressed='false']").first().click();
+    await page.getByRole("tab", { name: "Outras missões", exact: true }).click();
+    await page
+      .locator("button.rescue-row[aria-pressed='false']")
+      .filter({ visible: true })
+      .first()
+      .click();
+    await page.getByRole("tab", { name: "Rota", exact: true }).click();
     await expect(map).not.toHaveAttribute("data-route-rescue", previous!);
     await expect(map.locator(".map-marker:not(.driver)")).toHaveCount(2);
     await expect

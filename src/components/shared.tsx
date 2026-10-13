@@ -1,3 +1,4 @@
+import { PagedItems } from "./screen-sections";
 import Link from "next/link";
 import Image from "next/image";
 import { BrandLogo } from "./brand-logo";
@@ -116,7 +117,7 @@ export function RescueList({
 }) {
   if (!rescues.length) return <Empty title={emptyTitle} body={emptyBody} />;
   return (
-    <div className="rescue-list">
+    <PagedItems className="rescue-list" pageSize={3} mobilePageSize={2} label="Resgates">
       {rescues.map((r) => (
         <Link href={`/rescue/${r.id}`} className="rescue-row" key={r.id}>
           <span className="symbol">
@@ -132,6 +133,6 @@ export function RescueList({
           <StatusPill status={r.status} />
         </Link>
       ))}
-    </div>
+    </PagedItems>
   );
 }

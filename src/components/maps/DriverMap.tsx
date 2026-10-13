@@ -8,6 +8,15 @@ import { driverMarker } from "./DriverMarker";
 import { updateRoute } from "./RouteLayer";
 import type { Rescue } from "@/lib/domain";
 const DEFAULT_POSITION: [number, number] = [-46.64, -23.589];
+function routePadding(instance: maplibregl.Map) {
+  const { clientWidth: width, clientHeight: height } = instance.getContainer();
+  return {
+    top: Math.min(140, height * 0.34),
+    bottom: Math.min(60, height * 0.16),
+    left: Math.min(60, width * 0.08),
+    right: Math.min(60, width * 0.08),
+  };
+}
 export default function DriverMap({
   rescues,
   selectedId,
@@ -26,6 +35,7 @@ export default function DriverMap({
   const [renderedRoute, setRenderedRoute] = useState({ id: "", phase: "", points: 0 });
   const selectRef = useRef(onSelect);
   const viewportKey = useRef("");
+  const routeBounds = useRef<maplibregl.LngLatBounds | null>(null);
   useEffect(() => {
     selectRef.current = onSelect;
   }, [onSelect]);
@@ -69,7 +79,20 @@ export default function DriverMap({
       queueMicrotask(() => setFailed(true));
       return;
     }
+    const resize = new ResizeObserver(() => {
+      if (container.current?.clientWidth && container.current.clientHeight) {
+        instance.resize();
+        if (routeBounds.current)
+          instance.fitBounds(routeBounds.current, {
+            padding: routePadding(instance),
+            maxZoom: 14,
+            duration: 0,
+          });
+      }
+    });
+    resize.observe(container.current);
     return () => {
+      resize.disconnect();
       instance.remove();
       map.current = null;
     };
@@ -132,9 +155,14 @@ export default function DriverMap({
     };
     instance.once("idle", onIdle);
     const nextViewportKey = `${selected?.id}:${phase}:${rescues.map((r) => r.id).join(",")}`;
-    if (rescues.length && viewportKey.current !== nextViewportKey) {
+    routeBounds.current = rescues.length ? bounds : null;
+    if (
+      rescues.length &&
+      container.current?.clientWidth &&
+      viewportKey.current !== nextViewportKey
+    ) {
       instance.fitBounds(bounds, {
-        padding: { top: 150, bottom: 100, left: 60, right: 60 },
+        padding: routePadding(instance),
         maxZoom: 14,
         duration: 500,
       });

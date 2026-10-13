@@ -5,10 +5,9 @@ export default function Loading() {
       <div className="skeleton" aria-hidden="true" style={{ height: 54, maxWidth: 430 }} />
       <div className="metric-grid" aria-hidden="true">
         {[0, 1, 2, 3].map((item) => (
-          <div key={item} className="skeleton" style={{ height: 160 }} />
+          <div key={item} className="skeleton" style={{ height: 90 }} />
         ))}
       </div>
-      <div className="skeleton" aria-hidden="true" style={{ height: 300 }} />
     </div>
   );
 }

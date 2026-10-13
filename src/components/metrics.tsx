@@ -1,3 +1,4 @@
+import { PagedItems } from "./screen-sections";
 import { Banknote, HeartHandshake, Leaf, PackageCheck, Utensils, Route } from "lucide-react";
 import { money, number, type Role, type Rescue, categoryLabels } from "@/lib/domain";
 import { summarize } from "@/lib/data";
@@ -72,7 +73,7 @@ export function Charts({ rescues, asOf }: { rescues: Rescue[]; asOf: number }) {
   }, {});
   const sum = Object.values(groups).reduce((s, n) => s + n, 0);
   return (
-    <div className="dashboard-grid">
+    <PagedItems className="dashboard-grid" pageSize={2} label="Gráficos">
       <section className="panel stack">
         <div className="between">
           <h2>Alimentos salvos por semana</h2>
@@ -142,7 +143,7 @@ export function Charts({ rescues, asOf }: { rescues: Rescue[]; asOf: number }) {
           ))}
         {!sum && <p className="small muted">O primeiro resgate dará início ao seu gráfico.</p>}
       </section>
-    </div>
+    </PagedItems>
   );
 }
 
