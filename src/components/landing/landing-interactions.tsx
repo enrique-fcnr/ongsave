@@ -14,11 +14,11 @@ import {
   Package,
   Pause,
   Play,
-  Sprout,
   Truck,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/brand-logo";
 import { FeaturePreview } from "./product-preview";
 import styles from "./landing.module.css";
 
@@ -41,10 +41,7 @@ export function LandingHeader() {
       }}
     >
       <Link href="/" className={styles.brand} aria-label="ONGSave início">
-        <span>
-          <Sprout size={23} />
-        </span>
-        ONGSave
+        <BrandLogo className={styles.logo} />
       </Link>
       <nav className={styles.desktopNav} aria-label="Navegação principal">
         {navigation.map(([label, href]) => (

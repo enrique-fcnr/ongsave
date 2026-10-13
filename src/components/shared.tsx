@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { BrandLogo } from "./brand-logo";
 import { ArrowUpRight, Carrot, Clock, Leaf, Package, Sprout } from "lucide-react";
 import {
   categoryLabels,
@@ -13,10 +14,7 @@ import {
 export function Brand() {
   return (
     <Link href="/" className="brand" aria-label="ONGSave início">
-      <Sprout />
-      <span>
-        ONG<span>Save</span>
-      </span>
+      <BrandLogo />
     </Link>
   );
 }

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { BrandLogo } from "@/components/brand-logo";
 import {
   Bell,
   Camera,
@@ -24,8 +25,7 @@ export function DashboardPreview({ compact = false }: { compact?: boolean }) {
     >
       <div className={styles.previewTop}>
         <span className={styles.previewBrand}>
-          <Sprout size={23} />
-          ONGSave
+          <BrandLogo className={styles.previewLogo} />
         </span>
         <span className={styles.previewLabel}>Prévia ilustrativa</span>
         <Bell size={16} />

@@ -1,5 +1,5 @@
 /* Only cache the offline shell and public icons. Never cache sessions, API or operational pages. */
-const CACHE = "ongsave-static-v3";
+const CACHE = "ongsave-static-v4";
 const ASSETS = ["/offline.html", "/icon.svg", "/icons/icon-192.png", "/icons/icon-512.png"];
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));

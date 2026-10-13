@@ -118,16 +118,16 @@ hr {
   color: var(--foreground);
   white-space: nowrap;
 }
-.brand svg {
-  width: 40px;
-  height: 40px;
-  padding: 8px;
-  border-radius: 50%;
-  background: var(--brand);
-  color: var(--foreground);
+.brand-logo {
+  display: block;
+  width: 117px;
+  height: 72px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
-.brand span span {
-  color: inherit;
+.app-sidebar .brand-logo {
+  width: 156px;
+  height: 96px;
 }
 .stack {
   display: grid;
@@ -1494,10 +1494,9 @@ label.field {
     font-size: 21px;
     gap: 8px;
   }
-  .app-header .brand svg {
-    width: 34px;
-    height: 34px;
-    padding: 7px;
+  .app-header .brand-logo {
+    width: 78px;
+    height: 48px;
   }
   .desktop-header,
   .profile-chip > span:last-child {

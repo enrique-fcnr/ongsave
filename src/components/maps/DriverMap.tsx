@@ -81,7 +81,7 @@ export default function DriverMap({
     const selected = rescues.find((r) => r.id === selectedId) || rescues[0];
     const bounds = new maplibregl.LngLatBounds();
     bounds.extend(position);
-    for (const r of rescues) {
+    for (const r of selected ? [selected] : []) {
       const chosen = r.id === selected?.id;
       markers.push(
         rescueMarker(
@@ -161,8 +161,7 @@ export default function DriverMap({
       />
       <div className="map-badge">
         <div className="map-badge-title">
-          <span className="map-count">{rescues.length}</span>
-          {rescues.length === 1 ? "resgate próximo" : "resgates próximos"}
+          {rescues.length ? "Rota da missão selecionada" : "Nenhuma missão selecionada"}
         </div>
         <p className="small muted" style={{ marginTop: 5 }}>
           Posição e rota simuladas

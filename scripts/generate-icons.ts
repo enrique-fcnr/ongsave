@@ -5,9 +5,16 @@ async function main() {
   const svg = readFileSync("public/icon.svg");
   for (const size of [192, 512])
     await sharp(svg).resize(size, size).png().toFile(`public/icons/icon-${size}.png`);
+  await sharp(svg).resize(32, 32).png().toFile("public/icons/favicon-32.png");
+  await sharp(svg)
+    .resize(180, 180)
+    .flatten({ background: "#ffffff" })
+    .png()
+    .toFile("public/icons/apple-touch-icon.png");
   await sharp(svg)
     .resize(320, 320)
-    .extend({ top: 96, bottom: 96, left: 96, right: 96, background: "#d6ef93" })
+    .flatten({ background: "#ffffff" })
+    .extend({ top: 96, bottom: 96, left: 96, right: 96, background: "#ffffff" })
     .png()
     .toFile("public/icons/icon-maskable.png");
   console.log("Ícones PWA gerados.");

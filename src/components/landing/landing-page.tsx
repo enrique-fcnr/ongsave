@@ -20,6 +20,7 @@ import {
   Users,
 } from "lucide-react";
 import { DashboardPreview } from "./product-preview";
+import { BrandLogo } from "@/components/brand-logo";
 import {
   FeatureExplorer,
   LandingHeader,
@@ -465,10 +466,7 @@ export default function Landing() {
         <div className={styles.footerGrid}>
           <div>
             <Link href="/" className={styles.brand} aria-label="ONGSave início">
-              <span>
-                <Sprout size={23} />
-              </span>
-              ONGSave
+              <BrandLogo className={styles.logo} />
             </Link>
             <p>
               Uma fotografia inicia um resgate.

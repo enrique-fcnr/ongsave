@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 for (const width of [390, 996]) {
-  test(`mapa vetorial renderiza rota e permite selecionar coleta em ${width}px`, async ({
+  test(`mapa mostra apenas a missão escolhida pela lista em ${width}px`, async ({
     page,
   }) => {
     test.skip(
@@ -27,11 +27,13 @@ for (const width of [390, 996]) {
       .poll(async () => Number(await map.getAttribute("data-route-points")), { timeout: 30000 })
       .toBeGreaterThan(1);
     await expect(map.getByRole("button", { name: /^Entrega:/ })).toBeVisible();
+    await expect(map.locator(".map-marker:not(.driver)")).toHaveCount(2);
     await expect(map.getByRole("img", { name: "Posição simulada do motorista" })).toBeVisible();
     await expect(map.getByLabel("Legenda do mapa")).toBeVisible();
     const previous = await map.getAttribute("data-route-rescue");
-    await map.locator(".map-marker:not(.selected):not(.driver)").first().click();
+    await page.locator("button.rescue-row[aria-pressed='false']").first().click();
     await expect(map).not.toHaveAttribute("data-route-rescue", previous!);
+    await expect(map.locator(".map-marker:not(.driver)")).toHaveCount(2);
     await expect
       .poll(async () => Number(await map.getAttribute("data-route-points")), { timeout: 15000 })
       .toBeGreaterThan(1);

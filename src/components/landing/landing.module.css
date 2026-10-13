@@ -87,14 +87,13 @@
   color: var(--landing-ink);
   white-space: nowrap;
 }
-.brand > span {
-  background: #d6ef93;
-  color: #293424;
-  width: 39px;
-  height: 39px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
+.brand .logo {
+  width: 97.5px;
+  height: 60px;
+}
+.footer .logo {
+  width: 130px;
+  height: 80px;
 }
 .desktopNav {
   display: flex;
@@ -398,11 +397,9 @@
   font-size: 18px;
   letter-spacing: -0.6px;
 }
-.previewBrand svg {
-  background: #d6ef93;
-  padding: 4px;
-  box-sizing: content-box;
-  border-radius: 10px;
+.previewBrand .previewLogo {
+  width: 78px;
+  height: 48px;
 }
 .previewLabel {
   margin-left: auto;
@@ -1860,9 +1857,9 @@
     font-size: 20px;
     gap: 7px;
   }
-  .brand > span {
-    width: 35px;
-    height: 35px;
+  .header .brand .logo {
+    width: 78px;
+    height: 48px;
   }
   .headerActions {
     gap: 7px;

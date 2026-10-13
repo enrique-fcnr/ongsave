@@ -8,7 +8,13 @@ export const metadata: Metadata = {
     "Alimentos encontram novos destinos. Conectamos supermercados, instituições e pessoas que fazem a diferença.",
   applicationName: "ONGSave",
   appleWebApp: { capable: true, statusBarStyle: "default", title: "ONGSave" },
-  icons: { icon: "/icon.svg", apple: "/icons/icon-192.png" },
+  icons: {
+    icon: [
+      { url: "/icon.svg?v=brand-20261013", type: "image/svg+xml", sizes: "any" },
+      { url: "/icons/favicon-32.png", type: "image/png", sizes: "32x32" },
+    ],
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
 export const viewport: Viewport = {
   width: "device-width",
