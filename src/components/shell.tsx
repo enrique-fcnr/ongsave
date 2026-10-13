@@ -39,17 +39,23 @@ export function Shell({
 }) {
   const path = usePathname();
   const router = useRouter();
-  const nav = [
-    ...(profile.role !== "DRIVER" ? [{ href: "/home", label: "Início", icon: House }] : []),
-    ...(profile.role === "NGO"
-      ? [{ href: "/ngo/donations", label: "Doações disponíveis", icon: HeartHandshake }]
-      : profile.role === "DRIVER"
-        ? [{ href: "/driver/missions", label: "Missões", icon: MapPinned }]
-        : [{ href: "/supermarket/surplus/new", label: "Novo excedente", icon: Plus }]),
-    { href: "/rescues", label: "Resgates", icon: Package },
-    ...(profile.role === "DRIVER" ? [{ href: "/impact", label: "Impacto", icon: Leaf }] : []),
-    { href: "/profile", label: "Perfil", icon: User },
-  ];
+  const nav =
+    profile.role === "ADMIN"
+      ? [
+          { href: "/admin", label: "Visão da rede", icon: MapPinned },
+          { href: "/profile", label: "Perfil", icon: User },
+        ]
+      : [
+          ...(profile.role !== "DRIVER" ? [{ href: "/home", label: "Início", icon: House }] : []),
+          ...(profile.role === "NGO"
+            ? [{ href: "/ngo/donations", label: "Doações disponíveis", icon: HeartHandshake }]
+            : profile.role === "DRIVER"
+              ? [{ href: "/driver/missions", label: "Missões", icon: MapPinned }]
+              : [{ href: "/supermarket/surplus/new", label: "Novo excedente", icon: Plus }]),
+          { href: "/rescues", label: "Resgates", icon: Package },
+          ...(profile.role === "DRIVER" ? [{ href: "/impact", label: "Impacto", icon: Leaf }] : []),
+          { href: "/profile", label: "Perfil", icon: User },
+        ];
   const active = (href: string) =>
     path === href ||
     path.startsWith(href + "/") ||
@@ -58,9 +64,11 @@ export function Shell({
   const roleLabel =
     profile.role === "SUPERMARKET"
       ? "Supermercado"
-      : profile.role === "NGO"
-        ? "Instituição"
-        : "Motorista";
+      : profile.role === "ADMIN"
+        ? "Administração"
+        : profile.role === "NGO"
+          ? "Instituição"
+          : "Motorista";
   const sectionLabel =
     nav.find((item) => active(item.href))?.label ||
     (path.startsWith("/supermarket/reports") ? "Relatórios" : "Detalhes do resgate");

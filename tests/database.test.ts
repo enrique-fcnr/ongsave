@@ -218,4 +218,31 @@ describe("Fluxo real nas funções PostgreSQL e RLS", () => {
       (await db.query("select id from public.rescues where status='WAITING_DRIVER'")).rows,
     ).toHaveLength(3);
   });
+  it("administrador lê a rede completa sem permitir promoção de outros perfis", async () => {
+    await db.exec("reset role");
+    await db.query("insert into auth.users values($1,$2)", [
+      id("auth:admin@ongsave.com"),
+      "admin@ongsave.com",
+    ]);
+    await db.query(
+      "insert into public.profiles(auth_user_id,name,email,role) values($1,'Admin ONGSave',$2,'ADMIN')",
+      [id("auth:admin@ongsave.com"), "admin@ongsave.com"],
+    );
+    const expected = await db.query<{ count: number }>(
+      "select count(*)::int as count from public.rescues",
+    );
+    await actor("admin@ongsave.com");
+    expect((await db.query("select id from public.organizations")).rows).toHaveLength(8);
+    expect((await db.query("select id from public.rescues")).rows).toHaveLength(
+      expected.rows[0].count,
+    );
+    expect((await db.query("select id from public.impact_metrics")).rows).toHaveLength(16);
+    await actor("ong@ongsave.demo");
+    expect(
+      (await db.query("select id from public.profiles where email='admin@ongsave.com'")).rows,
+    ).toHaveLength(0);
+    await expect(db.exec("update public.profiles set role='ADMIN'")).rejects.toThrow(
+      /permission denied/,
+    );
+  });
 });

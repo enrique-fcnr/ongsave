@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Plus } from "lucide-react";
 import { redirect } from "next/navigation";
+import { requireProfile } from "@/lib/auth";
 import { operationalData, donationFeed, signedPhoto } from "@/lib/data";
 import { matchScore } from "@/lib/domain";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,8 @@ import { Metrics, Charts, EnvironmentalImpact } from "@/components/metrics";
 import { ScreenSections, PagedItems } from "@/components/screen-sections";
 import { DonationCard, Empty, RescueList } from "@/components/shared";
 export default async function Home() {
+  const { profile: actor } = await requireProfile();
+  if (actor.role === "ADMIN") redirect("/admin");
   const data = await operationalData();
   const { profile, organization, rescues, orgs } = data;
   if (profile.role === "DRIVER") redirect("/driver/missions");
