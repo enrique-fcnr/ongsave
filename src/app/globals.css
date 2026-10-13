@@ -1125,6 +1125,7 @@ label.field {
   overflow: hidden;
   border-radius: 36px;
   min-height: 700px;
+  padding-bottom: 360px;
 }
 .auth-story h1 {
   font-size: clamp(38px, 3.8vw, 58px);
@@ -1149,10 +1150,12 @@ label.field {
   color: var(--primary);
 }
 .auth-team {
-  position: relative;
-  margin-top: 24px;
-  flex: 1;
-  min-height: 200px;
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -12px;
+  height: 380px;
+  pointer-events: none;
 }
 .auth-team img {
   object-fit: contain;
@@ -1162,6 +1165,9 @@ label.field {
   color: #536a5b;
   font-size: 11px;
   padding-top: 18px;
+  position: relative;
+  z-index: 1;
+  margin-top: 24px;
 }
 .auth-form {
   display: grid;
@@ -1463,7 +1469,7 @@ label.field {
     position: static;
   }
   .auth-story {
-    padding: 32px;
+    padding: 32px 32px 360px;
   }
   .profile-chip > span:last-child {
     display: none;
