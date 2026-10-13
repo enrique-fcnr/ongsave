@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { operationalData, donationFeed, signedPhoto } from "@/lib/data";
 import { matchScore } from "@/lib/domain";
 import { Button } from "@/components/ui/button";
-import { Metrics, Charts } from "@/components/metrics";
+import { Metrics, Charts, EnvironmentalImpact } from "@/components/metrics";
 import { DonationCard, Empty, RescueList } from "@/components/shared";
 export default async function Home() {
   const data = await operationalData();
@@ -39,7 +39,7 @@ export default async function Home() {
     feed = (
       <section className="stack">
         <div className="between">
-          <h2>Doações próximas</h2>
+          <h2>Doações disponíveis para receber</h2>
           <Link className="small muted row" href="/ngo/donations">
             Ver todas
             <ArrowRight size={14} />
@@ -131,6 +131,17 @@ export default async function Home() {
         </div>
         <RescueList rescues={rescues.slice(0, 5)} orgs={orgs} />
       </section>
+      {profile.role === "NGO" && (
+        <section id="impacto" className="stack ngo-home-impact" aria-label="Seu impacto até aqui">
+          <div className="title-block">
+            <span className="eyebrow muted">O resultado das suas conexões</span>
+            <h2>Seu impacto até aqui</h2>
+            <p>Acompanhe os alimentos recebidos e os resultados de cada entrega confirmada.</p>
+          </div>
+          <Charts rescues={rescues} asOf={data.asOf} />
+          <EnvironmentalImpact rescues={rescues} />
+        </section>
+      )}
     </div>
   );
 }

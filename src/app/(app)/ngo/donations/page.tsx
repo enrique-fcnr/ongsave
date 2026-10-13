@@ -23,10 +23,10 @@ export default async function Donations() {
     <div className="stack">
       <div className="title-block">
         <span className="eyebrow muted">Alimentos em busca de um destino</span>
-        <h1>Doações próximas</h1>
+        <h1>Doações disponíveis</h1>
         <p>
-          Encontre o próximo resgate. As doações mais compatíveis com sua instituição aparecem
-          primeiro.
+          Alimentos que os supermercados disponibilizaram para sua instituição receber. As doações
+          mais compatíveis com seu perfil aparecem primeiro.
         </p>
       </div>
       {!preferences?.receiving_enabled && (

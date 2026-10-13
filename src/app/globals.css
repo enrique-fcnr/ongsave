@@ -133,6 +133,9 @@ hr {
   display: grid;
   gap: 28px;
 }
+.ngo-home-impact {
+  scroll-margin-top: 100px;
+}
 .row,
 .between {
   display: flex;
@@ -1532,10 +1535,12 @@ label.field {
     justify-items: center;
     align-content: center;
     gap: 5px;
-    min-width: 48px;
+    flex: 1;
+    min-width: 0;
     color: var(--muted-foreground);
     font-size: 10px;
-    padding: 8px 12px;
+    padding: 8px 6px;
+    text-align: center;
     border-radius: 999px;
     min-height: 54px;
   }

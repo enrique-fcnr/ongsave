@@ -133,7 +133,11 @@ export async function RescueDetail({ id }: { id: string }) {
           </div>
           <RescueActions key={r.status} id={r.id} status={r.status} role={profile.role} />
           {r.status === "DELIVERED" && (
-            <Link className="notice" href="/impact" style={{ textAlign: "center" }}>
+            <Link
+              className="notice"
+              href={profile.role === "NGO" ? "/home#impacto" : "/impact"}
+              style={{ textAlign: "center" }}
+            >
               Ver impacto atualizado
             </Link>
           )}

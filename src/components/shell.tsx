@@ -42,12 +42,12 @@ export function Shell({
   const nav = [
     ...(profile.role !== "DRIVER" ? [{ href: "/home", label: "Início", icon: House }] : []),
     ...(profile.role === "NGO"
-      ? [{ href: "/ngo/donations", label: "Doações", icon: HeartHandshake }]
+      ? [{ href: "/ngo/donations", label: "Doações disponíveis", icon: HeartHandshake }]
       : profile.role === "DRIVER"
         ? [{ href: "/driver/missions", label: "Missões", icon: MapPinned }]
         : [{ href: "/supermarket/surplus/new", label: "Novo excedente", icon: Plus }]),
     { href: "/rescues", label: "Resgates", icon: Package },
-    { href: "/impact", label: "Impacto", icon: Leaf },
+    ...(profile.role !== "NGO" ? [{ href: "/impact", label: "Impacto", icon: Leaf }] : []),
     { href: "/profile", label: "Perfil", icon: User },
   ];
   const active = (href: string) =>

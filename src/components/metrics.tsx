@@ -145,3 +145,30 @@ export function Charts({ rescues, asOf }: { rescues: Rescue[]; asOf: number }) {
     </div>
   );
 }
+
+export function EnvironmentalImpact({ rescues }: { rescues: Rescue[] }) {
+  const m = summarize(rescues);
+  return (
+    <>
+      <div className="impact-banner">
+        <div>
+          <span className="eyebrow">Estimativa ambiental</span>
+          <div className="impact-total">{number(m.co2)} kg de CO₂e</div>
+          <p>
+            Potencial de emissões evitadas · {number(m.water)} litros de água associados aos
+            alimentos redirecionados.
+          </p>
+        </div>
+        <Leaf className="art" />
+      </div>
+      <details className="method-note">
+        <summary>Como calculamos essas estimativas</summary>
+        <p>
+          Os indicadores usam apenas entregas confirmadas e incluem o histórico de demonstração.
+          Fatores ilustrativos: 2 refeições/kg, 1,43 kg CO₂e/kg e 250 L/kg. São estimativas e não
+          representam inventário ambiental certificado.
+        </p>
+      </details>
+    </>
+  );
+}

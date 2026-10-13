@@ -1,10 +1,11 @@
-import { operationalData, summarize } from "@/lib/data";
-import { Metrics, Charts } from "@/components/metrics";
-import { number } from "@/lib/domain";
-import { Leaf } from "lucide-react";
+import { redirect } from "next/navigation";
+import { requireProfile } from "@/lib/auth";
+import { operationalData } from "@/lib/data";
+import { Metrics, Charts, EnvironmentalImpact } from "@/components/metrics";
 export default async function Impact() {
+  const { profile: actor } = await requireProfile();
+  if (actor.role === "NGO") redirect("/home#impacto");
   const { rescues, profile, asOf } = await operationalData();
-  const m = summarize(rescues);
   return (
     <div className="stack">
       <div className="title-block">
@@ -14,25 +15,7 @@ export default async function Impact() {
       </div>
       <Metrics rescues={rescues} role={profile.role} />
       <Charts rescues={rescues} asOf={asOf} />
-      <div className="impact-banner">
-        <div>
-          <span className="eyebrow">Estimativa ambiental</span>
-          <div className="impact-total">{number(m.co2)} kg de CO₂e</div>
-          <p>
-            Potencial de emissões evitadas · {number(m.water)} litros de água associados aos
-            alimentos redirecionados.
-          </p>
-        </div>
-        <Leaf className="art" />
-      </div>
-      <details className="method-note">
-        <summary>Como calculamos essas estimativas</summary>
-        <p>
-          Os indicadores usam apenas entregas confirmadas e incluem o histórico de demonstração.
-          Fatores ilustrativos: 2 refeições/kg, 1,43 kg CO₂e/kg e 250 L/kg. São estimativas e não
-          representam inventário ambiental certificado.
-        </p>
-      </details>
+      <EnvironmentalImpact rescues={rescues} />
     </div>
   );
 }
