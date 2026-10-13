@@ -45,15 +45,17 @@ export function ScreenSections({
   const uid = useId();
   const [active, setActive] = useState(sections[0]?.id);
   const root = useRef<HTMLDivElement>(null);
+  const sectionIds = sections.map((section) => section.id).join("|");
   useEffect(() => {
+    const ids = sectionIds.split("|");
     const selectHash = () => {
       const hash = window.location.hash.slice(1);
-      if (sections.some((s) => s.id === hash)) setActive(hash);
+      if (ids.includes(hash)) setActive(hash);
     };
     selectHash();
     window.addEventListener("hashchange", selectHash);
     return () => window.removeEventListener("hashchange", selectHash);
-  }, [sections]);
+  }, [sectionIds]);
   const selected = sections.some((s) => s.id === active) ? active : sections[0]?.id;
   return (
     <div
