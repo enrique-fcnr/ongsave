@@ -18,8 +18,11 @@ export default async function Profile() {
         <h1>Seu perfil na rede</h1>
         <p>
           {organization?.name || profile.name}
-          {organization ? ` · ${organization.neighborhood}, São Paulo` : " · Motorista"}. Mantenha
-          seus dados e sua disponibilidade atualizados.
+          {organization
+            ? ` · ${organization.neighborhood}`
+            : profile.role === "ADMIN"
+              ? " · Administração"
+              : " · Motorista"}
         </p>
       </div>
       <ProfileForm profile={profile} prefs={p.data} driver={d.data} />

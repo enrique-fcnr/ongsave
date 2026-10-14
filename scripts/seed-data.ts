@@ -133,6 +133,7 @@ export const accountData = [
   { email: "motorista@ongsave.demo", name: "Lucas Almeida", role: "DRIVER", org: null },
   { email: "mariana@ongsave.demo", name: "Mariana Costa", role: "DRIVER", org: null },
   { email: "rafael@ongsave.demo", name: "Rafael Santos", role: "DRIVER", org: null },
+  { email: "admin@ongsave.com", name: "ONGSave Admin", role: "ADMIN", org: null },
 ];
 export const preferencesData = organizationData
   .filter((o) => o.type === "NGO")

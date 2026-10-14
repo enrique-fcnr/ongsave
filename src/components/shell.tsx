@@ -14,6 +14,7 @@ import {
   User,
 } from "lucide-react";
 import { Brand } from "./shared";
+import { ProfileAvatar } from "./profile-avatar";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { browserClient } from "@/lib/supabase/client";
@@ -41,10 +42,7 @@ export function Shell({
   const router = useRouter();
   const nav =
     profile.role === "ADMIN"
-      ? [
-          { href: "/admin", label: "Visão da rede", icon: MapPinned },
-          { href: "/profile", label: "Perfil", icon: User },
-        ]
+      ? [{ href: "/admin", label: "Visão da rede", icon: MapPinned }]
       : [
           ...(profile.role !== "DRIVER" ? [{ href: "/home", label: "Início", icon: House }] : []),
           ...(profile.role === "NGO"
@@ -52,10 +50,21 @@ export function Shell({
             : profile.role === "DRIVER"
               ? [{ href: "/driver/missions", label: "Missões", icon: MapPinned }]
               : [{ href: "/supermarket/surplus/new", label: "Novo excedente", icon: Plus }]),
-          { href: "/rescues", label: "Resgates", icon: Package },
+          { href: "/rescues", label: "Doações", icon: Package },
           ...(profile.role === "DRIVER" ? [{ href: "/impact", label: "Impacto", icon: Leaf }] : []),
-          { href: "/profile", label: "Perfil", icon: User },
         ];
+  const mobileNav = [
+    ...nav
+      .filter((item) => item.href !== "/profile")
+      .map((item) =>
+        profile.role === "SUPERMARKET" && item.href === "/supermarket/surplus/new"
+          ? { ...item, label: "Nova doação" }
+          : item,
+      ),
+    ...(profile.role === "SUPERMARKET"
+      ? [{ href: "/supermarket/reports", label: "Relatórios", icon: FileChartColumn }]
+      : []),
+  ];
   const active = (href: string) =>
     path === href ||
     path.startsWith(href + "/") ||
@@ -189,15 +198,29 @@ export function Shell({
               </DialogContent>
             </Dialog>
             <Link href="/profile" className="profile-chip" aria-label="Abrir perfil">
-              <span className="avatar">
-                {(organization?.name || profile.name)
-                  .split(" ")
-                  .slice(0, 2)
-                  .map((s) => s[0])
-                  .join("")}
-              </span>
+              <ProfileAvatar name={organization?.name || profile.name} url={profile.avatar_url} />
               <span>{organization?.name || profile.name}</span>
             </Link>
+            <details className="mobile-profile-actions">
+              <summary aria-label="Abrir opções do perfil">
+                <ProfileAvatar name={organization?.name || profile.name} url={profile.avatar_url} />
+              </summary>
+              <div className="mobile-profile-menu">
+                <Link
+                  href="/profile"
+                  onClick={(event) =>
+                    event.currentTarget.closest("details")?.removeAttribute("open")
+                  }
+                >
+                  <User size={17} />
+                  Meu perfil
+                </Link>
+                <button type="button" onClick={logout}>
+                  <LogOut size={17} />
+                  Sair
+                </button>
+              </div>
+            </details>
           </div>
         </header>
         <main id="app-content" className="content" tabIndex={-1}>
@@ -205,7 +228,7 @@ export function Shell({
         </main>
       </div>
       <nav className="mobile-nav" aria-label="Navegação principal">
-        {nav.map((n) => (
+        {mobileNav.map((n) => (
           <Link
             key={n.href}
             href={n.href}

@@ -1,11 +1,12 @@
 "use client";
 import { FormSections } from "./screen-sections";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, Save } from "lucide-react";
+import { Camera, Save } from "lucide-react";
 import { z } from "zod";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { ProfileAvatar } from "./profile-avatar";
 import { browserClient } from "@/lib/supabase/client";
 import { categories, categoryLabels, type Preferences, type Profile } from "@/lib/domain";
 export function ProfileForm({
@@ -25,9 +26,19 @@ export function ProfileForm({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [failed, setFailed] = useState(false);
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [preview, setPreview] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url);
+  const photoInput = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  useEffect(
+    () => () => {
+      if (preview) URL.revokeObjectURL(preview);
+    },
+    [preview],
+  );
   return (
-    <div className="stack">
+    <div className="stack profile-form">
       <form
         className="form-grid"
         onSubmit={async (e) => {
@@ -68,7 +79,21 @@ export function ProfileForm({
                 .eq("id", driver.id);
               if (error) throw error;
             }
-            setMessage("Preferências atualizadas.");
+            if (photo) {
+              const photoForm = new FormData();
+              photoForm.set("file", photo);
+              const response = await fetch("/api/profile/photo", {
+                method: "POST",
+                body: photoForm,
+              });
+              const result = await response.json();
+              if (!response.ok) throw new Error(result.error || "Não foi possível salvar a foto.");
+              setAvatarUrl(result.avatarUrl);
+              setPhoto(null);
+              setPreview("");
+              if (photoInput.current) photoInput.current.value = "";
+            }
+            setMessage("Perfil atualizado.");
             router.refresh();
           } catch (e) {
             setFailed(true);
@@ -81,14 +106,81 @@ export function ProfileForm({
         <FormSections
           labels={
             prefs
-              ? ["Seus dados", "Disponibilidade", "Alimentos", "Conta"]
+              ? ["Seus dados", "Disponibilidade", "Alimentos"]
               : driver
-                ? ["Seus dados", "Veículo", "Conta"]
-                : ["Seus dados", "Conta"]
+                ? ["Seus dados", "Veículo"]
+                : ["Seus dados"]
           }
         >
           <fieldset className="form-section">
             <legend>Seus dados</legend>
+            <div className="profile-photo-field">
+              <ProfileAvatar
+                name={profile.name}
+                url={preview || avatarUrl}
+                className="profile-photo-preview"
+              />
+              <div className="profile-photo-controls">
+                <strong>Foto de perfil</strong>
+                <div className="row">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={busy}
+                    onClick={() => photoInput.current?.click()}
+                  >
+                    <Camera size={16} />
+                    {preview || avatarUrl ? "Trocar foto" : "Adicionar foto"}
+                  </Button>
+                  {photo && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      disabled={busy}
+                      onClick={() => {
+                        setPhoto(null);
+                        setPreview("");
+                        if (photoInput.current) photoInput.current.value = "";
+                      }}
+                    >
+                      Desfazer
+                    </Button>
+                  )}
+                </div>
+                <p className="small muted" id="profile-photo-help">
+                  {photo
+                    ? "Foto selecionada. Salve para atualizar."
+                    : "JPEG, PNG ou WebP · Até 4 MB"}
+                </p>
+              </div>
+              <input
+                ref={photoInput}
+                hidden
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                aria-label="Foto de perfil"
+                aria-describedby="profile-photo-help"
+                disabled={busy}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  if (
+                    !file.size ||
+                    file.size > 4 * 1024 * 1024 ||
+                    !["image/jpeg", "image/png", "image/webp"].includes(file.type)
+                  ) {
+                    setFailed(true);
+                    setMessage("Escolha uma foto JPEG, PNG ou WebP de até 4 MB.");
+                    e.target.value = "";
+                    return;
+                  }
+                  setFailed(false);
+                  setMessage("");
+                  setPhoto(file);
+                  setPreview(URL.createObjectURL(file));
+                }}
+              />
+            </div>
             <div className="form-columns">
               <label className="field">
                 Nome
@@ -198,28 +290,6 @@ export function ProfileForm({
               </fieldset>
             </>
           )}
-          <section className="panel stack">
-            <h2>Sua conta</h2>
-            <p className="small muted">
-              Para alterar o e-mail, fale com a equipe responsável pelo cadastro.
-            </p>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={async () => {
-                await browserClient().auth.signOut();
-                router.replace("/login");
-                router.refresh();
-              }}
-            >
-              <LogOut size={17} />
-              Sair da conta
-            </Button>
-            <p className="small muted">
-              Para instalar o app, use “Adicionar à tela inicial” no navegador do celular. O
-              primeiro acesso precisa de conexão.
-            </p>
-          </section>
         </FormSections>
         {message && (
           <p className={failed ? "error" : "notice"} role={failed ? "alert" : "status"}>

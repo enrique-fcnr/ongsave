@@ -1,18 +1,15 @@
 import Link from "next/link";
-import { ArrowRight, Plus } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { redirect } from "next/navigation";
 import { requireProfile } from "@/lib/auth";
-import { operationalData, donationFeed, signedPhoto } from "@/lib/data";
-import { matchScore } from "@/lib/domain";
-import { Button } from "@/components/ui/button";
+import { operationalData } from "@/lib/data";
 import { Metrics, Charts, EnvironmentalImpact } from "@/components/metrics";
-import { ScreenSections, PagedItems } from "@/components/screen-sections";
-import { DonationCard, Empty, RescueList } from "@/components/shared";
+import { ScreenSections } from "@/components/screen-sections";
 export default async function Home() {
   const { profile: actor } = await requireProfile();
   if (actor.role === "ADMIN") redirect("/admin");
   const data = await operationalData();
-  const { profile, organization, rescues, orgs } = data;
+  const { profile, organization, rescues } = data;
   if (profile.role === "DRIVER") redirect("/driver/missions");
   const hour = Number(
     new Intl.DateTimeFormat("en-GB", {
@@ -22,56 +19,6 @@ export default async function Home() {
     }).format(new Date()),
   );
   const greeting = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
-  let feed: React.ReactNode = null;
-  if (profile.role === "NGO") {
-    const { batches, preferences } = await donationFeed();
-    const sorted = batches
-      .map((b) => ({
-        b,
-        score:
-          preferences && organization
-            ? matchScore(
-                b,
-                organization,
-                preferences,
-                orgs.find((o) => o.id === b.supermarket_id),
-              )
-            : 0,
-      }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3);
-    feed = (
-      <section className="stack">
-        <div className="between">
-          <h2>Doações disponíveis para receber</h2>
-          <Link className="small muted row" href="/ngo/donations">
-            Ver todas
-            <ArrowRight size={14} />
-          </Link>
-        </div>
-        {sorted.length ? (
-          <PagedItems className="donation-grid" pageSize={2} label="Doações recomendadas">
-            {await Promise.all(
-              sorted.map(async ({ b, score }) => (
-                <DonationCard
-                  key={b.id}
-                  batch={b}
-                  score={score}
-                  market={orgs.find((o) => o.id === b.supermarket_id)}
-                  url={await signedPhoto(b.image_url)}
-                />
-              )),
-            )}
-          </PagedItems>
-        ) : (
-          <Empty
-            title="Nenhuma doação disponível agora"
-            body="Novas oportunidades aparecerão aqui."
-          />
-        )}
-      </section>
-    );
-  }
   return (
     <div className="stack">
       <div className="between page-heading">
@@ -84,65 +31,41 @@ export default async function Home() {
               : "Encontre o que sua instituição pode receber e acompanhe cada resgate."}
           </p>
         </div>
-        {profile.role === "SUPERMARKET" && (
-          <Button render={<Link href="/supermarket/surplus/new" />} nativeButton={false}>
-            <Plus size={18} />
-            Registrar excedente
-          </Button>
-        )}
       </div>
       <ScreenSections
         sections={[
           {
             id: "visao-geral",
             label: "Visão geral",
-            content: <Metrics rescues={rescues} role={profile.role} />,
-          },
-          ...(profile.role === "NGO" ? [{ id: "doacoes", label: "Doações", content: feed }] : []),
-          {
-            id: "resgates",
-            label: "Resgates recentes",
             content: (
-              <section className="stack">
-                <div className="section-heading">
-                  <h2>Seus resgates recentes</h2>
-                  <Link className="text-link" href="/rescues">
-                    Ver todos <ArrowRight size={15} />
-                  </Link>
-                </div>
-                <RescueList rescues={rescues.slice(0, 5)} orgs={orgs} />
-              </section>
-            ),
-          },
-          {
-            id: "impacto",
-            label: "Impacto",
-            content: (
-              <section className="stack" aria-label="Seu impacto até aqui">
-                <div className="section-heading">
-                  <h2>Seu impacto até aqui</h2>
-                  {profile.role === "SUPERMARKET" && (
-                    <Link href="/supermarket/reports" className="text-link">
-                      Ver relatório <ArrowRight size={15} />
-                    </Link>
-                  )}
-                </div>
-                <ScreenSections
-                  label="Detalhes do impacto"
-                  sections={[
-                    {
-                      id: "graficos",
-                      label: "Gráficos",
-                      content: <Charts rescues={rescues} asOf={data.asOf} />,
-                    },
-                    {
-                      id: "estimativas",
-                      label: "Estimativas ambientais",
-                      content: <EnvironmentalImpact rescues={rescues} />,
-                    },
-                  ]}
-                />
-              </section>
+              <div className="stack">
+                <Metrics rescues={rescues} role={profile.role} />
+                <section className="stack" id="impacto" aria-label="Seu impacto até aqui">
+                  <div className="section-heading">
+                    <h2>Seu impacto até aqui</h2>
+                    {profile.role === "SUPERMARKET" && (
+                      <Link href="/supermarket/reports" className="text-link">
+                        Ver relatório <ArrowRight size={15} />
+                      </Link>
+                    )}
+                  </div>
+                  <ScreenSections
+                    label="Detalhes do impacto"
+                    sections={[
+                      {
+                        id: "graficos",
+                        label: "Gráficos",
+                        content: <Charts rescues={rescues} asOf={data.asOf} />,
+                      },
+                      {
+                        id: "estimativas",
+                        label: "Estimativas ambientais",
+                        content: <EnvironmentalImpact rescues={rescues} />,
+                      },
+                    ]}
+                  />
+                </section>
+              </div>
             ),
           },
         ]}

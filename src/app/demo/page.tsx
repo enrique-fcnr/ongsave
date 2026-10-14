@@ -18,7 +18,7 @@ export default function Demo() {
       </div>
       <div className="title-block demo-intro">
         <span className="eyebrow muted">Conheça a rede por dentro</span>
-        <h1>Três papéis. Um resgate conectado.</h1>
+        <h1>Quatro papéis. Um resgate conectado.</h1>
         <p>
           Escolha um perfil para explorar a plataforma. As contas e os dados deste ambiente são de
           demonstração.

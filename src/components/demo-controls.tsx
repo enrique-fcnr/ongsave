@@ -2,7 +2,7 @@
 import { FormSections, PagedItems } from "./screen-sections";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { HeartHandshake, RotateCcw, Store, Truck } from "lucide-react";
+import { HeartHandshake, RotateCcw, ShieldCheck, Store, Truck } from "lucide-react";
 import { Button } from "./ui/button";
 import { browserClient } from "@/lib/supabase/client";
 const accounts = [
@@ -27,6 +27,13 @@ const accounts = [
     email: "motorista@ongsave.demo",
     Icon: Truck,
   },
+  {
+    name: "ONGSave Admin",
+    role: "administrador",
+    body: "Acompanhe as organizações, os supermercados e o impacto da rede.",
+    email: "admin@ongsave.com",
+    Icon: ShieldCheck,
+  },
 ];
 export function DemoControls({ configured }: { configured: boolean }) {
   const [busy, setBusy] = useState("");
@@ -34,7 +41,7 @@ export function DemoControls({ configured }: { configured: boolean }) {
   const router = useRouter();
   return (
     <FormSections labels={["Escolher perfil", "Preparar demonstração"]}>
-      <PagedItems className="demo-grid" pageSize={3} label="Perfis de demonstração">
+      <PagedItems className="demo-grid" pageSize={4} label="Perfis de demonstração">
         {accounts.map((a) => (
           <div key={a.email} className="panel demo-account">
             <span className="avatar">

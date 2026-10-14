@@ -23,6 +23,7 @@ function flatten(children: ReactNode): ReactNode[] {
 }
 
 export function FormSections({ children, labels }: { children: ReactNode; labels: string[] }) {
+  if (labels.length === 1) return <div className="stack">{children}</div>;
   return (
     <ScreenSections
       sections={flatten(children).map((content, i) => ({
@@ -192,7 +193,7 @@ export function PagedItems({
           </table>
         </div>
       ) : (
-        <div className={className}>
+        <div className={className ?? "paged-content"}>
           {items.map((item, i) => (
             <div
               className="paged-item"

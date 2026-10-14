@@ -107,11 +107,13 @@ export function DonationCard({
 export function RescueList({
   rescues,
   orgs,
+  photoUrls = {},
   emptyTitle = "Nenhum resgate por aqui",
   emptyBody = "Os próximos resgates aparecerão aqui, automaticamente.",
 }: {
   rescues: Rescue[];
   orgs: Organization[];
+  photoUrls?: Record<string, string | undefined>;
   emptyTitle?: string;
   emptyBody?: string;
 }) {
@@ -121,7 +123,17 @@ export function RescueList({
       {rescues.map((r) => (
         <Link href={`/rescue/${r.id}`} className="rescue-row" key={r.id}>
           <span className="symbol">
-            <Package size={21} />
+            {r.surplus_batches?.image_url && photoUrls[r.surplus_batches.image_url] ? (
+              <Image
+                src={photoUrls[r.surplus_batches.image_url]!}
+                alt=""
+                width={44}
+                height={44}
+                unoptimized
+              />
+            ) : (
+              <Package size={21} />
+            )}
           </span>
           <div className="info">
             <h3>{r.surplus_batches?.title || "Resgate de alimentos"}</h3>

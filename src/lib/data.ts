@@ -34,6 +34,18 @@ export async function signedPhoto(path: string | null | undefined) {
   const { data } = await client.storage.from("surplus").createSignedUrl(path, 3600);
   return data?.signedUrl;
 }
+export async function signedPhotos(paths: (string | null | undefined)[]) {
+  const uniquePaths = [...new Set(paths.filter((path): path is string => Boolean(path)))];
+  if (!uniquePaths.length) return {};
+  const { client } = await requireProfile();
+  const signedEntries = await Promise.all(
+    uniquePaths.map(async (path) => {
+      const { data } = await client.storage.from("surplus").createSignedUrl(path, 3600);
+      return [path, data?.signedUrl] as const;
+    }),
+  );
+  return Object.fromEntries(signedEntries);
+}
 export async function donationFeed() {
   const context = await operationalData();
   const { client, organization } = context;

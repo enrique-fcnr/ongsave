@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   Check,
   CheckCheck,
+  CircleCheck,
   ImagePlus,
   LoaderCircle,
   Plus,
@@ -32,6 +33,13 @@ const manual: SurplusAnalysis = {
   confidence: 0,
   warnings: [],
 };
+const analysisSteps = [
+  "Identificando alimentos",
+  "Classificando categoria",
+  "Estimando quantidade",
+  "Avaliando condição visual aparente",
+  "Organizando a sugestão de revisão",
+];
 async function post(url: string, body: BodyInit, isJson = false) {
   const r = await fetch(url, {
     method: "POST",
@@ -54,6 +62,8 @@ export function SurplusForm() {
   const [aiError, setAiError] = useState("");
   const [confirmed, setConfirmed] = useState(false);
   const [batchId, setBatchId] = useState("");
+  const [analysisReady, setAnalysisReady] = useState(false);
+  const [completedSteps, setCompletedSteps] = useState(0);
   const camera = useRef<HTMLInputElement>(null);
   const gallery = useRef<HTMLInputElement>(null);
   useEffect(
@@ -62,7 +72,17 @@ export function SurplusForm() {
     },
     [preview],
   );
+  useEffect(() => {
+    if (stage !== "analyzing" || !analysisReady) return;
+    const timer = window.setTimeout(() => {
+      if (completedSteps < analysisSteps.length) setCompletedSteps((count) => count + 1);
+      else setStage("review");
+    }, completedSteps === analysisSteps.length ? 600 : 220);
+    return () => window.clearTimeout(timer);
+  }, [stage, analysisReady, completedSteps]);
   async function analyze(imagePath: string) {
+    setAnalysisReady(false);
+    setCompletedSteps(0);
     setStage("analyzing");
     setAiError("");
     try {
@@ -70,9 +90,9 @@ export function SurplusForm() {
       setAnalysis(result.analysis);
       setAnalysisId(result.analysisId);
       setProvider(result.provider);
+      setAnalysisReady(true);
     } catch (e) {
       setAiError(e instanceof Error ? e.message : "Não conseguimos analisar bem esta imagem.");
-    } finally {
       setStage("review");
     }
   }
@@ -212,20 +232,35 @@ export function SurplusForm() {
           <p className="small muted">JPEG, PNG ou WebP · Até 4 MB</p>
         </>
       ) : stage === "analyzing" ? (
-        <div className="panel stack" style={{ padding: 35 }}>
-          <LoaderCircle className="spin" color="var(--primary)" size={32} />
-          {[
-            "Identificando alimentos",
-            "Classificando categoria",
-            "Estimando quantidade",
-            "Avaliando condição visual aparente",
-            "Organizando a sugestão de revisão",
-          ].map((t) => (
-            <div className="row muted small" key={t}>
-              <Sparkles size={15} />
-              {t}
-            </div>
-          ))}
+        <div className="panel stack analysis-progress">
+          <p className="row small" role="status" aria-live="polite">
+            {completedSteps === analysisSteps.length ? (
+              <CircleCheck color="var(--primary)" size={24} aria-hidden="true" />
+            ) : (
+              <LoaderCircle className="spin" color="var(--primary)" size={24} aria-hidden="true" />
+            )}
+            {completedSteps === analysisSteps.length
+              ? "Sugestão pronta para revisar"
+              : "Preparando as informações do alimento"}
+          </p>
+          <ul className="analysis-steps" aria-label="Progresso da análise">
+            {analysisSteps.map((label, index) => {
+              const done = index < completedSteps;
+              return (
+                <li className={`analysis-step small${done ? " is-complete" : ""}`} key={label}>
+                  <Sparkles size={15} aria-hidden="true" />
+                  <span>{label}</span>
+                  <span className="analysis-step-status" aria-label={done ? "Concluído" : "Analisando"}>
+                    {done ? (
+                      <CircleCheck size={20} aria-hidden="true" />
+                    ) : (
+                      <LoaderCircle className="spin" size={18} aria-hidden="true" />
+                    )}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       ) : (
         <>

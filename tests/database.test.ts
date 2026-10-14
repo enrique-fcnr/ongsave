@@ -220,10 +220,6 @@ describe("Fluxo real nas funções PostgreSQL e RLS", () => {
   });
   it("administrador lê a rede completa sem permitir promoção de outros perfis", async () => {
     await db.exec("reset role");
-    await db.query("insert into auth.users values($1,$2)", [
-      id("auth:admin@ongsave.com"),
-      "admin@ongsave.com",
-    ]);
     await db.query(
       "insert into public.profiles(auth_user_id,name,email,role) values($1,'Admin ONGSave',$2,'ADMIN')",
       [id("auth:admin@ongsave.com"), "admin@ongsave.com"],
@@ -244,5 +240,27 @@ describe("Fluxo real nas funções PostgreSQL e RLS", () => {
     await expect(db.exec("update public.profiles set role='ADMIN'")).rejects.toThrow(
       /permission denied/,
     );
+  });
+  it("mantém fotos de perfil privadas e impede acesso direto pelo cliente", async () => {
+    await db.exec("reset role");
+    expect(
+      (await db.query<{ public: boolean }>("select public from storage.buckets where id='avatars'"))
+        .rows[0].public,
+    ).toBe(false);
+    await db.query("insert into storage.objects(bucket_id,name) values('avatars',$1)", [
+      `${id("auth:mercado@ongsave.demo")}/private-avatar.webp`,
+    ]);
+    await actor("ong@ongsave.demo");
+    expect(
+      (await db.query("select id from storage.objects where bucket_id='avatars'")).rows,
+    ).toHaveLength(0);
+    await expect(
+      db.query("insert into storage.objects(bucket_id,name) values('avatars',$1)", [
+        `${id("auth:mercado@ongsave.demo")}/overwrite.webp`,
+      ]),
+    ).rejects.toThrow(/row-level security/);
+    await expect(
+      db.exec("update public.profiles set avatar_url='https://example.com/photo.jpg'"),
+    ).rejects.toThrow(/permission denied/);
   });
 });

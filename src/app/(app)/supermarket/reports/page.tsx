@@ -1,12 +1,12 @@
-import { FormSections, PagedItems } from "@/components/screen-sections";
+import { FormSections } from "@/components/screen-sections";
 import { redirect } from "next/navigation";
 import { operationalData, summarize } from "@/lib/data";
-import { number, categoryLabels } from "@/lib/domain";
+import { number } from "@/lib/domain";
 import { Metrics, Charts } from "@/components/metrics";
-import { StatusPill, Empty } from "@/components/shared";
 import { PrintButton } from "@/components/print-button";
+import { ImpactCertificate } from "@/components/impact-certificate";
 export default async function Reports() {
-  const { profile, organization, rescues, orgs, asOf } = await operationalData();
+  const { profile, organization, rescues, asOf } = await operationalData();
   if (profile.role !== "SUPERMARKET") redirect("/home");
   const now = new Date(asOf);
   const period = new Intl.DateTimeFormat("pt-BR", {
@@ -23,6 +23,10 @@ export default async function Reports() {
     (r) => key.format(new Date(r.delivered_at || r.created_at)) === key.format(now),
   );
   const m = summarize(monthly);
+  const issuedAt = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    dateStyle: "long",
+  }).format(now);
   return (
     <div className="stack">
       <div className="between page-heading">
@@ -36,69 +40,30 @@ export default async function Reports() {
         <PrintButton />
       </div>
       <FormSections
-        labels={[
-          "Indicadores",
-          "Resultado ambiental",
-          "Gráficos",
-          "Registros",
-          "Exportar",
-          "Metodologia",
-        ]}
+        labels={["Indicadores", "Certificado"]}
       >
-        <Metrics rescues={monthly} role={profile.role} />
-        <div className="panel between">
-          <div>
-            <h2>{number(m.co2)} kg CO₂e estimados evitados</h2>
-            <p className="small muted" style={{ marginTop: 8 }}>
-              Estimativa ilustrativa · {m.partners} instituições beneficiadas
-            </p>
+        <div className="stack">
+          <Metrics rescues={monthly} role={profile.role} />
+          <Charts rescues={monthly} asOf={asOf} />
+          <div className="panel between">
+            <div>
+              <h2>{number(m.co2)} kg CO₂e estimados evitados</h2>
+              <p className="small muted" style={{ marginTop: 8 }}>
+                Estimativa ilustrativa · {m.partners} instituições beneficiadas
+              </p>
+            </div>
+            <span className="pill">Impacto social</span>
           </div>
-          <span className="pill">Impacto social</span>
         </div>
-        <Charts rescues={monthly} asOf={asOf} />
-        <section className="panel stack">
-          <h2>Registro de resgates</h2>
-          <PagedItems
-            tableHeaders={["Data", "Categoria", "Peso", "Instituição", "Status"]}
-            pageSize={4}
-            mobilePageSize={3}
-            label="Registros do relatório"
-          >
-            {monthly.map((r) => (
-              <tr key={r.id}>
-                <td>
-                  {new Intl.DateTimeFormat("pt-BR", {
-                    timeZone: "America/Sao_Paulo",
-                    day: "2-digit",
-                    month: "2-digit",
-                  }).format(new Date(r.created_at))}
-                </td>
-                <td>{categoryLabels[r.surplus_batches?.category || "other"]}</td>
-                <td>{number(Number(r.surplus_batches?.estimated_weight_kg || 0))} kg</td>
-                <td>{orgs.find((o) => o.id === r.ngo_id)?.name}</td>
-                <td>
-                  <StatusPill status={r.status} />
-                </td>
-              </tr>
-            ))}
-          </PagedItems>
-          {!monthly.length && (
-            <Empty
-              title="Nenhum registro neste mês"
-              body="As próximas entregas aparecerão neste relatório."
-            />
-          )}
-        </section>
-        <p className="small muted">
-          Para exportar, selecione “Salvar como PDF” na janela de impressão.
-        </p>
-        <details className="method-note">
-          <summary>Sobre os dados e as estimativas</summary>
-          <p>
-            Inclui histórico simulado. Refeições, economia, água e CO₂e usam fatores ilustrativos a
-            partir das entregas confirmadas e não constituem certificação ESG.
-          </p>
-        </details>
+        <ImpactCertificate
+          organization={organization?.name || "Supermercado parceiro"}
+          period={period}
+          issuedAt={issuedAt}
+          rescuedKg={m.kg}
+          meals={m.meals}
+          ngoCount={m.partners}
+          co2Kg={m.co2}
+        />
       </FormSections>
     </div>
   );
