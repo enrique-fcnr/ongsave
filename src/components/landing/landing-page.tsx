@@ -13,7 +13,6 @@ import {
   Leaf,
   MapPin,
   PackageCheck,
-  Play,
   ShieldCheck,
   Sprout,
   Store,
@@ -275,21 +274,19 @@ export default function Landing() {
           <SectionHeading
             label="Conheça a ONGSave"
             title="Uma rede que transforma excedentes em cuidado."
-            body="Em breve, um vídeo vai mostrar de perto como supermercados, instituições e motoristas fazem essa conexão acontecer."
+            body="Assista e conheça como supermercados, instituições e motoristas fazem essa conexão acontecer."
           />
-          <div
-            className={styles.videoPlaceholder}
+          <video
+            className={styles.landingVideo}
+            controls
+            playsInline
+            preload="metadata"
+            aria-label="Vídeo de apresentação da ONGSave"
             data-reveal
-            role="img"
-            aria-label="Espaço reservado para o vídeo de apresentação da ONGSave"
           >
-            <div className={styles.videoGlow} aria-hidden="true" />
-            <span className={styles.videoPlay} aria-hidden="true">
-              <Play size={25} fill="currentColor" />
-            </span>
-            <span className={styles.videoCaption}>Vídeo de apresentação</span>
-            <span className={styles.videoNote}>Seu vídeo entra aqui</span>
-          </div>
+            <source src="/landing/ongsave-apresentacao.mp4" type="video/mp4" />
+            Seu navegador não oferece suporte à reprodução de vídeo.
+          </video>
         </section>
 
         <section className={styles.peopleSection} id="nossa-rede">

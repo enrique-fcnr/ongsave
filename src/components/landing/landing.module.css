@@ -711,74 +711,16 @@
   font-size: 15px;
   line-height: 1.8;
 }
-.videoPlaceholder {
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  min-height: 300px;
-  aspect-ratio: 16 / 7;
-  max-height: 510px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+.landingVideo {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 680px;
   border: 1px solid #dce9df;
   border-radius: 28px;
-  color: #fff;
-  background:
-    radial-gradient(ellipse at 50% 105%, #80b779 0, transparent 48%),
-    linear-gradient(135deg, #173c2c 0%, #226c50 52%, #438b65 100%);
+  background: #173c2c;
   box-shadow: 0 22px 60px #183d291c;
-}
-.videoPlaceholder::before,
-.videoPlaceholder::after {
-  position: absolute;
-  z-index: -1;
-  width: 42%;
-  height: 140%;
-  border: 1px solid #ffffff20;
-  border-radius: 50%;
-  content: "";
-  transform: rotate(32deg);
-}
-.videoPlaceholder::before {
-  left: -8%;
-  top: -22%;
-}
-.videoPlaceholder::after {
-  right: -9%;
-  bottom: -50%;
-  width: 55%;
-  height: 175%;
-}
-.videoGlow {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background: linear-gradient(115deg, #102c2026, transparent 52%, #c2e19b16);
-}
-.videoPlay {
-  display: grid;
-  width: 72px;
-  height: 72px;
-  place-items: center;
-  padding-left: 4px;
-  border: 1px solid #ffffff75;
-  border-radius: 50%;
-  color: #205f47;
-  background: #fff;
-  box-shadow: 0 8px 28px #102c2033;
-}
-.videoCaption {
-  margin-top: 19px;
-  font-size: 20px;
-  font-weight: 650;
-  letter-spacing: -0.35px;
-}
-.videoNote {
-  margin-top: 6px;
-  color: #ffffffc7;
-  font-size: 13px;
+  object-fit: contain;
 }
 .ticker {
   margin: 0 -32px;
@@ -2099,25 +2041,9 @@
   .section {
     padding: 65px 24px;
   }
-  .videoPlaceholder {
-    min-height: 220px;
-    aspect-ratio: 4 / 3;
+  .landingVideo {
+    max-height: 70vh;
     border-radius: 21px;
-  }
-  .videoPlay {
-    width: 60px;
-    height: 60px;
-  }
-  .videoPlay svg {
-    width: 21px;
-    height: 21px;
-  }
-  .videoCaption {
-    margin-top: 15px;
-    font-size: 17px;
-  }
-  .videoNote {
-    font-size: 12px;
   }
   .sectionHeading {
     margin-bottom: 33px;
