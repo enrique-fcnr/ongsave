@@ -51,6 +51,17 @@ export function ProfileForm({
             const basic = z
               .object({ name: z.string().min(2).max(100), phone: z.string().max(25) })
               .parse({ name: form.get("name"), phone: form.get("phone") });
+            const vehicle = driver
+              ? z
+                  .object({
+                    vehicle_label: z.string().trim().min(2, "Informe o modelo do veículo.").max(100),
+                    vehicle_capacity_kg: z.coerce.number().int().min(1).max(5000),
+                  })
+                  .parse({
+                    vehicle_label: form.get("vehicle_label"),
+                    vehicle_capacity_kg: form.get("vehicle_capacity_kg"),
+                  })
+              : null;
             const client = browserClient();
             const { error } = await client.from("profiles").update(basic).eq("id", profile.id);
             if (error) throw error;
@@ -75,7 +86,10 @@ export function ProfileForm({
             if (driver) {
               const { error } = await client
                 .from("drivers")
-                .update({ availability: form.get("availability") === "on" })
+                .update({
+                  ...(vehicle || {}),
+                  availability: form.get("availability") === "on",
+                })
                 .eq("id", driver.id);
               if (error) throw error;
             }
@@ -279,13 +293,35 @@ export function ProfileForm({
           {driver && (
             <>
               <fieldset className="form-section">
-                <legend>Seu veículo e suas missões</legend>
-                <p className="small muted">
-                  {driver.vehicle_label} · Capacidade de {driver.vehicle_capacity_kg} kg
-                </p>
+                <legend>Seu veículo e suas entregas</legend>
+                <div className="form-columns">
+                  <label className="field">
+                    Veículo (modelo e cor)
+                    <Input
+                      name="vehicle_label"
+                      defaultValue={driver.vehicle_label}
+                      minLength={2}
+                      maxLength={100}
+                      required
+                    />
+                  </label>
+                  <label className="field">
+                    Capacidade de carga (kg)
+                    <Input
+                      name="vehicle_capacity_kg"
+                      type="number"
+                      min={1}
+                      max={5000}
+                      step={1}
+                      defaultValue={driver.vehicle_capacity_kg}
+                      required
+                    />
+                  </label>
+                </div>
+                <p className="small muted">A capacidade ajuda a evitar uma rota com mais peso do que o seu veículo comporta.</p>
                 <label className="check-label">
                   <input type="checkbox" name="availability" defaultChecked={driver.availability} />
-                  Disponível para novas missões
+                  Disponível para novas entregas
                 </label>
               </fieldset>
             </>

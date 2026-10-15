@@ -33,12 +33,20 @@ export async function RescueDetail({ id }: { id: string }) {
     <div className="stack detail-workspace">
       <Link className="back" href={profile.role === "DRIVER" ? "/driver/missions" : "/rescues"}>
         <ArrowLeft size={16} />
-        Voltar aos resgates
+        {profile.role === "DRIVER" ? "Voltar às entregas" : "Voltar aos resgates"}
       </Link>
       <div className="between page-heading">
         <div className="title-block">
-          <span className="eyebrow muted">Resgate #{r.id.slice(0, 8)}</span>
-          <h1>{r.status === "DELIVERED" ? "Missão concluída" : r.surplus_batches?.title}</h1>
+          <span className="eyebrow muted">
+            {profile.role === "DRIVER" ? "Entrega" : "Resgate"} #{r.id.slice(0, 8)}
+          </span>
+          <h1>
+            {r.status === "DELIVERED"
+              ? profile.role === "DRIVER"
+                ? "Entrega concluída"
+                : "Resgate concluído"
+              : r.surplus_batches?.title}
+          </h1>
           <p>
             {r.status === "DELIVERED"
               ? "Os alimentos chegaram a um novo destino. Obrigado por fazer parte."
@@ -52,7 +60,7 @@ export async function RescueDetail({ id }: { id: string }) {
       <FormSections labels={["Acompanhamento", "Rota", "Endereços", "Resultado"]}>
         <div className="panel stack">
           <div className="between">
-            <h2>Acompanhe o resgate</h2>
+            <h2>{profile.role === "DRIVER" ? "Acompanhe a entrega" : "Acompanhe o resgate"}</h2>
             <span className="small muted">{number(weight)} kg</span>
           </div>
           <PagedItems

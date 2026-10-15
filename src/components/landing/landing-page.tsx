@@ -13,6 +13,7 @@ import {
   Leaf,
   MapPin,
   PackageCheck,
+  Play,
   ShieldCheck,
   Sprout,
   Store,
@@ -62,11 +63,11 @@ const roles = [
     name: "Motoristas",
     eyebrow: "O caminho entre as pontas",
     title: "Faça do seu trajeto um resgate.",
-    body: "Conecte a coleta ao destino. Veja a missão, consulte os endereços e registre o andamento de cada entrega.",
+    body: "Conecte a coleta ao destino. Consulte os endereços e acompanhe cada etapa da entrega.",
     items: [
-      "Encontre missões disponíveis",
+      "Encontre entregas disponíveis",
       "Consulte mapa e endereços",
-      "Acompanhe as etapas do resgate",
+      "Acompanhe as etapas da entrega",
     ],
     cta: "Área do motorista",
   },
@@ -80,7 +81,7 @@ const faqs = [
   {
     question: "Como um resgate começa?",
     answer:
-      "O supermercado fotografa o excedente, revisa os dados e publica o lote. Uma instituição reserva a doação, e a missão fica disponível para um motorista realizar a coleta e a entrega.",
+      "O supermercado fotografa o excedente, revisa os dados e publica o lote. Uma instituição reserva a doação, e a entrega fica disponível para um motorista realizar a coleta e o transporte.",
   },
   {
     question: "A foto publica a doação automaticamente?",
@@ -267,6 +268,27 @@ export default function Landing() {
           />
           <div data-reveal>
             <ProcessExplorer />
+          </div>
+        </section>
+
+        <section className={styles.section} id="video">
+          <SectionHeading
+            label="Conheça a ONGSave"
+            title="Uma rede que transforma excedentes em cuidado."
+            body="Em breve, um vídeo vai mostrar de perto como supermercados, instituições e motoristas fazem essa conexão acontecer."
+          />
+          <div
+            className={styles.videoPlaceholder}
+            data-reveal
+            role="img"
+            aria-label="Espaço reservado para o vídeo de apresentação da ONGSave"
+          >
+            <div className={styles.videoGlow} aria-hidden="true" />
+            <span className={styles.videoPlay} aria-hidden="true">
+              <Play size={25} fill="currentColor" />
+            </span>
+            <span className={styles.videoCaption}>Vídeo de apresentação</span>
+            <span className={styles.videoNote}>Seu vídeo entra aqui</span>
           </div>
         </section>
 

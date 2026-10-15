@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   calculateImpact,
   canTransition,
+  summarizeDriverDay,
   matchScore,
   tokenSchema,
   type Batch,
@@ -33,6 +34,20 @@ describe("Regras do resgate", () => {
     });
     expect(() => calculateImpact(-1)).toThrow();
     expect(() => calculateImpact(NaN)).toThrow();
+  });
+  it("calcula a estimativa diária do motorista pelas entregas concluídas no horário de São Paulo", () => {
+    const daily = summarizeDriverDay(
+      [
+        { driver_id: "driver-1", status: "DELIVERED", delivered_at: "2026-10-14T03:00:00Z" },
+        { driver_id: "driver-1", status: "DELIVERED", delivered_at: "2026-10-14T11:00:00-03:00" },
+        { driver_id: "driver-1", status: "IN_TRANSIT", delivered_at: null },
+        { driver_id: "driver-2", status: "DELIVERED", delivered_at: "2026-10-14T12:00:00-03:00" },
+        { driver_id: "driver-1", status: "DELIVERED", delivered_at: "2026-10-13T23:59:00-03:00" },
+      ],
+      "driver-1",
+      new Date("2026-10-14T16:00:00Z"),
+    );
+    expect(daily).toEqual({ deliveries: 2, revenue: 50 });
   });
   it("ordena matching simples considerando horário de São Paulo", () => {
     const b = { category: "produce", estimated_weight_kg: 38 } as Batch;

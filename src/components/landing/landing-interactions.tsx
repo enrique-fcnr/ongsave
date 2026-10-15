@@ -235,11 +235,11 @@ const features = [
   },
   {
     Icon: Truck,
-    label: "Missões",
+    label: "Entregas",
     title: "Cada trajeto tem um propósito.",
-    body: "Motoristas encontram as missões, consultam os endereços e acompanham as etapas. Um código confirma que a entrega chegou ao destino.",
+    body: "Motoristas encontram entregas disponíveis, consultam os endereços e acompanham cada etapa. Um código confirma a chegada ao destino.",
     items: [
-      "Mapa e detalhes da missão",
+      "Mapa e detalhes da entrega",
       "Etapas de coleta e entrega",
       "Código de confirmação no recebimento",
     ],
@@ -335,7 +335,7 @@ const process = [
   },
   {
     title: "Conecte a doação a uma instituição.",
-    text: "A ONG escolhe o lote que pode receber. Uma missão conecta a reserva ao próximo trajeto.",
+    text: "A ONG escolhe o lote que pode receber. Uma entrega conecta a reserva ao próximo trajeto.",
     view: 1,
   },
   {

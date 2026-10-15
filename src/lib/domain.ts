@@ -93,6 +93,31 @@ export function calculateImpact(weight: number) {
     estimated_water_saved_liters: Math.round(weight * 250),
   };
 }
+export const DEMO_DRIVER_DELIVERY_RATE_BRL = 25;
+export function summarizeDriverDay(
+  rescues: Pick<Rescue, "driver_id" | "status" | "delivered_at">[],
+  driverId: string,
+  asOf = new Date(),
+) {
+  const dateInSaoPaulo = (date: Date) =>
+    new Intl.DateTimeFormat("sv-SE", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(date);
+  const deliveries = rescues.filter(
+    (rescue) =>
+      rescue.driver_id === driverId &&
+      rescue.status === "DELIVERED" &&
+      rescue.delivered_at !== null &&
+      dateInSaoPaulo(new Date(rescue.delivered_at)) === dateInSaoPaulo(asOf),
+  ).length;
+  return {
+    deliveries,
+    revenue: deliveries * DEMO_DRIVER_DELIVERY_RATE_BRL,
+  };
+}
 export type Organization = {
   id: string;
   name: string;
@@ -148,6 +173,7 @@ export type Rescue = {
   supermarket_id: string;
   ngo_id: string;
   driver_id: string | null;
+  driver_route_position?: number | null;
   status: RescueStatus;
   pickup_address: string;
   pickup_latitude: number;

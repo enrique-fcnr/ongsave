@@ -1,0 +1,95 @@
+.page {
+  display: grid;
+  gap: 20px;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+.heading, .sectionHeading, .mobileTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.eyebrow {
+  color: var(--primary);
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.heading h1 { margin-top: 5px; font-size: clamp(26px, 2.4vw, 34px); letter-spacing: -1px; }
+.heading p, .sectionHeading p { margin-top: 5px; color: var(--muted-foreground); font-size: 13px; }
+.monthlyPrice {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  background: white;
+  color: var(--primary);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.metrics article { min-width: 0; padding: 16px 18px; border: 1px solid var(--border); border-radius: 18px; background: white; }
+.metrics article.highlight { background: var(--surface-mint); }
+.metrics article span { display: flex; align-items: center; gap: 8px; color: var(--muted-foreground); font-size: 11px; }
+.metrics article span svg { color: var(--primary); }
+.metrics article strong { display: block; margin-top: 10px; color: var(--foreground); font-size: clamp(20px, 2vw, 28px); letter-spacing: -.7px; }
+.contracts { min-width: 0; padding: 20px; border: 1px solid var(--border); border-radius: 22px; background: white; }
+.sectionHeading { margin-bottom: 16px; }
+.sectionHeading h2 { font-size: 19px; letter-spacing: -.3px; }
+.sectionHeading > span { color: var(--muted-foreground); font-size: 11px; }
+.tableWrap { overflow-x: auto; }
+.tableWrap table { width: 100%; border-collapse: collapse; text-align: left; }
+.tableWrap th, .tableWrap td { padding: 14px 12px; border-top: 1px solid var(--border); white-space: nowrap; font-size: 12px; }
+.tableWrap thead th { color: var(--muted-foreground); font-size: 10px; font-weight: 500; }
+.tableWrap tbody th { color: var(--foreground); font-weight: 600; }
+.tableWrap td { color: var(--muted-foreground); }
+.tableWrap td small { color: var(--muted-foreground); font-size: 10px; }
+.received { color: var(--primary) !important; font-weight: 600; }
+.status { display: inline-flex; align-items: center; padding: 5px 9px; border-radius: 99px; background: #f2f4f1; color: #66736c; font-size: 10px; }
+.status.active { background: #e8f4d4; color: #4d752a; }
+.status.proposed { background: #fff2db; color: #93631b; }
+.status.paused, .status.cancelled { background: #f2f4f1; color: #66736c; }
+.actions { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 7px; }
+.actions > small { flex-basis: 100%; color: #a34b37; font-size: 10px; }
+.noAction { color: var(--muted-foreground); }
+.addPayment { position: relative; }
+.addPayment summary { display: inline-flex; align-items: center; gap: 5px; padding: 6px 9px; border: 1px solid var(--border); border-radius: 99px; color: var(--primary); cursor: pointer; font-size: 10px; white-space: nowrap; }
+.addPayment form { position: absolute; z-index: 20; top: calc(100% + 7px); right: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; width: min(330px, calc(100vw - 50px)); padding: 14px; border: 1px solid var(--border); border-radius: 16px; background: white; box-shadow: 0 12px 32px #142b201c; }
+.addPayment label { display: grid; gap: 5px; color: var(--muted-foreground); font-size: 10px; }
+.addPayment input, .addPayment select { min-width: 0; height: 32px; border: 1px solid var(--border); border-radius: 8px; padding: 0 8px; color: var(--foreground); background: white; font: inherit; font-size: 11px; }
+.addPayment form button, .addPayment form small { grid-column: 1 / -1; }
+.addPayment form small[role="alert"] { color: #a34b37; }
+.addPayment form small[role="status"] { color: var(--primary); }
+.mobileList { display: none; }
+.empty { display: grid; justify-items: center; padding: 38px 18px; border-top: 1px solid var(--border); text-align: center; }
+.empty > span { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: var(--surface-mint); color: var(--primary); }
+.empty h3 { margin-top: 12px; font-size: 15px; }
+.empty p, .note { margin-top: 5px; color: var(--muted-foreground); font-size: 11px; }
+.setupNotice { margin: 8px 0; padding: 14px 16px; border: 1px solid #ead9b7; border-radius: 14px; background: #fffaf0; color: #745821; font-size: 12px; }
+.setupNotice p { margin-top: 4px; color: #766a52; line-height: 1.5; }
+.note { margin: -8px 2px 0; }
+@media (max-width: 900px) { .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .page { gap: 14px; }
+  .heading { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .heading p { font-size: 12px; }
+  .metrics { gap: 8px; }
+  .metrics article { padding: 13px; border-radius: 15px; }
+  .metrics article span { align-items: flex-start; font-size: 10px; }
+  .metrics article strong { margin-top: 8px; font-size: 21px; }
+  .contracts { padding: 15px; border-radius: 18px; }
+  .tableWrap { display: none; }
+  .mobileList { display: grid; gap: 10px; }
+  .mobileList article { padding: 13px; border: 1px solid var(--border); border-radius: 14px; }
+  .mobileTop { align-items: flex-start; }
+  .mobileTop > strong { max-width: 65%; font-size: 13px; }
+  .mobileMetrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .mobileMetrics span { display: grid; gap: 3px; color: var(--muted-foreground); font-size: 10px; }
+  .mobileMetrics strong { color: var(--foreground); font-size: 12px; }
+  .mobileList .actions { margin-top: 12px; }
+  .mobileList .addPayment form { left: 0; right: auto; }
+}

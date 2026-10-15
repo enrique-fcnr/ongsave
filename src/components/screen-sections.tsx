@@ -130,6 +130,7 @@ export function PagedItems({
   className,
   pageSize = 3,
   mobilePageSize = 1,
+  showAllOnDesktop = false,
   label = "Itens",
   tableHeaders,
 }: {
@@ -137,6 +138,7 @@ export function PagedItems({
   className?: string;
   pageSize?: number;
   mobilePageSize?: number;
+  showAllOnDesktop?: boolean;
   label?: string;
   tableHeaders?: string[];
 }) {
@@ -159,7 +161,15 @@ export function PagedItems({
       height.removeEventListener("change", update);
     };
   }, []);
-  const size = mobile ? (compact ? 1 : mobilePageSize) : compact ? Math.min(2, pageSize) : pageSize;
+  const size = mobile
+    ? compact
+      ? 1
+      : mobilePageSize
+    : showAllOnDesktop
+      ? pageSize
+      : compact
+        ? Math.min(2, pageSize)
+        : pageSize;
   const pages = Math.max(1, Math.ceil(items.length / size));
   const current = Math.min(page, pages - 1);
   return (

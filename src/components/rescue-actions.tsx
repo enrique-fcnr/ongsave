@@ -92,7 +92,12 @@ export function RescueActions({
       }
       router.refresh();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Não foi possível atualizar.");
+      const message = e instanceof Error ? e.message : "Não foi possível atualizar.";
+      setError(
+        role === "DRIVER"
+          ? message.replace(/missões/gi, "entregas").replace(/missão/gi, "entrega")
+          : message,
+      );
     } finally {
       setBusy(false);
     }
@@ -107,17 +112,20 @@ export function RescueActions({
       {role === "DRIVER" && status !== "DELIVERED" && status !== "CANCELLED" && (
         <>
           {status === "AT_DESTINATION" && (
-            <label className="field">
-              Digite o código da instituição
+            <label className="field driver-confirmation-code">
+              Código de confirmação da ONG
+              <span id="delivery-code-help" className="small muted">
+                Peça o código de quatro dígitos à equipe após conferir a entrega.
+              </span>
               <Input
                 value={token}
                 onChange={(e) => setToken(e.target.value.replace(/\D/g, "").slice(0, 4))}
                 inputMode="numeric"
-                autoComplete="off"
+                autoComplete="one-time-code"
+                aria-describedby="delivery-code-help"
                 pattern="[0-9]{4}"
                 maxLength={4}
                 placeholder="0000"
-                style={{ fontSize: 24, letterSpacing: 10, textAlign: "center" }}
               />
             </label>
           )}
@@ -128,7 +136,7 @@ export function RescueActions({
             {busy ? (
               <LoaderCircle size={18} className="spin" />
             ) : status === "WAITING_DRIVER" ? (
-              "Aceitar missão"
+              "Aceitar entrega"
             ) : status === "AT_DESTINATION" ? (
               "Confirmar entrega"
             ) : (

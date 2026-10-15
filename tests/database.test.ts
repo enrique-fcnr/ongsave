@@ -6,6 +6,7 @@ import { demoAnalysis } from "../src/lib/ai/demo-analysis";
 let db: PGlite;
 let batch: string;
 let rescue: string;
+let routeRescue: string;
 async function actor(email: string) {
   await db.exec("reset role");
   await db.query("select set_config('request.jwt.claim.sub',$1,false)", [id(`auth:${email}`)]);
@@ -122,7 +123,19 @@ describe("Fluxo real nas funções PostgreSQL e RLS", () => {
   });
   it("motorista aceita e concorrente perde acesso e não pode avançar", async () => {
     await actor("motorista@ongsave.demo");
-    await db.query("select public.accept_mission($1)", [rescue]);
+    routeRescue = (
+      await db.query<{ id: string }>(
+        "select id from public.rescues where status='WAITING_DRIVER' and id<>$1 order by id limit 1",
+        [rescue],
+      )
+    ).rows[0].id;
+    await db.query("select public.accept_deliveries($1::uuid[])", [[rescue, routeRescue]]);
+    const route = await db.query<{ id: string; driver_route_position: number }>(
+      "select id,driver_route_position from public.rescues where driver_id=(select id from public.drivers where profile_id=(select id from public.profiles where email='motorista@ongsave.demo')) and id=any($1::uuid[]) order by driver_route_position",
+      [[rescue, routeRescue]],
+    );
+    expect(route.rows.map((row) => row.id)).toEqual([rescue, routeRescue]);
+    expect(route.rows.map((row) => row.driver_route_position)).toEqual([1, 2]);
     await actor("mariana@ongsave.demo");
     await expect(db.query("select public.accept_mission($1)", [rescue])).rejects.toThrow(
       /já aceitou/,
@@ -133,6 +146,24 @@ describe("Fluxo real nas funções PostgreSQL e RLS", () => {
     expect(
       (await db.query("select id from public.rescues where id=$1", [rescue])).rows,
     ).toHaveLength(0);
+  });
+  it("motorista pode atualizar o veículo e a capacidade respeita a carga da rota", async () => {
+    await actor("motorista@ongsave.demo");
+    await db.query(
+      "update public.drivers set vehicle_label='Fiat Fiorino · Prata',vehicle_capacity_kg=100 where id=(select id from public.drivers where profile_id=(select id from public.profiles where email='motorista@ongsave.demo'))",
+    );
+    const saved = await db.query<{ vehicle_label: string; vehicle_capacity_kg: string }>(
+      "select vehicle_label,vehicle_capacity_kg from public.drivers where profile_id=(select id from public.profiles where email='motorista@ongsave.demo')",
+    );
+    expect(saved.rows[0]).toMatchObject({
+      vehicle_label: "Fiat Fiorino · Prata",
+    });
+    expect(Number(saved.rows[0].vehicle_capacity_kg)).toBe(100);
+    await expect(
+      db.query(
+        "update public.drivers set vehicle_capacity_kg=1 where profile_id=(select id from public.profiles where email='motorista@ongsave.demo')",
+      ),
+    ).rejects.toThrow(/capacidade não pode ficar abaixo/);
   });
   it("driver não lê token nem pula etapas", async () => {
     await actor("motorista@ongsave.demo");
@@ -145,6 +176,9 @@ describe("Fluxo real nas funções PostgreSQL e RLS", () => {
     await expect(
       db.query("select public.advance_rescue($1,'DELIVERED','1234')", [rescue]),
     ).rejects.toThrow(/Transição/);
+    await db.query("select public.advance_rescue($1,'GOING_TO_PICKUP',null)", [routeRescue]);
+    await db.query("select public.advance_rescue($1,'AT_PICKUP',null)", [routeRescue]);
+    await db.query("select public.advance_rescue($1,'PICKED_UP',null)", [routeRescue]);
     for (const next of [
       "GOING_TO_PICKUP",
       "AT_PICKUP",
@@ -229,11 +263,24 @@ describe("Fluxo real nas funções PostgreSQL e RLS", () => {
     );
     await actor("admin@ongsave.com");
     expect((await db.query("select id from public.organizations")).rows).toHaveLength(8);
+    expect((await db.query("select id from public.supermarket_contracts")).rows).toHaveLength(4);
+    expect((await db.query("select id from public.supermarket_contract_installments")).rows).toHaveLength(0);
+    await db.query(
+      "insert into public.supermarket_contract_installments(contract_id,period,amount,due_on,status,paid_at) select id,'2026-10-01',499,'2026-10-05','PAID',now() from public.supermarket_contracts limit 1",
+    );
+    expect(
+      (await db.query("select id from public.supermarket_contract_installments where status='PAID'")).rows,
+    ).toHaveLength(1);
     expect((await db.query("select id from public.rescues")).rows).toHaveLength(
       expected.rows[0].count,
     );
     expect((await db.query("select id from public.impact_metrics")).rows).toHaveLength(16);
     await actor("ong@ongsave.demo");
+    expect((await db.query("select id from public.supermarket_contracts")).rows).toHaveLength(0);
+    expect((await db.query("select id from public.supermarket_contract_installments")).rows).toHaveLength(0);
+    await expect(
+      db.query("insert into public.supermarket_contracts(organization_id,monthly_amount) values($1,499)", [id("mercado-paulista")]),
+    ).rejects.toThrow(/permission denied|row-level security/);
     expect(
       (await db.query("select id from public.profiles where email='admin@ongsave.com'")).rows,
     ).toHaveLength(0);

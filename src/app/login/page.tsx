@@ -43,7 +43,7 @@ export default async function Login({
           <div className="title-block">
             <span className="eyebrow">Sua rede de resgates</span>
             <h1>Bom ter você aqui.</h1>
-            <p>Acesse sua conta para acompanhar doações, missões e entregas.</p>
+            <p>Acesse sua conta para acompanhar doações e entregas.</p>
           </div>
           {!isConfigured() && (
             <div className="notice">

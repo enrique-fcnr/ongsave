@@ -110,16 +110,18 @@ export function RescueList({
   photoUrls = {},
   emptyTitle = "Nenhum resgate por aqui",
   emptyBody = "Os próximos resgates aparecerão aqui, automaticamente.",
+  label = "Resgates",
 }: {
   rescues: Rescue[];
   orgs: Organization[];
   photoUrls?: Record<string, string | undefined>;
   emptyTitle?: string;
   emptyBody?: string;
+  label?: string;
 }) {
   if (!rescues.length) return <Empty title={emptyTitle} body={emptyBody} />;
   return (
-    <PagedItems className="rescue-list" pageSize={3} mobilePageSize={2} label="Resgates">
+    <PagedItems className="rescue-list" pageSize={3} mobilePageSize={2} label={label}>
       {rescues.map((r) => (
         <Link href={`/rescue/${r.id}`} className="rescue-row" key={r.id}>
           <span className="symbol">

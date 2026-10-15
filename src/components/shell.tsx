@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   Bell,
   FileChartColumn,
+  FileText,
   HeartHandshake,
   House,
   Leaf,
@@ -42,15 +43,22 @@ export function Shell({
   const router = useRouter();
   const nav =
     profile.role === "ADMIN"
-      ? [{ href: "/admin", label: "Visão da rede", icon: MapPinned }]
+      ? [
+          { href: "/admin", label: "Visão da rede", icon: MapPinned },
+          { href: "/admin/contracts", label: "Contratos", icon: FileText },
+        ]
       : [
           ...(profile.role !== "DRIVER" ? [{ href: "/home", label: "Início", icon: House }] : []),
           ...(profile.role === "NGO"
             ? [{ href: "/ngo/donations", label: "Doações disponíveis", icon: HeartHandshake }]
             : profile.role === "DRIVER"
-              ? [{ href: "/driver/missions", label: "Missões", icon: MapPinned }]
+              ? [{ href: "/driver/missions", label: "Mapa", icon: MapPinned }]
               : [{ href: "/supermarket/surplus/new", label: "Novo excedente", icon: Plus }]),
-          { href: "/rescues", label: "Doações", icon: Package },
+          {
+            href: "/rescues",
+            label: profile.role === "DRIVER" ? "Entregas" : "Doações",
+            icon: Package,
+          },
           ...(profile.role === "DRIVER" ? [{ href: "/impact", label: "Impacto", icon: Leaf }] : []),
         ];
   const mobileNav = [
@@ -59,7 +67,9 @@ export function Shell({
       .map((item) =>
         profile.role === "SUPERMARKET" && item.href === "/supermarket/surplus/new"
           ? { ...item, label: "Nova doação" }
-          : item,
+          : profile.role === "DRIVER" && item.href === "/rescues"
+            ? { ...item, label: "Entregas" }
+            : item,
       ),
     ...(profile.role === "SUPERMARKET"
       ? [{ href: "/supermarket/reports", label: "Relatórios", icon: FileChartColumn }]
@@ -67,7 +77,7 @@ export function Shell({
   ];
   const active = (href: string) =>
     path === href ||
-    path.startsWith(href + "/") ||
+    (href !== "/admin" && path.startsWith(href + "/")) ||
     (href === "/rescues" && path.startsWith("/rescue/")) ||
     (href === "/home" && path.startsWith("/supermarket/surplus/") && !path.endsWith("/new"));
   const roleLabel =
@@ -79,8 +89,14 @@ export function Shell({
           ? "Instituição"
           : "Motorista";
   const sectionLabel =
-    nav.find((item) => active(item.href))?.label ||
-    (path.startsWith("/supermarket/reports") ? "Relatórios" : "Detalhes do resgate");
+    (profile.role === "DRIVER" && path.startsWith("/rescue/")
+      ? "Detalhes da entrega"
+      : nav.find((item) => active(item.href))?.label) ||
+    (path.startsWith("/supermarket/reports")
+      ? "Relatórios"
+      : profile.role === "DRIVER"
+        ? "Detalhes da entrega"
+        : "Detalhes do resgate");
   async function logout() {
     await browserClient().auth.signOut();
     router.replace("/login");
@@ -185,7 +201,11 @@ export function Shell({
                             .eq("id", n.id)
                         }
                       >
-                        <h3>{n.title}</h3>
+                        <h3>
+                          {profile.role === "DRIVER" && n.title === "Nova missão próxima"
+                            ? "Nova entrega disponível"
+                            : n.title}
+                        </h3>
                         <p className="small muted" style={{ marginTop: 6 }}>
                           {n.body}
                         </p>

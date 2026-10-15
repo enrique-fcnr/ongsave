@@ -7,8 +7,8 @@ export async function operationalData() {
   let query = client
     .from("rescues")
     .select("*,surplus_batches(*),impact_metrics(*)")
-    .order("created_at", { ascending: false })
-    .limit(200);
+    .order("created_at", { ascending: false });
+  if (profile.role !== "DRIVER") query = query.limit(200);
   if (profile.role === "SUPERMARKET" && organization)
     query = query.eq("supermarket_id", organization.id);
   if (profile.role === "NGO" && organization) query = query.eq("ngo_id", organization.id);

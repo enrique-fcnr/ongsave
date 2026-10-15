@@ -1,5 +1,5 @@
 "use client";
-import { FormSections, PagedItems } from "./screen-sections";
+import { PagedItems } from "./screen-sections";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { HeartHandshake, RotateCcw, ShieldCheck, Store, Truck } from "lucide-react";
@@ -23,7 +23,7 @@ const accounts = [
   {
     name: "Lucas Almeida",
     role: "motorista",
-    body: "Encontre uma missão e conecte a coleta ao próximo destino.",
+    body: "Consulte entregas disponíveis e acompanhe cada trajeto.",
     email: "motorista@ongsave.demo",
     Icon: Truck,
   },
@@ -40,8 +40,14 @@ export function DemoControls({ configured }: { configured: boolean }) {
   const [message, setMessage] = useState("");
   const router = useRouter();
   return (
-    <FormSections labels={["Escolher perfil", "Preparar demonstração"]}>
-      <PagedItems className="demo-grid" pageSize={4} label="Perfis de demonstração">
+    <div className="stack demo-controls">
+      <PagedItems
+        className="demo-grid"
+        pageSize={4}
+        mobilePageSize={1}
+        showAllOnDesktop
+        label="Perfis de demonstração"
+      >
         {accounts.map((a) => (
           <div key={a.email} className="panel demo-account">
             <span className="avatar">
@@ -121,6 +127,6 @@ export function DemoControls({ configured }: { configured: boolean }) {
           demo123.
         </p>
       </div>
-    </FormSections>
+    </div>
   );
 }
