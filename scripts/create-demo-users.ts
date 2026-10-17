@@ -1,5 +1,5 @@
 import { serviceClient } from "./environment";
-import { accountData, id, organizationData } from "./seed-data";
+import { accountData, financialSupportData, id, organizationData } from "./seed-data";
 import { seed } from "./seed";
 async function main() {
   const client = serviceClient();
@@ -43,21 +43,23 @@ async function main() {
     const { error } = await client.from("profiles").upsert(profile, { onConflict: "id" });
     if (error) throw error;
     if (account.org) {
-      const { error } = await client
-        .from("organization_members")
-        .upsert(
-          {
-            id: id(`member:${account.email}`),
-            organization_id: id(account.org),
-            profile_id: profile.id,
-            member_role: "operator",
-          },
-          { onConflict: "organization_id,profile_id" },
-        );
+      const { error } = await client.from("organization_members").upsert(
+        {
+          id: id(`member:${account.email}`),
+          organization_id: id(account.org),
+          profile_id: profile.id,
+          member_role: "operator",
+        },
+        { onConflict: "organization_id,profile_id" },
+      );
       if (error) throw error;
     }
     console.log(`Conta pronta: ${account.email}`);
   }
+  const { error: supportError } = await client
+    .from("financial_supports")
+    .upsert(financialSupportData, { onConflict: "id" });
+  if (supportError) throw supportError;
   await seed();
   console.log("Contas demo prontas. Senha: demo123");
 }

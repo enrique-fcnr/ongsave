@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const roles = ["SUPERMARKET", "NGO", "DRIVER", "ADMIN"] as const;
+export const roles = ["SUPERMARKET", "NGO", "DRIVER", "ADMIN", "FINANCIAL_DONOR"] as const;
 export type Role = (typeof roles)[number];
 export const statuses = [
   "AVAILABLE",
@@ -121,7 +121,7 @@ export function summarizeDriverDay(
 export type Organization = {
   id: string;
   name: string;
-  type: "SUPERMARKET" | "NGO";
+  type: "SUPERMARKET" | "NGO" | "FINANCIAL_DONOR";
   neighborhood: string;
   address_line: string;
   city: string;

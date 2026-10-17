@@ -5,6 +5,7 @@ import {
   Bell,
   FileChartColumn,
   FileText,
+  HandCoins,
   HeartHandshake,
   House,
   Leaf,
@@ -46,21 +47,26 @@ export function Shell({
       ? [
           { href: "/admin", label: "Visão da rede", icon: MapPinned },
           { href: "/admin/contracts", label: "Contratos", icon: FileText },
+          { href: "/admin/funding", label: "Apoios e editais", icon: HandCoins },
         ]
-      : [
-          ...(profile.role !== "DRIVER" ? [{ href: "/home", label: "Início", icon: House }] : []),
-          ...(profile.role === "NGO"
-            ? [{ href: "/ngo/donations", label: "Doações disponíveis", icon: HeartHandshake }]
-            : profile.role === "DRIVER"
-              ? [{ href: "/driver/missions", label: "Mapa", icon: MapPinned }]
-              : [{ href: "/supermarket/surplus/new", label: "Novo excedente", icon: Plus }]),
-          {
-            href: "/rescues",
-            label: profile.role === "DRIVER" ? "Entregas" : "Doações",
-            icon: Package,
-          },
-          ...(profile.role === "DRIVER" ? [{ href: "/impact", label: "Impacto", icon: Leaf }] : []),
-        ];
+      : profile.role === "FINANCIAL_DONOR"
+        ? [{ href: "/financial-donation", label: "Doação financeira", icon: HandCoins }]
+        : [
+            ...(profile.role !== "DRIVER" ? [{ href: "/home", label: "Início", icon: House }] : []),
+            ...(profile.role === "NGO"
+              ? [{ href: "/ngo/donations", label: "Doações disponíveis", icon: HeartHandshake }]
+              : profile.role === "DRIVER"
+                ? [{ href: "/driver/missions", label: "Mapa", icon: MapPinned }]
+                : [{ href: "/supermarket/surplus/new", label: "Novo excedente", icon: Plus }]),
+            {
+              href: "/rescues",
+              label: profile.role === "DRIVER" ? "Entregas" : "Doações",
+              icon: Package,
+            },
+            ...(profile.role === "DRIVER"
+              ? [{ href: "/impact", label: "Impacto", icon: Leaf }]
+              : []),
+          ];
   const mobileNav = [
     ...nav
       .filter((item) => item.href !== "/profile")
@@ -87,7 +93,9 @@ export function Shell({
         ? "Administração"
         : profile.role === "NGO"
           ? "Instituição"
-          : "Motorista";
+          : profile.role === "FINANCIAL_DONOR"
+            ? "Empresa apoiadora"
+            : "Motorista";
   const sectionLabel =
     (profile.role === "DRIVER" && path.startsWith("/rescue/")
       ? "Detalhes da entrega"

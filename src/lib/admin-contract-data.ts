@@ -5,6 +5,7 @@ import { requireProfile } from "./auth";
 export type ContractSummary = {
   id: string;
   supermarket: string;
+  planTier: "SMALL" | "MEDIUM" | "LARGE";
   monthlyAmount: number;
   status: "PROPOSED" | "ACTIVE" | "PAUSED" | "CANCELLED";
   paidInstallments: number;
@@ -19,10 +20,13 @@ export async function adminContractData() {
   const { data, error } = await client
     .from("supermarket_contracts")
     .select(
-      "id,monthly_amount,status,organizations(name),supermarket_contract_installments(amount,status)",
+      "id,monthly_amount,plan_tier,status,organizations(name),supermarket_contract_installments(amount,status)",
     )
     .order("created_at", { ascending: false });
-  if (error && (error.code === "PGRST205" || error.code === "42P01")) {
+  if (
+    error &&
+    (error.code === "PGRST205" || error.code === "PGRST204" || error.code === "42P01")
+  ) {
     return {
       contracts: [],
       paidInstallments: 0,
@@ -43,6 +47,7 @@ export async function adminContractData() {
     return {
       id: row.id,
       supermarket: organization?.name || "Supermercado",
+      planTier: row.plan_tier as ContractSummary["planTier"],
       monthlyAmount: Number(row.monthly_amount),
       status: row.status,
       paidInstallments: paid.length,

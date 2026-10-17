@@ -2,7 +2,7 @@
 import { PagedItems } from "./screen-sections";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { HeartHandshake, RotateCcw, ShieldCheck, Store, Truck } from "lucide-react";
+import { HandCoins, HeartHandshake, RotateCcw, ShieldCheck, Store, Truck } from "lucide-react";
 import { Button } from "./ui/button";
 import { browserClient } from "@/lib/supabase/client";
 const accounts = [
@@ -34,6 +34,13 @@ const accounts = [
     email: "admin@ongsave.com",
     Icon: ShieldCheck,
   },
+  {
+    name: "Grupo Horizonte",
+    role: "empresa apoiadora",
+    body: "Acompanhe o apoio financeiro destinado ao custeio das entregas.",
+    email: "apoio@ongsave.demo",
+    Icon: HandCoins,
+  },
 ];
 export function DemoControls({ configured }: { configured: boolean }) {
   const [busy, setBusy] = useState("");
@@ -43,7 +50,7 @@ export function DemoControls({ configured }: { configured: boolean }) {
     <div className="stack demo-controls">
       <PagedItems
         className="demo-grid"
-        pageSize={4}
+        pageSize={5}
         mobilePageSize={1}
         showAllOnDesktop
         label="Perfis de demonstração"

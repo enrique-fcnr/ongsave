@@ -6,6 +6,7 @@ import {
   preferencesData,
   driverData,
   operationalSeed,
+  financialSupportData,
 } from "./seed-data";
 const literal = (v: unknown): string =>
   v === null
@@ -30,7 +31,7 @@ const profiles = accountData
       `insert into public.profiles(id,auth_user_id,name,email,role) select ${literal(id(`profile:${a.email}`))},id,${literal(a.name)},${literal(a.email)},${literal(a.role)} from auth.users where email=${literal(a.email)} on conflict do nothing;\n${a.org ? `insert into public.organization_members(id,organization_id,profile_id) select ${literal(id(`member:${a.email}`))},${literal(id(a.org))},id from public.profiles where email=${literal(a.email)} on conflict do nothing;` : ""}`,
   )
   .join("\n");
-const sql = `-- Generated from scripts/seed-data.ts. Bootstrap Auth with npm run demo:users.\nbegin;\n${insert("organizations", organizationData)}\n${profiles}\n${insert("ngo_preferences", preferencesData)}\ndo $$ begin\nif (select count(*) from public.profiles where email like '%@ongsave.demo') < 11 then raise notice 'Execute npm run demo:users para popular o histórico e as missões.'; return; end if;\n${insert("drivers", driverData)}\n${Object.entries(
+const sql = `-- Generated from scripts/seed-data.ts. Bootstrap Auth with npm run demo:users.\nbegin;\n${insert("organizations", organizationData)}\n${profiles}\n${insert("ngo_preferences", preferencesData)}\n${insert("financial_supports", financialSupportData)}\ndo $$ begin\nif (select count(*) from public.profiles where email like '%@ongsave.demo') < 12 then raise notice 'Execute npm run demo:users para popular o histórico e as missões.'; return; end if;\n${insert("drivers", driverData)}\n${Object.entries(
   operationalSeed(new Date("2026-09-30T15:00:00Z")),
 )
   .map(([t, r]) => insert(t, r))

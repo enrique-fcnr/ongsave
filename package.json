@@ -16,6 +16,7 @@
     "seed": "tsx scripts/seed.ts",
     "seed:sql": "tsx scripts/generate-seed-sql.ts",
     "demo:users": "tsx scripts/create-demo-users.ts",
+    "demo:financial-donor": "tsx scripts/create-financial-donor-demo.ts",
     "demo:reset": "tsx scripts/reset-demo.ts",
     "db:migrate": "tsx scripts/migrate.ts",
     "pwa:icons": "tsx scripts/generate-icons.ts"

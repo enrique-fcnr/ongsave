@@ -18,6 +18,11 @@ const statusLabels = {
   PAUSED: "Pausado",
   CANCELLED: "Encerrado",
 } as const;
+const planLabels = {
+  SMALL: "Pequeno",
+  MEDIUM: "Médio",
+  LARGE: "Grande",
+} as const;
 
 export function AdminContracts({ data }: { data: ContractData }) {
   return (
@@ -28,8 +33,14 @@ export function AdminContracts({ data }: { data: ContractData }) {
           <h1>Contratos</h1>
           <p>Acompanhe mensalidades previstas e pagamentos registrados por supermercado.</p>
         </div>
-        <span className={styles.monthlyPrice}><Banknote size={16} /> Proposta padrão · R$ 499/mês</span>
+        <span className={styles.monthlyPrice}><Banknote size={16} /> Pequeno, médio e grande porte</span>
       </header>
+
+      <section className={styles.planGrid} aria-label="Planos mensais por porte">
+        <article><span>Pequeno porte</span><strong>R$ 299 <small>/ mês</small></strong></article>
+        <article><span>Médio porte</span><strong>R$ 499 <small>/ mês</small></strong></article>
+        <article><span>Grande porte</span><strong>R$ 999 <small>/ mês</small></strong></article>
+      </section>
 
       <section className={styles.metrics} aria-label="Resumo dos contratos">
         <article>
@@ -72,6 +83,7 @@ export function AdminContracts({ data }: { data: ContractData }) {
                   <tr>
                     <th>Supermercado</th>
                     <th>Status</th>
+                    <th>Plano</th>
                     <th>Mensalidade</th>
                     <th>Parcelas pagas</th>
                     <th>Total recebido</th>
@@ -84,6 +96,7 @@ export function AdminContracts({ data }: { data: ContractData }) {
                     <tr key={contract.id}>
                       <th scope="row">{contract.supermarket}</th>
                       <td><span className={`${styles.status} ${styles[contract.status.toLowerCase()]}`}>{statusLabels[contract.status]}</span></td>
+                      <td>{planLabels[contract.planTier]}</td>
                       <td>{money(contract.monthlyAmount)} <small>/ mês</small></td>
                       <td>{number(contract.paidInstallments)}</td>
                       <td className={styles.received}>{money(contract.amountReceived)}</td>
@@ -101,6 +114,7 @@ export function AdminContracts({ data }: { data: ContractData }) {
                     <strong>{contract.supermarket}</strong>
                     <span className={`${styles.status} ${styles[contract.status.toLowerCase()]}`}>{statusLabels[contract.status]}</span>
                   </div>
+                  <span className={styles.mobilePlan}>{planLabels[contract.planTier]} porte</span>
                   <div className={styles.mobileMetrics}>
                     <span>Mensalidade<strong>{money(contract.monthlyAmount)}</strong></span>
                     <span>Pagas<strong>{number(contract.paidInstallments)}</strong></span>

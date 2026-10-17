@@ -31,6 +31,13 @@
   font-size: 12px;
   white-space: nowrap;
 }
+.planGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.planGrid article { display: grid; gap: 7px; padding: 15px 18px; border: 1px solid var(--border); border-radius: 17px; background: white; }
+.planGrid article:nth-child(2) { background: var(--surface-mint); }
+.planGrid article > span { color: var(--muted-foreground); font-size: 11px; }
+.planGrid article > strong { color: var(--foreground); font-size: 20px; letter-spacing: -.5px; }
+.planGrid article small { color: var(--muted-foreground); font-size: 10px; font-weight: 400; }
+.mobilePlan { display: inline-flex; margin-top: 9px; padding: 4px 8px; border-radius: 99px; background: var(--surface-mint); color: var(--primary); font-size: 10px; }
 .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .metrics article { min-width: 0; padding: 16px 18px; border: 1px solid var(--border); border-radius: 18px; background: white; }
 .metrics article.highlight { background: var(--surface-mint); }
@@ -77,6 +84,11 @@
   .page { gap: 14px; }
   .heading { align-items: flex-start; flex-direction: column; gap: 10px; }
   .heading p { font-size: 12px; }
+  .planGrid { gap: 7px; }
+  .planGrid article { padding: 11px 9px; border-radius: 13px; }
+  .planGrid article > span { font-size: 9px; }
+  .planGrid article > strong { font-size: 15px; }
+  .planGrid article small { font-size: 9px; }
   .metrics { gap: 8px; }
   .metrics article { padding: 13px; border-radius: 15px; }
   .metrics article span { align-items: flex-start; font-size: 10px; }

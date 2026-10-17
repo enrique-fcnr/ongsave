@@ -77,6 +77,15 @@ export const organizationData = [
     latitude: -23.5574,
     longitude: -46.6446,
   },
+  {
+    name: "Grupo Horizonte",
+    slug: "grupo-horizonte",
+    type: "FINANCIAL_DONOR",
+    neighborhood: "Itaim Bibi",
+    address_line: "Endereço demonstrativo · São Paulo",
+    latitude: -23.5902,
+    longitude: -46.6824,
+  },
 ].map((o) => ({
   ...o,
   id: id(o.slug),
@@ -134,6 +143,23 @@ export const accountData = [
   { email: "mariana@ongsave.demo", name: "Mariana Costa", role: "DRIVER", org: null },
   { email: "rafael@ongsave.demo", name: "Rafael Santos", role: "DRIVER", org: null },
   { email: "admin@ongsave.com", name: "ONGSave Admin", role: "ADMIN", org: null },
+  {
+    email: "apoio@ongsave.demo",
+    name: "Equipe Grupo Horizonte",
+    role: "FINANCIAL_DONOR",
+    org: "grupo-horizonte",
+  },
+];
+export const financialSupportData = [
+  {
+    id: id("support:grupo-horizonte:initial"),
+    organization_id: id("grupo-horizonte"),
+    created_by: id("profile:apoio@ongsave.demo"),
+    amount: 12000,
+    status: "PLEDGED",
+    purpose: "Fundo demonstrativo de custeio das entregas",
+    note: "Compromisso ilustrativo para a apresentação acadêmica.",
+  },
 ];
 export const preferencesData = organizationData
   .filter((o) => o.type === "NGO")

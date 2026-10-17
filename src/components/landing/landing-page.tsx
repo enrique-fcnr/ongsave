@@ -4,12 +4,15 @@ import type { CSSProperties } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
+  BadgeCheck,
   ChartNoAxesCombined,
   Check,
   ChevronDown,
   CircleCheck,
   Clock3,
+  FileChartColumn,
   HeartHandshake,
+  HandCoins,
   Leaf,
   MapPin,
   PackageCheck,
@@ -34,76 +37,76 @@ const roles = [
   {
     Icon: Store,
     name: "Supermercados",
-    eyebrow: "O primeiro gesto",
-    title: "Dê um novo destino ao excedente.",
-    body: "Sua equipe transforma alimentos disponíveis em doações organizadas, com foto, prazo e informações revisadas.",
+    eyebrow: "Onde o desperdício pode ser evitado",
+    title: "Evite que alimentos bons terminem no aterro.",
+    body: "Dê destino a excedentes próprios para consumo e conecte sua loja a instituições que precisam de alimentos.",
     items: [
-      "Registre os lotes disponíveis",
-      "Acompanhe reservas e coletas",
-      "Consulte impacto e relatórios",
+      "Aproveite alimentos antes do descarte",
+      "Conecte excedentes a quem pode recebê-los",
+      "Comprove o destino dos alimentos doados",
     ],
     cta: "Área do supermercado",
   },
   {
     Icon: HeartHandshake,
     name: "Instituições",
-    eyebrow: "Onde o alimento faz diferença",
-    title: "Receba com mais clareza e cuidado.",
-    body: "Encontre doações que sua instituição pode receber e acompanhe cada etapa até a confirmação da entrega.",
+    eyebrow: "Alimento chegando a quem precisa",
+    title: "Amplie o atendimento com alimentos aproveitados.",
+    body: "Acesse excedentes doados por mercados e receba alimentos adequados à capacidade da sua instituição.",
     items: [
-      "Explore as doações disponíveis",
-      "Reserve o que consegue receber",
-      "Confirme o recebimento por código",
+      "Encontre alimentos disponíveis para doação",
+      "Escolha volumes que consegue distribuir",
+      "Confirme o que chegou à instituição",
     ],
     cta: "Área da instituição",
   },
   {
     Icon: Truck,
     name: "Motoristas",
-    eyebrow: "O caminho entre as pontas",
-    title: "Faça do seu trajeto um resgate.",
-    body: "Conecte a coleta ao destino. Consulte os endereços e acompanhe cada etapa da entrega.",
+    eyebrow: "O elo entre o excedente e a mesa",
+    title: "Leve alimento de onde sobra para onde faz falta.",
+    body: "Cada entrega aproxima alimentos ainda próprios para consumo das instituições que atendem pessoas.",
     items: [
-      "Encontre entregas disponíveis",
-      "Consulte mapa e endereços",
-      "Acompanhe as etapas da entrega",
+      "Ajude a evitar o descarte de alimentos",
+      "Conecte coleta e destino social",
+      "Faça a doação chegar a quem precisa",
     ],
     cta: "Área do motorista",
   },
 ];
 const faqs = [
   {
-    question: "Quem pode participar da ONGSave?",
+    question: "Como a ONGSave ajuda a combater o desperdício e a fome?",
     answer:
-      "A rede conecta supermercados, instituições que recebem alimentos e motoristas que realizam os resgates. Cada participante cadastrado acessa uma área preparada para seu papel.",
+      "A ONGSave organiza a conexão entre mercados com excedentes, instituições que atendem pessoas e motoristas que fazem as entregas. Assim, alimentos próprios para consumo podem chegar a um novo destino antes de serem descartados.",
   },
   {
-    question: "Como um resgate começa?",
+    question: "Como o alimento que iria para descarte chega a uma instituição?",
     answer:
-      "O supermercado fotografa o excedente, revisa os dados e publica o lote. Uma instituição reserva a doação, e a entrega fica disponível para um motorista realizar a coleta e o transporte.",
+      "O mercado informa quais alimentos ainda podem ser aproveitados. Uma instituição escolhe o que consegue receber, e um motorista conecta o ponto de coleta ao destino social.",
   },
   {
-    question: "A foto publica a doação automaticamente?",
+    question: "Como vocês evitam que um alimento inadequado seja doado?",
     answer:
-      "Não. A equipe do supermercado revisa as informações do alimento, o peso e o prazo antes de publicar. A foto ajuda no registro, e a decisão de disponibilizar o lote continua com a equipe.",
+      "A equipe do mercado confere as condições, a quantidade e o prazo antes de oferecer o excedente. A decisão de doar continua com quem conhece e responde pelo alimento.",
   },
   {
-    question: "Como a entrega é confirmada?",
+    question: "Como saber se a doação realmente chegou?",
     answer:
-      "A instituição recebe um código de confirmação. No destino, o motorista informa esse código para registrar o recebimento e concluir o resgate.",
+      "A instituição confirma o recebimento por um código. Esse registro mostra que os alimentos chegaram ao destino e conclui a entrega.",
   },
   {
-    question: "Os indicadores de impacto são estimativas?",
+    question: "Como a ONGSave mostra o resultado das doações?",
     answer:
-      "O peso dos alimentos entregues e o número de resgates vêm dos registros da operação. As refeições e os valores de economia são estimativas calculadas a partir desses dados e aparecem identificados no app.",
+      "O peso entregue e as doações concluídas vêm dos registros da operação. Refeições e economia são estimativas calculadas a partir desses dados e aparecem identificadas como estimativas.",
   },
   {
     question: "Posso conhecer a plataforma antes de participar?",
     answer: (
       <>
-        Sim. O <Link href="/demo">ambiente de demonstração</Link> apresenta os perfis de
-        supermercado, instituição e motorista. O acesso à operação é destinado a participantes
-        cadastrados.
+        Sim. O <Link href="/demo">ambiente de demonstração</Link> mostra como os diferentes
+        participantes ajudam a fazer o alimento chegar ao destino. O acesso à operação é destinado
+        a participantes cadastrados.
       </>
     ),
   },
@@ -138,31 +141,30 @@ export default function Landing() {
                 <HeartHandshake size={16} />
                 <Truck size={16} />
               </span>
-              <span>Uma rede de pessoas. Um propósito em comum.</span>
+              <span>Menos desperdício. Mais alimento na mesa.</span>
             </div>
             <h1 id="landing-title">
-              Alimentos merecem
+              Menos comida no lixo.
               <br />
-              um <span>novo destino.</span>
+              mais <span>alimento na mesa.</span>
             </h1>
             <p>
-              Do excedente do mercado à mesa de quem precisa.
-              <br className={styles.desktopBreak} /> Uma fotografia conecta as pessoas que fazem
-              esse resgate acontecer.
+              A ONGSave conecta excedentes próprios para consumo a instituições que atendem pessoas.
+              <br className={styles.desktopBreak} /> Uma rede organiza o caminho para a doação chegar a tempo.
             </p>
             <div className={styles.heroActions}>
               <Link href="/login" className={`${styles.cta} ${styles.lightCta}`}>
-                Começar um resgate
+                Ajudar a fazer o alimento chegar
                 <ArrowRight size={18} />
               </Link>
               <a href="#plataforma" className={styles.outlineCta}>
-                Conhecer a plataforma
+                Ver como a solução funciona
                 <ArrowUpRight size={17} />
               </a>
             </div>
             <div className={styles.heroNote}>
               <CircleCheck size={14} />
-              Supermercados, instituições e motoristas. Juntos.
+              Alimento aproveitado. Mais pessoas atendidas.
             </div>
           </div>
           <div className={styles.heroPreview}>
@@ -172,8 +174,8 @@ export default function Landing() {
                 <PackageCheck size={19} />
               </span>
               <div>
-                <strong>Um novo destino encontrado.</strong>
-                <small>Do excedente à mesa, com propósito.</small>
+                <strong>Alimento a caminho de quem precisa.</strong>
+                <small>Menos descarte. Mais comida aproveitada.</small>
               </div>
               <Check size={16} />
             </div>
@@ -184,7 +186,7 @@ export default function Landing() {
           <p>
             Três pontas.
             <br />
-            <strong>Uma rede de cuidado.</strong>
+            <strong>Uma rede contra o desperdício de alimentos.</strong>
           </p>
           <div>
             {roles.map(({ Icon, name }) => (
@@ -199,12 +201,12 @@ export default function Landing() {
         <section className={styles.section} id="o-desafio">
           <SectionHeading
             label="O desafio"
-            title="O alimento está pronto. A conexão nem sempre."
-            body="Quando o tempo é curto e os contatos estão espalhados, um alimento em boas condições pode perder a chance de chegar a outro destino."
+            title="Alimento bom ainda é perdido quando a doação não chega a tempo."
+            body="Excedentes têm prazo curto. Sem uma conexão entre quem doa, quem precisa receber e quem transporta, alimentos próprios para consumo podem acabar no descarte."
           />
           <ProblemTicker />
           <p className={styles.bridgeText}>
-            Uma boa ação não precisa se perder no caminho.
+            A ONGSave encurta o caminho entre o excedente e quem precisa.
             <ArrowRight size={20} />
           </p>
         </section>
@@ -212,8 +214,8 @@ export default function Landing() {
         <section className={`${styles.section} ${styles.platformSection}`} id="plataforma">
           <SectionHeading
             label="A plataforma"
-            title="Tudo o que um resgate precisa. Em um só lugar."
-            body="Um fluxo conectado para registrar, encontrar, transportar e acompanhar cada doação. Simples para quem participa. Valioso para quem recebe."
+            title="Um caminho organizado para o alimento não se perder."
+            body="A ONGSave conecta mercados, instituições e motoristas para levar excedentes próprios para consumo a pessoas que precisam de alimento."
           />
           <div data-reveal>
             <FeatureExplorer />
@@ -222,26 +224,26 @@ export default function Landing() {
 
         <section className={`${styles.section} ${styles.benefitSection}`} id="beneficios">
           <SectionHeading
-            label="Por que ONGSave"
-            title="Menos etapas soltas. Mais resgates completos."
-            body="Cada participante sabe qual é o próximo passo. E toda entrega deixa um registro que ajuda a rede a seguir em frente."
+            label="O que muda na prática"
+            title="Menos alimento descartado. Mais doações que chegam."
+            body="A rede aproxima quem tem excedentes de quem precisa recebê-los e dá visibilidade ao que foi aproveitado."
           />
           <div className={styles.benefitGrid}>
             {[
               {
                 Icon: Clock3,
-                title: "Tempo para o que importa",
-                text: "Foto, dados e disponibilidade juntos para organizar o excedente e facilitar a decisão de quem recebe.",
+                title: "Aproveitamento antes do descarte",
+                text: "Alimentos próprios para consumo encontram um destino social enquanto ainda podem ser aproveitados.",
               },
               {
                 Icon: ShieldCheck,
-                title: "Cuidado em cada etapa",
-                text: "Revisão antes da publicação, acompanhamento do trajeto e confirmação no recebimento.",
+                title: "Doação que chega ao destino",
+                text: "A conexão entre mercado, instituição e motorista ajuda a evitar que o alimento se perca no caminho.",
               },
               {
                 Icon: ChartNoAxesCombined,
-                title: "Impacto que fica visível",
-                text: "Peso entregue, resgates concluídos e estimativas de refeições para acompanhar o resultado da operação.",
+                title: "Resultado que pode ser acompanhado",
+                text: "Registros de peso e entregas confirmadas mostram quanto alimento foi aproveitado; refeições são estimativas.",
               },
             ].map(({ Icon, title, text }, i) => (
               <article
@@ -262,8 +264,8 @@ export default function Landing() {
         <section className={styles.section} id="como-funciona">
           <SectionHeading
             label="Como funciona"
-            title="Uma fotografia inicia um resgate completo."
-            body="Três passos conectam o cuidado de quem doa à confirmação de quem recebe."
+            title="Do excedente ao destino social, sem perder tempo."
+            body="O alimento é identificado, destinado a uma instituição e levado por um motorista até quem precisa."
           />
           <div data-reveal>
             <ProcessExplorer />
@@ -272,9 +274,9 @@ export default function Landing() {
 
         <section className={styles.section} id="video">
           <SectionHeading
-            label="Conheça a ONGSave"
-            title="Uma rede que transforma excedentes em cuidado."
-            body="Assista e conheça como supermercados, instituições e motoristas fazem essa conexão acontecer."
+            label="A solução em ação"
+            title="Veja como um excedente pode virar alimento aproveitado."
+            body="Conheça o caminho que conecta mercados, instituições e motoristas para evitar o descarte de alimentos."
           />
           <video
             className={styles.landingVideo}
@@ -293,16 +295,17 @@ export default function Landing() {
           <div className={styles.peopleCopy} data-reveal>
             <span className={styles.sectionTag}>
               <Users size={14} />
-              Uma rede feita por pessoas
+              Pessoas unidas para evitar o desperdício
             </span>
             <h2>
-              Por trás de cada resgate,
+              Para que o alimento não se perca,
               <br />
               tem gente.
             </h2>
             <p>
-              Gente que separa o alimento. Gente que abre as portas. Gente que faz o caminho. A
-              ONGSave aproxima essas pessoas para que o cuidado chegue mais longe.
+              Equipes de mercados separam excedentes, instituições recebem o que podem distribuir e
+              motoristas fazem a entrega. A ONGSave aproxima essas pessoas para que mais alimentos
+              cheguem a quem precisa.
             </p>
             <div className={styles.peopleValues}>
               <span>
@@ -315,7 +318,7 @@ export default function Landing() {
               </span>
             </div>
             <a href="#para-quem" className={styles.textLink}>
-              Encontre seu lugar nessa rede
+              Ajude a resolver esse problema
               <ArrowRight size={17} />
             </a>
           </div>
@@ -338,9 +341,9 @@ export default function Landing() {
 
         <section className={styles.section} id="para-quem">
           <SectionHeading
-            label="Faça parte"
-            title="Um propósito. Três formas de participar."
-            body="Cada papel tem uma área própria, com as informações e as ações de que precisa para fazer o resgate acontecer."
+            label="Quem faz a solução acontecer"
+            title="Cada participante ajuda a levar alimento a quem precisa."
+            body="Mercados, instituições e motoristas atuam em conjunto para aproveitar excedentes e fazer as doações chegarem ao destino."
           />
           <div className={styles.roleGrid}>
             {roles.map(({ Icon, name, eyebrow, title, body, items, cta }, index) => (
@@ -385,27 +388,141 @@ export default function Landing() {
           </p>
         </section>
 
+        <section className={`${styles.section} ${styles.businessSection}`} id="modelo-de-negocio">
+          <SectionHeading
+            label="Como mantemos a solução em funcionamento"
+            title="Três fontes sustentam o caminho do alimento."
+            body="Mensalidades, apoio financeiro e contratos por projeto ajudam a manter a operação e a custear entregas entre os pontos da rede."
+          />
+          <div className={styles.businessGrid}>
+            <article data-reveal>
+              <span>
+                <Store size={22} />
+              </span>
+              <small>01 · Mensalidades que apoiam a operação</small>
+              <h3>Planos para supermercados</h3>
+              <p>
+                A proposta é redirecionar para a ONGSave parte do orçamento que seria usado no
+                descarte dos excedentes em aterro. Os planos apoiam a operação que conecta alimentos
+                ainda próprios para consumo a pessoas e instituições que precisam deles.
+              </p>
+              <div className={styles.planPrices} aria-label="Mensalidades por porte">
+                <div><span>Pequeno porte</span><strong>R$ 299 <small>/ mês</small></strong></div>
+                <div><span>Médio porte</span><strong>R$ 499 <small>/ mês</small></strong></div>
+                <div><span>Grande porte</span><strong>R$ 999 <small>/ mês</small></strong></div>
+              </div>
+            </article>
+            <article data-reveal>
+              <span>
+                <HandCoins size={22} />
+              </span>
+              <small>02 · Recursos para fazer as doações chegarem</small>
+              <h3>Doações financeiras de empresas</h3>
+              <p>
+                Empresas de diferentes setores podem apoiar o custeio das entregas e ajudar a
+                superar uma barreira central: levar excedentes de onde estão a instituições que
+                precisam recebê-los. Na operação real, os recursos devem ser destinados por meio de
+                uma OSC parceira apta a recebê-los e prestar contas.
+              </p>
+              <p className={styles.businessFinePrint}>
+                A Lei 9.249/1995 prevê, em hipóteses específicas, dedução da base de cálculo como
+                despesa operacional — para empresas no lucro real, até o limite legal e quando a
+                entidade beneficiária cumpre os requisitos. Isso não é desconto direto do imposto
+                devido.{" "}
+                <a
+                  href="https://planalto.gov.br/ccivil_03/leis/l9249.htm"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Lei 9.249/1995
+                </a>{" "}
+                ·{" "}
+                <a
+                  href="https://normas.receita.fazenda.gov.br/sijut2consulta/anexoOutros.action?idArquivoBinario=50185"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Solução de Consulta da Receita
+                </a>
+              </p>
+            </article>
+            <article data-reveal>
+              <span>
+                <FileChartColumn size={22} />
+              </span>
+              <small>03 · Projetos para ampliar o alcance</small>
+              <h3>Contratações públicas</h3>
+              <p>
+                Editais e contratos públicos podem apoiar soluções de logística social e ampliar o
+                alcance das entregas, conforme os requisitos de cada oportunidade. Parcerias com
+                organizações da sociedade civil também podem seguir o MROSC, por um caminho
+                diferente da contratação comercial.
+              </p>
+            </article>
+          </div>
+          <p className={styles.businessFootnote}>
+            As três frentes sustentam os custos para conectar excedentes a instituições e custear
+            motoristas conforme as entregas e o orçamento de cada projeto. Valores e exemplos da
+            plataforma são demonstrativos.
+          </p>
+          <aside className={styles.esgRecognition} data-reveal aria-labelledby="esg-recognition-title">
+            <div className={styles.esgSeal} aria-hidden="true">
+              <BadgeCheck size={32} />
+              <span>ONGSave</span>
+              <small>CERTIFICAÇÃO ESG</small>
+            </div>
+            <div className={styles.esgRecognitionCopy}>
+              <span className={styles.sectionTag}>Programa de certificação ONGSave</span>
+              <h3 id="esg-recognition-title">Certificação ESG ONGSave</h3>
+              <p>
+                Empresas que comprovam sua participação na rede podem receber o certificado ESG
+                ONGSave do período, acompanhado de um selo digital e de um relatório com indicadores
+                verificados de suas ações.
+              </p>
+              <p>
+                A avaliação considera três dimensões: ambiental, com alimentos desviados do descarte
+                e estimativas associadas; social, com alimentos destinados e instituições atendidas;
+                e governança, com rastreabilidade, confirmações e prestação de contas das ações na
+                plataforma. A emissão depende da validação dos registros e informa o período e os
+                critérios avaliados.
+              </p>
+              <p className={styles.esgRecognitionNote}>
+                Certificação própria do programa ONGSave, limitada às ações e aos indicadores
+                acompanhados pela rede. Não substitui uma auditoria ESG independente nem certificações
+                de terceiros, e não representa avaliação completa de todas as operações da empresa.{" "}
+                <a
+                  href="https://www.b3.com.br/pt_br/market-data-e-indices/indices/indices-de-sustentabilidade/indice-de-sustentabilidade-empresarial-ise-b3.htm"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Veja como funciona o ISE B3
+                </a>
+              </p>
+            </div>
+          </aside>
+        </section>
+
         <section className={styles.impactSection} id="impacto">
           <div data-reveal>
             <span className={styles.sectionTag}>
               <Leaf size={14} />
-              Cada entrega conta
+              O alimento aproveitado faz diferença
             </span>
             <h2>
-              O alimento chega.
-              <br />O impacto permanece.
+              Menos alimento perdido.
+              <br />Mais destinos possíveis.
             </h2>
             <p>
-              Quando o recebimento é confirmado, o resgate entra no histórico. Sua equipe acompanha
-              o que foi entregue e as possibilidades que esse gesto representa.
+              Cada recebimento confirmado mostra que um alimento próprio para consumo chegou a uma
+              instituição. Os registros ajudam a acompanhar o que foi aproveitado e distribuído.
             </p>
             <Link href="/login" className={styles.textLink}>
-              Acompanhar meus resgates
+              Acompanhar os resultados
               <ArrowRight size={17} />
             </Link>
           </div>
           <div className={styles.impactExample} data-reveal>
-            <span className={styles.miniEyebrow}>Um exemplo de transformação</span>
+            <span className={styles.miniEyebrow}>O que uma entrega pode representar</span>
             <div className={styles.impactEquation}>
               <div>
                 <strong>
@@ -421,7 +538,7 @@ export default function Landing() {
             </div>
             <div className={styles.impactConfirmation}>
               <CircleCheck size={18} />
-              Uma entrega confirmada. Um resultado registrado.
+              Alimento aproveitado. Entrega confirmada.
             </div>
             <p className={styles.previewFootnote}>
               Exemplo ilustrativo. Refeições são estimativas a partir do peso entregue.
@@ -432,8 +549,8 @@ export default function Landing() {
         <section className={`${styles.section} ${styles.faqSection}`} id="perguntas">
           <SectionHeading
             label="Perguntas frequentes"
-            title="Vamos tirar suas dúvidas?"
-            body="O essencial para entender como a rede se conecta e como você pode participar."
+            title="Como ajudamos o alimento a chegar a quem precisa?"
+            body="Entenda como a ONGSave enfrenta o desperdício e organiza a destinação de excedentes."
           />
           <div className={styles.faqList} data-reveal>
             {faqs.map(({ question, answer }, index) => (
@@ -456,18 +573,17 @@ export default function Landing() {
               <Sprout size={32} />
             </span>
             <h2>
-              O próximo destino começa
+              Ajude a fazer o alimento chegar
               <br />
-              com uma boa ação.
+              a quem precisa.
             </h2>
             <p>
-              Conecte seu mercado, sua instituição ou seu trajeto
-              <br className={styles.desktopBreak} /> a uma rede que transforma excedentes em
-              possibilidades.
+              Evite o descarte de alimentos e aproxime excedentes de
+              <br className={styles.desktopBreak} /> instituições que atendem pessoas.
             </p>
             <div className={styles.heroActions}>
               <Link href="/login" className={`${styles.cta} ${styles.lightCta}`}>
-                Fazer parte da rede
+                Fazer parte da solução
                 <ArrowRight size={17} />
               </Link>
               <Link href="/demo" className={styles.outlineCta}>
@@ -488,9 +604,9 @@ export default function Landing() {
               <BrandLogo className={styles.logo} />
             </Link>
             <p>
-              Uma fotografia inicia um resgate.
+              Menos excedentes desperdiçados.
               <br />
-              Uma rede faz ele acontecer.
+              Mais alimentos chegando a quem precisa.
             </p>
             <span className={styles.footerLocation}>
               <MapPin size={14} />

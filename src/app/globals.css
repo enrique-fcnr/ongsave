@@ -635,6 +635,9 @@ label.field {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
 }
+.funding-metric-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 .metric {
   padding: 24px;
   border-radius: 24px;

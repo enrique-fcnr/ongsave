@@ -26,6 +26,7 @@ const navigation = [
   ["Como funciona", "#como-funciona"],
   ["A plataforma", "#plataforma"],
   ["Para quem", "#para-quem"],
+  ["Modelo de negócio", "#modelo-de-negocio"],
 ];
 export function LandingHeader() {
   const [open, setOpen] = useState(false);
@@ -148,18 +149,29 @@ export function ScrollReveal({ children }: { children: ReactNode }) {
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries)
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting || entry.intersectionRatio > 0) {
             entry.target.setAttribute("data-visible", "true");
             observer.unobserve(entry.target);
           }
       },
-      { threshold: 0.06 },
+      { rootMargin: "0px 0px 120px 0px", threshold: 0.01 },
     );
     element.setAttribute("data-reveal-ready", "true");
     element
       .querySelectorAll<HTMLElement>("[data-reveal]")
       .forEach((target) => observer.observe(target));
-    return () => observer.disconnect();
+
+    // Keep content visible if the browser fails to report an intersection.
+    const revealFallback = window.setTimeout(() => {
+      element
+        .querySelectorAll<HTMLElement>('[data-reveal]:not([data-visible="true"])')
+        .forEach((target) => target.setAttribute("data-visible", "true"));
+    }, 1800);
+
+    return () => {
+      window.clearTimeout(revealFallback);
+      observer.disconnect();
+    };
   }, []);
   return (
     <div ref={root} className={styles.page}>
@@ -168,10 +180,10 @@ export function ScrollReveal({ children }: { children: ReactNode }) {
   );
 }
 const problems = [
-  { Icon: Clock3, text: "Excedente com prazo curto" },
-  { Icon: Link2, text: "Contatos espalhados" },
-  { Icon: Package, text: "Alimentos sem destino" },
-  { Icon: Truck, text: "Coletas difíceis de combinar" },
+  { Icon: Clock3, text: "Alimentos próprios para consumo perto do vencimento" },
+  { Icon: Link2, text: "Mercados e instituições sem conexão direta" },
+  { Icon: Package, text: "Excedentes que podem acabar no descarte" },
+  { Icon: Truck, text: "Falta de transporte para a doação chegar" },
 ];
 export function ProblemTicker() {
   const [paused, setPaused] = useState(false);
@@ -213,46 +225,46 @@ export function ProblemTicker() {
 const features = [
   {
     Icon: Camera,
-    label: "Foto & revisão",
-    title: "Uma foto abre novas possibilidades.",
-    body: "Registre o excedente e organize as informações do lote. Antes de publicar, sua equipe confere o alimento, o peso e o prazo.",
+    label: "Evitar o descarte",
+    title: "Identifique o alimento que ainda pode ser aproveitado.",
+    body: "Quando o excedente é percebido a tempo, o mercado pode destiná-lo a pessoas em vez de enviá-lo ao descarte. A equipe confere as condições antes de oferecer a doação.",
     items: [
-      "Registro com foto do alimento",
-      "Informações revisadas pela equipe",
-      "Publicação com disponibilidade e prazo",
+      "Reconheça excedentes ainda próprios para consumo",
+      "Confira condições, quantidade e prazo",
+      "Evite que a doação se perca por falta de informação",
     ],
   },
   {
     Icon: HeartHandshake,
-    label: "Doações",
-    title: "O alimento certo encontra quem precisa.",
-    body: "Instituições visualizam as doações disponíveis e escolhem o que conseguem receber. O próximo destino começa com uma conexão.",
+    label: "Conectar a quem precisa",
+    title: "Aproxime o excedente de quem pode distribuí-lo.",
+    body: "Instituições encontram alimentos doados e escolhem volumes compatíveis com o que conseguem receber e distribuir.",
     items: [
-      "Feed com alimentos disponíveis",
-      "Endereços e prazos à vista",
-      "Reserva vinculada à instituição",
+      "Ofertas próximas de quem atende pessoas",
+      "Escolhas compatíveis com a capacidade de recebimento",
+      "Destino social definido para cada doação",
     ],
   },
   {
     Icon: Truck,
-    label: "Entregas",
-    title: "Cada trajeto tem um propósito.",
-    body: "Motoristas encontram entregas disponíveis, consultam os endereços e acompanham cada etapa. Um código confirma a chegada ao destino.",
+    label: "Fazer chegar",
+    title: "A entrega completa o caminho até a instituição.",
+    body: "Motoristas conectam o ponto de coleta ao destino social. A instituição confirma o recebimento para que o alimento não fique pelo caminho.",
     items: [
-      "Mapa e detalhes da entrega",
-      "Etapas de coleta e entrega",
-      "Código de confirmação no recebimento",
+      "Conexão entre o local do excedente e quem recebe",
+      "Acompanhamento até o destino social",
+      "Confirmação de que o alimento chegou",
     ],
   },
   {
     Icon: ChartNoAxesCombined,
-    label: "Impacto",
-    title: "Uma entrega. Um resultado que fica.",
-    body: "Acompanhe o peso dos alimentos entregues, os resgates concluídos e as refeições estimadas. Transforme a operação em uma história que dá para acompanhar.",
+    label: "Comprovar o resultado",
+    title: "Mostre quanto alimento foi aproveitado.",
+    body: "Os registros das entregas confirmadas ajudam a demonstrar o destino dos excedentes e o alcance social da rede. Refeições são apresentadas como estimativas.",
     items: [
-      "Histórico de resgates concluídos",
-      "Peso entregue e refeições estimadas",
-      "Indicadores e relatórios da operação",
+      "Histórico de alimentos que chegaram ao destino",
+      "Peso entregue e estimativas identificadas",
+      "Evidências para acompanhar o resultado social e ambiental",
     ],
   },
 ];
@@ -329,18 +341,18 @@ export function FeatureExplorer() {
 }
 const process = [
   {
-    title: "Registre o que pode ser doado.",
-    text: "Fotografe, revise e publique os alimentos disponíveis. O cuidado começa com informação clara.",
+    title: "Evite que o excedente vá para o descarte.",
+    text: "Identifique alimentos que ainda podem ser consumidos e informe suas condições para que recebam um novo destino a tempo.",
     view: 0,
   },
   {
-    title: "Conecte a doação a uma instituição.",
-    text: "A ONG escolhe o lote que pode receber. Uma entrega conecta a reserva ao próximo trajeto.",
+    title: "Encontre uma instituição que possa receber.",
+    text: "A instituição escolhe o que consegue distribuir. Assim, o excedente encontra um destino social compatível.",
     view: 1,
   },
   {
-    title: "Resgate, entregue e acompanhe.",
-    text: "O motorista realiza o trajeto. A instituição confirma o recebimento, e o impacto fica registrado.",
+    title: "Faça a doação chegar e confirme o destino.",
+    text: "O motorista transporta o alimento e a instituição confirma o recebimento. Cada entrega concluída reduz o risco de desperdício no caminho.",
     view: 2,
   },
 ];

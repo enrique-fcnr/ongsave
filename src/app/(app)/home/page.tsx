@@ -8,6 +8,7 @@ import { ScreenSections } from "@/components/screen-sections";
 export default async function Home() {
   const { profile: actor } = await requireProfile();
   if (actor.role === "ADMIN") redirect("/admin");
+  if (actor.role === "FINANCIAL_DONOR") redirect("/financial-donation");
   const data = await operationalData();
   const { profile, organization, rescues } = data;
   if (profile.role === "DRIVER") redirect("/driver/missions");

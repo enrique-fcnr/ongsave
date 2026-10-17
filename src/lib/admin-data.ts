@@ -31,6 +31,7 @@ export async function adminNetworkData() {
       client
         .from("organizations")
         .select("id,name,slug,type,neighborhood,address_line,city,latitude,longitude")
+        .in("type", ["NGO", "SUPERMARKET"])
         .order("id")
         .range(start, end),
     ),

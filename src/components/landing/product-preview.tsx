@@ -48,28 +48,28 @@ export function DashboardPreview({ compact = false }: { compact?: boolean }) {
           <div className={styles.sidebarSprout}>
             <Sprout size={36} />
             <p>
-              Pequenas ações.
+              Menos alimento perdido.
               <br />
-              Novos destinos.
+              Mais destinos sociais.
             </p>
           </div>
         </aside>
         <div className={styles.previewContent}>
           <div className={styles.previewGreeting}>
             <div>
-              <span>Uma boa ação começa aqui</span>
+              <span>Um excedente pode virar alimento</span>
               <h3>Olá, Mercado Paulista.</h3>
             </div>
             <span className={styles.previewAction}>
               <Camera size={14} />
-              Registrar excedente
+              Destinar alimento
             </span>
           </div>
           <div className={styles.previewMetrics}>
             {[
-              ["38 kg", "Alimentos resgatados"],
-              ["≈ 76", "Refeições estimadas"],
-              ["01", "Resgate confirmado"],
+              ["38 kg", "Alimentos aproveitados"],
+              ["≈ 76", "Refeições possíveis"],
+              ["01", "Doação entregue"],
             ].map(([value, label]) => (
               <div key={label}>
                 <span>{label}</span>
@@ -81,7 +81,7 @@ export function DashboardPreview({ compact = false }: { compact?: boolean }) {
           <div className={styles.previewLower}>
             <div className={styles.previewChart}>
               <div className={styles.previewCardHeading}>
-                <strong>Alimentos ganhando destino</strong>
+                <strong>Alimentos com novo destino</strong>
                 <span>Esta semana</span>
               </div>
               <div className={styles.chartBars} aria-hidden="true">
@@ -101,11 +101,11 @@ export function DashboardPreview({ compact = false }: { compact?: boolean }) {
               <div className={styles.produceIcon}>
                 <Leaf size={38} />
               </div>
-              <strong>Hortifrúti misto</strong>
-              <span>38 kg de novas possibilidades</span>
+              <strong>Hortifrúti aproveitado</strong>
+              <span>38 kg longe do descarte</span>
               <div className={styles.previewRecipient}>
                 <HeartHandshake size={17} />
-                <span>Recebido pela instituição</span>
+              <span>Alimento recebido pela instituição</span>
                 <Check size={15} />
               </div>
             </div>
@@ -133,11 +133,11 @@ export function FeaturePreview({ view }: { view: number }) {
             <Camera size={13} />
             Foto do excedente
           </span>
-          <span className={styles.cameraCaption}>Visão de IA · exemplo ilustrativo</span>
+            <span className={styles.cameraCaption}>Análise inicial · exemplo ilustrativo</span>
         </div>
         <div className={styles.reviewCard}>
-          <span className={styles.miniEyebrow}>Sua equipe tem a última palavra</span>
-          <h3>Revisar antes de publicar</h3>
+          <span className={styles.miniEyebrow}>Segurança antes da doação</span>
+          <h3>Confira antes de oferecer</h3>
           <div className={styles.reviewField}>
             <span>Alimento</span>
             <strong>Maçãs</strong>
@@ -168,7 +168,7 @@ export function FeaturePreview({ view }: { view: number }) {
     return (
       <div className={styles.feedPreview}>
         <div className={styles.previewCardHeading}>
-          <strong>Encontre o próximo resgate</strong>
+          <strong>Alimentos que podem ser aproveitados</strong>
           <span className={styles.previewPill}>Disponível</span>
         </div>
         <div className={styles.feedCards}>
@@ -202,7 +202,7 @@ export function FeaturePreview({ view }: { view: number }) {
             </div>
           ))}
         </div>
-        <p className={styles.previewFootnote}>Disponibilidade, endereço e prazo em um só lugar.</p>
+        <p className={styles.previewFootnote}>Informações claras ajudam a doação a chegar a tempo.</p>
       </div>
     );
   if (view === 2)
@@ -233,12 +233,12 @@ export function FeaturePreview({ view }: { view: number }) {
         <div className={styles.routeCard}>
           <span className={styles.previewPill}>
             <Truck size={13} />
-            Cada trajeto importa
+            O caminho até quem precisa
           </span>
-          <h3>Da coleta à entrega</h3>
+          <h3>Do excedente ao destino social</h3>
           <div>
             <MapPin size={15} />
-            <span>Supermercado → Instituição</span>
+            <span>Alimento disponível → Instituição</span>
           </div>
           <div className={styles.reviewCheck}>
             <CheckCheck size={17} />
@@ -254,18 +254,18 @@ export function FeaturePreview({ view }: { view: number }) {
         <strong>
           38<span>kg</span>
         </strong>
-        <p>Alimentos resgatados</p>
+          <p>Alimentos aproveitados</p>
       </div>
       <div className={styles.impactPreviewStats}>
-        <span className={styles.miniEyebrow}>Uma entrega deixa sua marca</span>
-        <h3>O resultado fica visível.</h3>
+        <span className={styles.miniEyebrow}>O destino fica comprovado</span>
+        <h3>Veja o alimento que chegou.</h3>
         <div>
           <strong>≈ 76</strong>
           <span>refeições estimadas</span>
         </div>
         <div>
           <strong>1</strong>
-          <span>resgate registrado</span>
+          <span>doação confirmada</span>
         </div>
         <p className={styles.previewFootnote}>
           Exemplo ilustrativo. Estimativas calculadas a partir do peso entregue.

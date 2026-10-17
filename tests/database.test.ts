@@ -39,6 +39,33 @@ describe("Fluxo real nas funções PostgreSQL e RLS", () => {
       ).rows[0].count,
     ).toBe(16);
   });
+  it("empresa apoiadora acompanha e registra apenas seus compromissos financeiros", async () => {
+    await actor("apoio@ongsave.demo");
+    expect((await db.query("select id from public.financial_supports")).rows).toHaveLength(1);
+    await db.query(
+      "insert into public.financial_supports(organization_id,created_by,amount) values($1,$2,250)",
+      [id("grupo-horizonte"), id("profile:apoio@ongsave.demo")],
+    );
+    await expect(
+      db.query(
+        "insert into public.financial_supports(organization_id,created_by,amount) values($1,$2,250)",
+        [id("mercado-paulista"), id("profile:apoio@ongsave.demo")],
+      ),
+    ).rejects.toThrow(/row-level security/);
+    const unauthorizedUpdate = await db.query(
+      "update public.financial_supports set status='RECEIVED' where organization_id=$1",
+      [id("grupo-horizonte")],
+    );
+    expect(unauthorizedUpdate.rowCount).toBe(0);
+    expect(
+      (
+        await db.query<{ status: string }>(
+          "select status from public.financial_supports where organization_id=$1",
+          [id("grupo-horizonte")],
+        )
+      ).rows.every((row) => row.status === "PLEDGED"),
+    ).toBe(true);
+  });
   it("conta de outro mercado não lê lotes do Mercado Paulista nem muda papéis", async () => {
     await actor("aurora@ongsave.demo");
     expect(
@@ -254,22 +281,37 @@ describe("Fluxo real nas funções PostgreSQL e RLS", () => {
   });
   it("administrador lê a rede completa sem permitir promoção de outros perfis", async () => {
     await db.exec("reset role");
-    await db.query(
-      "insert into public.profiles(auth_user_id,name,email,role) values($1,'Admin ONGSave',$2,'ADMIN')",
-      [id("auth:admin@ongsave.com"), "admin@ongsave.com"],
-    );
     const expected = await db.query<{ count: number }>(
       "select count(*)::int as count from public.rescues",
     );
     await actor("admin@ongsave.com");
-    expect((await db.query("select id from public.organizations")).rows).toHaveLength(8);
+    expect((await db.query("select id from public.organizations")).rows).toHaveLength(9);
     expect((await db.query("select id from public.supermarket_contracts")).rows).toHaveLength(4);
-    expect((await db.query("select id from public.supermarket_contract_installments")).rows).toHaveLength(0);
+    const contractPlans = await db.query<{ plan_tier: string; monthly_amount: string }>(
+      "select plan_tier, monthly_amount::text from public.supermarket_contracts",
+    );
+    expect(new Set(contractPlans.rows.map((contract) => contract.plan_tier))).toEqual(
+      new Set(["SMALL", "MEDIUM", "LARGE"]),
+    );
+    expect(
+      contractPlans.rows.every((contract) =>
+        ({ SMALL: "299.00", MEDIUM: "499.00", LARGE: "999.00" })[
+          contract.plan_tier as "SMALL" | "MEDIUM" | "LARGE"
+        ] === contract.monthly_amount,
+      ),
+    ).toBe(true);
+    expect(
+      (await db.query("select id from public.supermarket_contract_installments")).rows,
+    ).toHaveLength(0);
     await db.query(
       "insert into public.supermarket_contract_installments(contract_id,period,amount,due_on,status,paid_at) select id,'2026-10-01',499,'2026-10-05','PAID',now() from public.supermarket_contracts limit 1",
     );
     expect(
-      (await db.query("select id from public.supermarket_contract_installments where status='PAID'")).rows,
+      (
+        await db.query(
+          "select id from public.supermarket_contract_installments where status='PAID'",
+        )
+      ).rows,
     ).toHaveLength(1);
     expect((await db.query("select id from public.rescues")).rows).toHaveLength(
       expected.rows[0].count,
@@ -277,9 +319,14 @@ describe("Fluxo real nas funções PostgreSQL e RLS", () => {
     expect((await db.query("select id from public.impact_metrics")).rows).toHaveLength(16);
     await actor("ong@ongsave.demo");
     expect((await db.query("select id from public.supermarket_contracts")).rows).toHaveLength(0);
-    expect((await db.query("select id from public.supermarket_contract_installments")).rows).toHaveLength(0);
+    expect(
+      (await db.query("select id from public.supermarket_contract_installments")).rows,
+    ).toHaveLength(0);
     await expect(
-      db.query("insert into public.supermarket_contracts(organization_id,monthly_amount) values($1,499)", [id("mercado-paulista")]),
+      db.query(
+        "insert into public.supermarket_contracts(organization_id,monthly_amount) values($1,499)",
+        [id("mercado-paulista")],
+      ),
     ).rejects.toThrow(/permission denied|row-level security/);
     expect(
       (await db.query("select id from public.profiles where email='admin@ongsave.com'")).rows,

@@ -14,7 +14,7 @@ export async function seed() {
       .upsert(rows, { onConflict: table === "ngo_preferences" ? "organization_id" : "id" });
     if (error) throw new Error(`${table}: ${error.message}`);
   }
-  console.log("Seed aplicado: 8 organizações, 3 motoristas, 16 entregas, 4 doações e 3 missões.");
+  console.log("Seed aplicado: 9 organizações, 3 motoristas, 16 entregas, 4 doações e 3 missões.");
 }
 if (process.argv[1]?.endsWith("seed.ts"))
   seed().catch((e) => {
